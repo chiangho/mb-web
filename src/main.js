@@ -10,19 +10,29 @@ import Register from "./view/Register.vue";
 
 Vue.config.productionTip = false;
 
+const userCacheKey = "UserInfo";
+
 
 Vue.use(VueRouter)
 Vue.use(Vuex);
 Vue.use(Antd);
 
+/**
+ * 1、 判断是否登陆，userInfo token 是否存在
+ */ 
+
 const store = new Vuex.Store({
   state: {
-    userName: "",
+    /***
+     * userInfo：{token:"",userName:"",email:""}
+     */
+    userInfo: JSON.parse(localStorage.getItem(userCacheKey)),
     isLogin:false,
   },
   mutations: {
-    setUserName (state,userName) {
-      state.userName=userName;
+    setUserName (state,userInfo) {
+      state.userInfo=userInfo;
+      localStorage.setItem(userCacheKey, JSON.stringify(userInfo));
     },
     setLoginState(state,loginState){
       state.isLogin = loginState
