@@ -27,6 +27,7 @@ const store = new Vuex.Store({
      * userInfo：{token:"",userName:"",email:""}
      */
     userInfo: JSON.parse(localStorage.getItem(userCacheKey)),
+    roles:[],
     isLogin:false,
   },
   mutations: {
@@ -42,13 +43,26 @@ const store = new Vuex.Store({
 
 const router = new VueRouter({
   routes: [
-    { path: '/', component: Home },
+    { path: '/', component: Home},
     { path: '/home', component: Home },
     { path: '/login', component: Login },
-    { path: '/register', component: Register }
+    { path: '/register', component: Register},
+    { path: '/404', component: 404}
   ],
 })
 
+
+router.beforeEach((to,from,next)=>{
+  if(to.meta&&to.meta.auth&&to.meta.auth==true){
+    if(store.state.userInfo&&store.state.userInfo.token){
+       next();
+    }else{
+      next({path:'/login'});
+    }
+  }else{
+    next();
+  }
+});
 
 
 new Vue({

@@ -3,14 +3,14 @@
     <a-layout>
       <a-layout-header>
         <a-row >
-          <a-col :span="4" >
-            <div class="item logo">XXXXXXX</div>
+          <a-col :span="4">
+            <div class="item logo">遇见书</div>
           </a-col>
           <a-col :span="16">
-            <a-menu v-model="current" mode="horizontal">
+            <a-menu  mode="horizontal">
               <a-menu-item key="mail">
                 <!-- <a-icon type="mail"/> -->
-                <router-link to="/home">Home</router-link>
+                <router-link to="/home">首页</router-link>
               </a-menu-item>
               <!-- <a-menu-item key="app">
                 <a-icon type="appstore"/>Navigation Two
@@ -30,17 +30,14 @@
     </a-layout>
   </div>
 </template>
-
 <script>
-
-
 export default {
-  name: "app",
-  components: {
-    // HelloWorld
+  methods:{
+
   }
-};
+}
 </script>
+
 <style>
 #app{
   font-size: 14px
@@ -57,6 +54,7 @@ export default {
 .ant-layout-header .logo {
   font-size: 24px;
   text-align: left;
+  
 }
 .ant-layout-header .right {
   text-align: right;
