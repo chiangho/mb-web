@@ -1,5 +1,8 @@
 <template>
   <div>
-    主页
+      内容
   </div>
 </template>
+<style scoped>
+
+</style>

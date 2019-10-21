@@ -1,22 +1,38 @@
 <template>
   <div id="app">
-    <p>
-      <!-- 使用 router-link 组件来导航. -->
-      <!-- 通过传入 `to` 属性指定链接. -->
-      <!-- <router-link> 默认会被渲染成一个 `<a>` 标签 -->
-      <router-link to="/login">Go to login</router-link>
-      <br>
-      <router-link to="/register">Go to rigister</router-link>
-    </p>
-    <!-- 路由出口 -->
-    <!-- 路由匹配到的组件将渲染在这里 -->
-    <router-view></router-view>
-    <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
+    <a-layout>
+      <a-layout-header>
+        <a-row >
+          <a-col :span="4" >
+            <div class="item logo">XXXXXXX</div>
+          </a-col>
+          <a-col :span="16">
+            <a-menu v-model="current" mode="horizontal">
+              <a-menu-item key="mail">
+                <!-- <a-icon type="mail"/> -->
+                <router-link to="/home">Home</router-link>
+              </a-menu-item>
+              <!-- <a-menu-item key="app">
+                <a-icon type="appstore"/>Navigation Two
+              </a-menu-item> -->
+            </a-menu>
+          </a-col>
+          <a-col :span="4">
+            <div class="item right">
+              <router-link to="/login">登录</router-link>
+            </div>
+          </a-col>
+        </a-row>
+      </a-layout-header>
+      <a-layout-content>
+          <router-view></router-view>
+      </a-layout-content>
+    </a-layout>
   </div>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
+
 
 export default {
   name: "app",
@@ -25,14 +41,45 @@ export default {
   }
 };
 </script>
-
 <style>
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+#app{
+  font-size: 14px
+}
+.ant-layout-header {
+  color: white;
+  padding: 0 20px !important;
+}
+.ant-layout-header .item {
+  height: 64px;
+  height: 64px;
+  line-height: 64px;
+}
+.ant-layout-header .logo {
+  font-size: 24px;
+  text-align: left;
+}
+.ant-layout-header .right {
+  text-align: right;
+}
+.ant-layout-header .ant-menu {
+  height: 65px;
+  line-height: 65px;
+  background: #001529;
+  color: white;
+}
+a{
+  color: white !important;
+  text-decoration:underline
+}
+a:hover{
+  color: #1890ff !important
+}
+a:link{
+  color: #1890ff !important
+}
+a:active{
+  color: #1890ff !important
 }
 </style>
+
+
