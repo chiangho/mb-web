@@ -7,10 +7,11 @@ import 'ant-design-vue/dist/antd.css';
 import Home from "./view/Home.vue"
 import Login from "./view/Login.vue";
 import Register from "./view/Register.vue";
+import ForgetPassword from "./view/ForgetPassword.vue";
+import Common from "./Common.js"
 
 Vue.config.productionTip = false;
 
-const userCacheKey = "UserInfo";
 
 
 Vue.use(VueRouter)
@@ -24,19 +25,18 @@ Vue.use(Antd);
 const store = new Vuex.Store({
   state: {
     /***
-     * userInfo：{token:"",userName:"",email:""}
+     * userInfo：{userName:"",email:""}
      */
-    userInfo: JSON.parse(localStorage.getItem(userCacheKey)),
-    roles:[],
-    isLogin:false,
+    userInfo: JSON.parse(localStorage.getItem(Common.Config.userInfoCacheKey)),
+    userToken:localStorage.getItem(Common.Config.userTokenCacheKey)
   },
   mutations: {
-    setUserName (state,userInfo) {
+    setUserInfo (state,userInfo) {
       state.userInfo=userInfo;
-      localStorage.setItem(userCacheKey, JSON.stringify(userInfo));
+      localStorage.setItem(Common.Config.userInfoCacheKey, JSON.stringify(userInfo));
     },
-    setLoginState(state,loginState){
-      state.isLogin = loginState
+    setUserToken(state,token){
+      state.token = token;
     }
   }
 })
@@ -47,14 +47,15 @@ const router = new VueRouter({
     { path: '/home', component: Home },
     { path: '/login', component: Login },
     { path: '/register', component: Register},
+    { path: '/forget-password', component: ForgetPassword},
     { path: '/404', component: 404}
   ],
 })
 
-
+//如果token不存在则调整到登录页面
 router.beforeEach((to,from,next)=>{
   if(to.meta&&to.meta.auth&&to.meta.auth==true){
-    if(store.state.userInfo&&store.state.userInfo.token){
+    if(store.state.userToken){
        next();
     }else{
       next({path:'/login'});

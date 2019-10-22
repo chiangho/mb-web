@@ -2,45 +2,48 @@
   <div id="app">
     <a-layout>
       <a-layout-header>
-        <a-row >
+        <a-row>
           <a-col :span="4">
             <div class="item logo">遇见书</div>
           </a-col>
           <a-col :span="16">
-            <a-menu  mode="horizontal">
+            <a-menu mode="horizontal">
               <a-menu-item key="mail">
                 <!-- <a-icon type="mail"/> -->
                 <router-link to="/home">首页</router-link>
               </a-menu-item>
               <!-- <a-menu-item key="app">
                 <a-icon type="appstore"/>Navigation Two
-              </a-menu-item> -->
+              </a-menu-item>-->
             </a-menu>
           </a-col>
           <a-col :span="4">
             <div class="item right">
-              <router-link to="/login">登录</router-link>
+              <a-button @click="to_login_page()">登录</a-button>
             </div>
           </a-col>
         </a-row>
       </a-layout-header>
       <a-layout-content>
-          <router-view></router-view>
+        <router-view></router-view>
       </a-layout-content>
     </a-layout>
   </div>
 </template>
 <script>
-export default {
-  methods:{
 
+export default {
+  methods: {
+    to_login_page(){
+      this.$router.push('login')
+    }
   }
-}
+};
 </script>
 
 <style>
-#app{
-  font-size: 14px
+#app {
+  font-size: 14px;
 }
 .ant-layout-header {
   color: white;
@@ -54,7 +57,6 @@ export default {
 .ant-layout-header .logo {
   font-size: 24px;
   text-align: left;
-  
 }
 .ant-layout-header .right {
   text-align: right;
@@ -65,18 +67,18 @@ export default {
   background: #001529;
   color: white;
 }
-a{
+.ant-layout-header a {
   color: white !important;
-  text-decoration:underline
+  text-decoration: underline;
 }
-a:hover{
-  color: #1890ff !important
+.ant-layout-header a:hover {
+  color: #1890ff !important;
 }
-a:link{
-  color: #1890ff !important
+.ant-layout-header a:link {
+  color: #1890ff !important;
 }
-a:active{
-  color: #1890ff !important
+.ant-layout-header a:active {
+  color: #1890ff !important;
 }
 </style>
 
