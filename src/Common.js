@@ -1,7 +1,7 @@
-var Config={
-    userInfoCacheKey:"UserInfo",
-    userTokenCacheKey:"UserToken",
-    host:"http://49.234.70.238:9001"
+var Config = {
+    userInfoCacheKey: "UserInfo",
+    userTokenCacheKey: "UserToken",
+    host: "http://127.0.0.1:9001"
 }
 
 export default {
