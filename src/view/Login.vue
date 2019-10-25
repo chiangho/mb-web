@@ -1,72 +1,89 @@
 <template>
-  <a-form
-    id="components-form-demo-normal-login"
-    :form="form" 
-    class="login-form"
-    @submit="handleSubmit"
-  >
-    <a-form-item :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol" label="邮箱">
-      <a-input
-        v-decorator="[
+  <div>
+    
+
+    <a-form
+      id="components-form-demo-normal-login"
+      :form="form"
+      class="login-form"
+      @submit="handleSubmit"
+    >
+      <a-form-item  
+       :label-col="formTailLayout.labelCol" :wrapper-col="formTailLayout.wrapperCol">
+
+        <a-alert type="error" message="Error text" banner />
+
+      </a-form-item>
+      
+      <a-form-item
+        :label-col="formItemLayout.labelCol"
+        :wrapper-col="formItemLayout.wrapperCol"
+        label="邮箱"
+      >
+        <a-input
+          v-decorator="[
           'account',
           { rules: [{ required: true, message: '请输入邮箱!' }] },
         ]"
-        placeholder="邮箱"
+          placeholder="邮箱"
+        >
+          <!-- <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" /> -->
+        </a-input>
+      </a-form-item>
+      <a-form-item
+        :label-col="formItemLayout.labelCol"
+        :wrapper-col="formItemLayout.wrapperCol"
+        label="密码"
       >
-      <!-- <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" /> -->
-      </a-input>
-    </a-form-item>
-    <a-form-item :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol" label="密码">
-      <a-input
-        v-decorator="[
+        <a-input
+          v-decorator="[
           'password',
           { rules: [{ required: true, message: '请输入密码!' }] },
         ]"
-        type="password"
-        placeholder="密码"
-      >
-      <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
-      </a-input>
-    </a-form-item>
-    <a-form-item :label-col="formTailLayout.labelCol" :wrapper-col="formTailLayout.wrapperCol">
-      <a-checkbox
-        v-decorator="[
+          type="password"
+          placeholder="密码"
+        >
+          <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
+        </a-input>
+      </a-form-item>
+      <a-form-item :label-col="formTailLayout.labelCol" :wrapper-col="formTailLayout.wrapperCol">
+        <a-checkbox
+          v-decorator="[
           'remember',
           {
             valuePropName: 'checked',
             initialValue: true,
           },
         ]"
-      >记住账号</a-checkbox>
-   
-      <a class="login-form-button" @click="to_forgot_password">忘记密码</a>
-      <a-button type="primary" html-type="submit" class="login-form-button">登录</a-button>Or
-      <a style="color:#000" @click="to_register">没有账号，赶紧注册吧!</a>
-    </a-form-item>
-  </a-form>
+        >记住账号</a-checkbox>
+
+        <a class="login-form-button" @click="to_forgot_password">忘记密码</a>
+        <a-button type="primary" html-type="submit" class="login-form-button">登录</a-button>Or
+        <a style="color:#000" @click="to_register">没有账号，赶紧注册吧!</a>
+      </a-form-item>
+    </a-form>
+  </div>
 </template>
 
 <script>
-
-
-import Http from "../Https.js"
+import Http from "../Https.js";
 
 const formItemLayout = {
   labelCol: { span: 4 },
-  wrapperCol: { span: 8 },
+  wrapperCol: { span: 8 }
 };
 
 const formTailLayout = {
   labelCol: { span: 4 },
-  wrapperCol: { span: 8, offset: 4 },
+  wrapperCol: { span: 8, offset: 4 }
 };
 
 export default {
-  data(){
-    return{
+  data() {
+    return {
       formItemLayout,
-      formTailLayout,
-    }
+      formTailLayout
+    };
   },
   beforeCreate() {
     this.form = this.$form.createForm(this, { name: "normal_login" });
@@ -74,25 +91,25 @@ export default {
   methods: {
     handleSubmit(e) {
       e.preventDefault();
-      this.form.validateFields((err,values) => {
+      this.form.validateFields((err, values) => {
         if (!err) {
           //调用登录接口
-           alert(JSON.stringify(values));
-           Http.fetchPost("login",values).then((data)=>{
-             window.console.log(data);
-           }).catch((err)=>{
-             window.console.log(err);
-           });
+          Http.fetchPost("login", values)
+            .then(data => {
+              alert(JSON.stringify(data));
+            })
+            .catch(err => {
+              window.console.log(err);
+            });
         }
       });
     },
-    to_forgot_password(){
-      this.$router.push('forget-password')  
+    to_forgot_password() {
+      this.$router.push("forget-password");
     },
-    to_register(){
-      this.$router.push('register')
+    to_register() {
+      this.$router.push("register");
     }
-
   }
 };
 </script>
