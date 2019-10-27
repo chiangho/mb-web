@@ -22,25 +22,7 @@ Vue.use(Antd);
  * 1、 判断是否登陆，userInfo token 是否存在
  */ 
 
-const store = new Vuex.Store({
-  state: {
-    /***
-     * userInfo：{name:"",email:"",icon:""}
-     */
-    userInfo: JSON.parse(localStorage.getItem(Common.Config.userInfoCacheKey)),
-    userToken:localStorage.getItem(Common.Config.userTokenCacheKey)
-  },
-  mutations: {
-    setUserInfo (state,userInfo) {
-      state.userInfo=userInfo;
-      localStorage.setItem(Common.Config.userInfoCacheKey, JSON.stringify(userInfo));
-    },
-    setUserToken(state,token){
-      state.userToken = token;
-      localStorage.setItem(Common.Config.userTokenCacheKey, token);
-    }
-  }
-})
+const store = new Vuex.Store(Common.store)
 
 const router = new VueRouter({
   routes: [
@@ -56,7 +38,7 @@ const router = new VueRouter({
 //如果token不存在则调整到登录页面
 router.beforeEach((to,from,next)=>{
   if(to.meta&&to.meta.auth&&to.meta.auth==true){
-    if(store.state.userToken){
+    if(Common.store.state.userToken){
        next();
     }else{
       next({path:'/login'});

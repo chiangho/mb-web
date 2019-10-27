@@ -105,7 +105,7 @@ export default {
               if(response.data&&response.data.status==200){
                 this.$store.commit("setUserToken",response.data.data.token);
                 this.$store.commit("setUserInfo",response.data.data.member);
-                alert(JSON.stringify(this.$store.state.userInfo));
+                this.$router.push('home');
               }else{
                 this.alertVisible = true;
                 this.alertMessage=response.data.error.message;
