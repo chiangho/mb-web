@@ -25,7 +25,7 @@ Vue.use(Antd);
 const store = new Vuex.Store({
   state: {
     /***
-     * userInfo：{userName:"",email:""}
+     * userInfo：{name:"",email:"",icon:""}
      */
     userInfo: JSON.parse(localStorage.getItem(Common.Config.userInfoCacheKey)),
     userToken:localStorage.getItem(Common.Config.userTokenCacheKey)
@@ -36,7 +36,8 @@ const store = new Vuex.Store({
       localStorage.setItem(Common.Config.userInfoCacheKey, JSON.stringify(userInfo));
     },
     setUserToken(state,token){
-      state.token = token;
+      state.userToken = token;
+      localStorage.setItem(Common.Config.userTokenCacheKey, token);
     }
   }
 })

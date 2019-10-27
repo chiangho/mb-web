@@ -11,7 +11,9 @@
       <a-form-item  
        :label-col="formTailLayout.labelCol" :wrapper-col="formTailLayout.wrapperCol">
 
-        <a-alert type="error" message="Error text" banner />
+        <a-alert v-if="alertVisible" type="error" :message="alertMessage"
+         closable
+         :afterClose="handleCloseAlert" />
 
       </a-form-item>
       
@@ -82,7 +84,9 @@ export default {
   data() {
     return {
       formItemLayout,
-      formTailLayout
+      formTailLayout,
+      alertVisible: false,
+      alertMessage:""
     };
   },
   beforeCreate() {
@@ -90,16 +94,26 @@ export default {
   },
   methods: {
     handleSubmit(e) {
+      this.alertVisible = false;
+      this.alertMessage="";
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
           //调用登录接口
           Http.fetchPost("login", values)
-            .then(data => {
-              alert(JSON.stringify(data));
+            .then(response => {
+              if(response.data&&response.data.status==200){
+                this.$store.commit("setUserToken",response.data.data.token);
+                this.$store.commit("setUserInfo",response.data.data.member);
+                alert(JSON.stringify(this.$store.state.userInfo));
+              }else{
+                this.alertVisible = true;
+                this.alertMessage=response.data.error.message;
+              }
             })
             .catch(err => {
-              window.console.log(err);
+              this.alertVisible = true;
+              this.alertMessage=JSON.stringify(err);
             });
         }
       });
@@ -109,6 +123,9 @@ export default {
     },
     to_register() {
       this.$router.push("register");
+    },
+    handleCloseAlert(){
+      this.visible = false;
     }
   }
 };
