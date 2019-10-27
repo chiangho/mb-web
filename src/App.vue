@@ -19,7 +19,11 @@
           </a-col>
           <a-col :span="4">
             <div class="item right">
-              <a-button @click="to_login_page()">登录</a-button>
+              <div v-if="$store.getters.isLogin">
+                {{$store.state.userInfo.name}}
+                <a-button @click="log_out()">退出</a-button>
+              </div>
+              <a-button v-else @click="to_login_page()">登录</a-button>
             </div>
           </a-col>
         </a-row>
@@ -31,11 +35,27 @@
   </div>
 </template>
 <script>
-
+import Http from "./Https.js";
 export default {
   methods: {
-    to_login_page(){
-      this.$router.push('login')
+    to_login_page() {
+      this.$router.push("login");
+    },
+    log_out() {
+      Http.fetchGet("log-out")
+        .then(response => {
+
+            this.$store.commit("setUserToken", "");
+            this.$store.commit("setUserInfo", null);
+           
+
+            window.console.log(response.data);
+        })
+        .catch(err => {
+          window.console.log(err);
+        });
+
+     
     }
   }
 };

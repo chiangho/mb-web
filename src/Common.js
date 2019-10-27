@@ -3,7 +3,9 @@
 var Config = {
     userInfoCacheKey: "UserInfo",
     userTokenCacheKey: "UserToken",
-    host: "http://127.0.0.1:9001"
+    host: "http://127.0.0.1:9001",
+    unauthorized:"unauthorized",
+    unauthorization:"unauthorization"
 }
 
 //全局状态信息
@@ -27,7 +29,7 @@ const store = {
     },
     getters: {
         isLogin: state => {
-            if (state.userToken) {
+            if (state.userToken&&state.userToken!="") {
                 return true;
             }
             return false;

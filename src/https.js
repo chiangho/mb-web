@@ -12,6 +12,8 @@ axios.interceptors.request.use((config) => {
     if (config.method === 'post') {
         config.data = qs.stringify(config.data);
     }
+    const token  =  Common.store.state.userToken;
+    config.headers.Authorization = token;
     return config;
 }, (error) => {
     window.console.log('错误的传参')
