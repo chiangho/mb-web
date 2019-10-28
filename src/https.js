@@ -23,10 +23,17 @@ axios.interceptors.request.use((config) => {
 //返回状态判断(添加响应拦截器)
 axios.interceptors.response.use((res) => {
     //对响应数据做些事
-    if (!res.data.success) {
-        return Promise.resolve(res);
-    }
-    return res;
+    if (res.status === 200) { 
+        let status = res.data.status;
+        if(status==Common.Config.unauthorization||status==Common.Config.unauthorized){
+            window.console.log("未认证，请先登录！");
+            Common.router.push("login");
+        }else{
+            return Promise.resolve(res);
+        }
+    } else {            
+        return Promise.reject(res);        
+    }    
 }, (error) => {
     window.console.log('网络异常')
     return Promise.reject(error);
@@ -36,11 +43,14 @@ axios.interceptors.response.use((res) => {
 export function fetchPost(url, params) {
     return new Promise((resolve, reject) => {
         axios.post(url, params)
-            .then(response => {
-                resolve(response);
-            }, err => {
-                reject(err);
-            })
+            .then(
+                (response) => {
+                    resolve(response);
+                }, 
+                (err) => {
+                    reject(err);
+                }            
+            )
             .catch((error) => {
                 reject(error)
             })

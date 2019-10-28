@@ -4,10 +4,7 @@ import Vuex from "vuex";
 import Antd from 'ant-design-vue'
 import App from './App.vue'
 import 'ant-design-vue/dist/antd.css';
-import Home from "./view/Home.vue"
-import Login from "./view/Login.vue";
-import Register from "./view/Register.vue";
-import ForgetPassword from "./view/ForgetPassword.vue";
+
 import Common from "./Common.js"
 
 Vue.config.productionTip = false;
@@ -24,19 +21,10 @@ Vue.use(Antd);
 
 const store = new Vuex.Store(Common.store)
 
-const router = new VueRouter({
-  routes: [
-    { path: '/', component: Home},
-    { path: '/home', component: Home },
-    { path: '/login', component: Login },
-    { path: '/register', component: Register},
-    { path: '/forget-password', component: ForgetPassword},
-    { path: '/404', component: 404}
-  ],
-})
+
 
 //如果token不存在则调整到登录页面
-router.beforeEach((to,from,next)=>{
+Common.router.beforeEach((to,from,next)=>{
   if(to.meta&&to.meta.auth&&to.meta.auth==true){
     if(Common.store.state.userToken){
        next();
@@ -50,7 +38,7 @@ router.beforeEach((to,from,next)=>{
 
 
 new Vue({
-  router,
+  router:Common.router,
   store,
   render: h => h(App),
 }).$mount('#app')

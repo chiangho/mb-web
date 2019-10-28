@@ -1,3 +1,8 @@
+import VueRouter from 'vue-router'
+import Home from "./view/Home.vue"
+import Login from "./view/Login.vue";
+import Register from "./view/Register.vue";
+import ForgetPassword from "./view/ForgetPassword.vue";
 
 //配置信息
 var Config = {
@@ -37,6 +42,20 @@ const store = {
     }
 };
 
+
+
+const router = new VueRouter({
+    routes: [
+      { path: '/', component: Home},
+      { path: '/home', component: Home },
+      { path: '/login', component: Login },
+      { path: '/register', component: Register},
+      { path: '/forget-password', component: ForgetPassword}
+     
+    ],
+  })
+  
+
 export default {
-    Config, store
+    Config, store,router
 }
