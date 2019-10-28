@@ -3,14 +3,15 @@ import Home from "./view/Home.vue"
 import Login from "./view/Login.vue";
 import Register from "./view/Register.vue";
 import ForgetPassword from "./view/ForgetPassword.vue";
+import RegisterXieyi from "./view/RegisterXieyi.vue";
 
 //配置信息
 var Config = {
     userInfoCacheKey: "UserInfo",
     userTokenCacheKey: "UserToken",
     host: "http://127.0.0.1:9001",
-    unauthorized:"unauthorized",
-    unauthorization:"unauthorization"
+    unauthorized: "unauthorized",
+    unauthorization: "unauthorization"
 }
 
 //全局状态信息
@@ -34,7 +35,7 @@ const store = {
     },
     getters: {
         isLogin: state => {
-            if (state.userToken&&state.userToken!="") {
+            if (state.userToken && state.userToken != "") {
                 return true;
             }
             return false;
@@ -46,16 +47,18 @@ const store = {
 //路由
 const router = new VueRouter({
     routes: [
-      { path: '/', component: Home},
-      { path: '/home', component: Home },
-      { path: '/login', component: Login },
-      { path: '/register', component: Register},
-      { path: '/forget-password', component: ForgetPassword}
-     
+        { path: '/', component: Home },
+        { path: '/home', component: Home },
+        { path: '/login', component: Login },
+        { path: '/register', component: Register },
+        { path: '/forget-password', component: ForgetPassword },
+        { path: '/register-xieyi', component: RegisterXieyi }
     ],
-  })
-  
+})
+
 
 export default {
-    Config, store,router
+    Config,
+    store,
+    router
 }

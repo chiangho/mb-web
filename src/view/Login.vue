@@ -113,7 +113,7 @@ export default {
             })
             .catch(err => {
               this.alertVisible = true;
-              this.alertMessage=JSON.stringify(err);
+              this.alertMessage=err.message;
             });
         }
       });
