@@ -43,7 +43,7 @@ const store = {
 };
 
 
-
+//路由
 const router = new VueRouter({
     routes: [
       { path: '/', component: Home},
