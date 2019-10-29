@@ -1,6 +1,16 @@
 <template>
   <div>
     <a-form :form="form" @submit="handleSubmit">
+      <a-form-item v-bind="tailFormItemAlertLayout">
+        <a-alert
+          v-if="alertVisible"
+          type="error"
+          :message="alertMessage"
+          closable
+          :afterClose="handleCloseAlert"
+        />
+      </a-form-item>
+
       <a-form-item v-bind="formItemLayout" label="邮箱">
         <a-input
           v-decorator="[
@@ -75,61 +85,56 @@
         ]"
         />
       </a-form-item>
-      <!-- <a-form-item
-      v-bind="formItemLayout"
-      label="Captcha"
-      extra="We must make sure that your are a human."
-    >
-      <a-row :gutter="8">
-        <a-col :span="12">
-          <a-input
-            v-decorator="[
+      <a-form-item v-bind="formItemLayout" label="验证码" extra="验证码将发送到你邮箱，有效时间30分钟">
+        <a-row :gutter="8">
+          <a-col :span="12">
+            <a-input
+              v-decorator="[
               'captcha',
-              { rules: [{ required: true, message: 'Please input the captcha you got!' }] },
+              { rules: [{ required: true, message: '请填写发送到你邮箱的验证码！' }] },
             ]"
-          />
-        </a-col>
-        <a-col :span="12">
-          <a-button>Get captcha</a-button>
-        </a-col>
-      </a-row>
-      </a-form-item>-->
-      <a-form-item v-bind="tailFormItemLayout">
-        <a-checkbox  v-decorator="['agreement', { valuePropName: 'checked' }]">
-          我已经阅读协议并同意协议内容
-        </a-checkbox> 
-        <a @click="showModal">《用户协议》</a>
+            />
+          </a-col>
+          <a-col :span="12">
+            <a-button @click="sentCaptchaToEmail">发送验证码</a-button>
+          </a-col>
+        </a-row>
       </a-form-item>
       <a-form-item v-bind="tailFormItemLayout">
-        <a-button type="primary" html-type="submit">Register</a-button>
+        <a-checkbox
+          v-decorator="['agreement', { valuePropName: 'checked' ,rules:[{ required: true, message: '同意用户协议才能注册!', }]}]"
+        >我已经阅读协议并同意协议内容</a-checkbox>
+        <a @click="showModal">《用户注册协议》</a>
+      </a-form-item>
+      <a-form-item v-bind="tailFormItemLayout">
+        <a-button type="primary" html-type="submit">注册账户</a-button>
       </a-form-item>
     </a-form>
 
     <a-modal
       title="用户注册协议"
       :visible="visible"
+      cancelText="不同意"
+      okText="同意"
       @ok="handleOk"
       :confirmLoading="confirmLoading"
       @cancel="handleCancel"
     >
-      <p>
-          用户协议
-      
-        <br/><br/><br/><br/><br/><br/><br/><br/>
-        <br/><br/><br/><br/><br/><br/><br/><br/>
-        asdfsadfsad
-      </p>
+      <p>hello 这里是用户协议</p>
     </a-modal>
   </div>
 </template>
 
 <script>
+import Http from "../Https.js";
 export default {
   data() {
     return {
       confirmDirty: false,
       visible: false,
-     
+      confirmLoading: false,
+      alertVisible:false,
+      alertMessage:"",
       formItemLayout: {
         labelCol: {
           xs: { span: 16 },
@@ -151,6 +156,18 @@ export default {
             offset: 8
           }
         }
+      },
+      tailFormItemAlertLayout: {
+        wrapperCol: {
+          xs: {
+            span: 8,
+            offset: 0
+          },
+          sm: {
+            span: 8,
+            offset: 8
+          }
+        }
       }
     };
   },
@@ -162,22 +179,26 @@ export default {
       this.visible = true;
     },
     handleOk() {
-      this.confirmLoading = true;
-      setTimeout(() => {
-        this.visible = false;
-        this.confirmLoading = false;
-        this.$form.setFieldsValue({'agreement':true});
-      }, 500);
+      this.visible = false;
+      this.confirmLoading = false;
+      this.form.setFieldsValue({ agreement: true });
     },
     handleCancel() {
       this.visible = false;
-      this.$form.setFieldsValue({'agreement':false});
+      this.form.setFieldsValue({ agreement: false });
     },
     handleSubmit(e) {
       e.preventDefault();
       this.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
-          window.console.log("Received values of form: ", values);
+          Http.fetchPost("register", values)
+            .then(response => {
+              alert(JSON.stirngify(response));
+            })
+            .catch(err => {
+              this.alertVisible = true;
+              this.alertMessage =JSON.stringify(err);
+            });
         }
       });
     },
@@ -188,7 +209,7 @@ export default {
     compareToFirstPassword(rule, value, callback) {
       const form = this.form;
       if (value && value !== form.getFieldValue("password")) {
-        callback("Two passwords that you enter is inconsistent!");
+        callback("两次输入的密码不一致!");
       } else {
         callback();
       }
@@ -199,6 +220,32 @@ export default {
         form.validateFields(["confirm"], { force: true });
       }
       callback();
+    },
+    sentCaptchaToEmail() {
+      this.alertVisible = false;
+      this.alertMessage="";
+      let email = this.form.getFieldValue("email");
+      if(email){
+          const params = {
+            "email":email
+          }
+          alert(JSON.stringify(params));
+          Http.fetchPost("sent-register-code", params)
+            .then(response => {
+              alert(JSON.stirngify(response.data));
+            })
+            .catch(err => {
+              this.alertVisible = true;
+              this.alertMessage =JSON.stringify(err);
+            });
+      }else{
+        this.alertVisible = true;
+        this.alertMessage ="请填写注册邮箱";
+      }
+    },
+    handleCloseAlert(){
+      this.alertVisible = false;
+      this.alertMessage="";
     }
   }
 };

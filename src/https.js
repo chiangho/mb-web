@@ -25,11 +25,16 @@ axios.interceptors.response.use((res) => {
     //对响应数据做些事
     if (res.status === 200) { 
         let status = res.data.status;
-        if(status==Common.Config.unauthorization||status==Common.Config.unauthorized){
-            window.console.log("未认证，请先登录！");
-            Common.router.push("login");
-        }else{
+        if(status === 200){
             return Promise.resolve(res);
+        }else{
+            let error  = res.data.error.code;
+            if(error==Common.Config.unauthorization||error==Common.Config.unauthorized){
+                window.console.log("未认证，请先登录！");
+                Common.router.push("login");
+            }else{
+                return Promise.reject(res);      
+            }
         }
     } else {            
         return Promise.reject(res);        
