@@ -102,13 +102,13 @@ export default {
           //调用登录接口
           Http.fetchPost("login", values)
             .then(response => {
-              if(response.data&&response.data.status==200){
-                this.$store.commit("setUserToken",response.data.data.token);
-                this.$store.commit("setUserInfo",response.data.data.member);
+              if(response.status==200){
+                this.$store.commit("setUserToken",response.data.token);
+                this.$store.commit("setUserInfo",response.data.member);
                 this.$router.push('home');
               }else{
                 this.alertVisible = true;
-                this.alertMessage=response.data.error.message;
+                this.alertMessage=response.error.message;
               }
             })
             .catch(err => {

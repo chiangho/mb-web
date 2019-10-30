@@ -6,7 +6,7 @@
           <a-col :span="4">
             <div class="item logo">遇见书</div>
           </a-col>
-          <a-col :span="16">
+          <a-col :span="10">
             <a-menu mode="horizontal">
               <a-menu-item key="mail">
                 <!-- <a-icon type="mail"/> -->
@@ -17,8 +17,8 @@
               </a-menu-item>-->
             </a-menu>
           </a-col>
-          <a-col :span="4">
-            <div class="item right">
+          <a-col :span="10" class="header-right">
+            <div class="item">
               <div v-if="$store.getters.isLogin">
                 {{$store.state.userInfo.name}}
                 <a-button @click="log_out()">退出</a-button>
@@ -78,9 +78,10 @@ export default {
   font-size: 24px;
   text-align: left;
 }
-.ant-layout-header .right {
-  text-align: right;
+.ant-layout-header .header-right{
+  text-align: right !important;
 }
+
 .ant-layout-header .ant-menu {
   height: 65px;
   line-height: 65px;

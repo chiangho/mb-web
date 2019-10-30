@@ -4,7 +4,7 @@
       <a-form-item v-bind="tailFormItemAlertLayout">
         <a-alert
           v-if="alertVisible"
-          type="error"
+          :type="alertType"
           :message="alertMessage"
           closable
           :afterClose="handleCloseAlert"
@@ -133,8 +133,9 @@ export default {
       confirmDirty: false,
       visible: false,
       confirmLoading: false,
-      alertVisible:false,
-      alertMessage:"",
+      alertVisible: false,
+      alertMessage: "",
+      alertType: "error",
       formItemLayout: {
         labelCol: {
           xs: { span: 16 },
@@ -188,16 +189,34 @@ export default {
       this.form.setFieldsValue({ agreement: false });
     },
     handleSubmit(e) {
+      this.alertVisible = false;
+      this.alertMessage = "";
+      this.alertType = "error";
+      let routerTemp = this.$router;
       e.preventDefault();
       this.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
           Http.fetchPost("register", values)
             .then(response => {
-              alert(JSON.stirngify(response));
+              if (response.status === 200) {
+                this.$success({
+                  content: (
+                    <div>
+                      <p>您已经成功注册账号，请去登录吧</p>
+                    </div>
+                  ),
+                  onOk() {
+                    routerTemp.push("login");
+                  },
+                });
+              } else {
+                this.alertVisible = true;
+                this.alertMessage = response.error.message;
+              }
             })
             .catch(err => {
               this.alertVisible = true;
-              this.alertMessage =JSON.stringify(err);
+              this.alertMessage = JSON.stringify(err);
             });
         }
       });
@@ -223,29 +242,37 @@ export default {
     },
     sentCaptchaToEmail() {
       this.alertVisible = false;
-      this.alertMessage="";
+      this.alertMessage = "";
+      this.alertType = "error";
       let email = this.form.getFieldValue("email");
-      if(email){
-          const params = {
-            "email":email
-          }
-          alert(JSON.stringify(params));
-          Http.fetchPost("sent-register-code", params)
-            .then(response => {
-              alert(JSON.stirngify(response.data));
-            })
-            .catch(err => {
+      if (email) {
+        const params = {
+          email: email
+        };
+
+        Http.fetchPost("sent-register-code", params)
+          .then(response => {
+            if (response.status === 200) {
+              this.alertType = "success";
               this.alertVisible = true;
-              this.alertMessage =JSON.stringify(err);
-            });
-      }else{
+              this.alertMessage = "验证码已经发送到你的邮箱，请查收";
+            } else {
+              this.alertVisible = true;
+              this.alertMessage = response.error.message;
+            }
+          })
+          .catch(err => {
+            this.alertVisible = true;
+            this.alertMessage = JSON.stringify(err);
+          });
+      } else {
         this.alertVisible = true;
-        this.alertMessage ="请填写注册邮箱";
+        this.alertMessage = "请填写注册邮箱";
       }
     },
-    handleCloseAlert(){
+    handleCloseAlert() {
       this.alertVisible = false;
-      this.alertMessage="";
+      this.alertMessage = "";
     }
   }
 };

@@ -26,14 +26,14 @@ axios.interceptors.response.use((res) => {
     if (res.status === 200) { 
         let status = res.data.status;
         if(status === 200){
-            return Promise.resolve(res);
+            return Promise.resolve(res.data);
         }else{
             let error  = res.data.error.code;
             if(error==Common.Config.unauthorization||error==Common.Config.unauthorized){
                 window.console.log("未认证，请先登录！");
                 Common.router.push("login");
             }else{
-                return Promise.reject(res);      
+                return Promise.resolve(res.data);      
             }
         }
     } else {            

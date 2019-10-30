@@ -3,7 +3,7 @@ import Home from "./view/Home.vue"
 import Login from "./view/Login.vue";
 import Register from "./view/Register.vue";
 import ForgetPassword from "./view/ForgetPassword.vue";
-import RegisterXieyi from "./view/RegisterXieyi.vue";
+
 
 //配置信息
 var Config = {
@@ -51,8 +51,8 @@ const router = new VueRouter({
         { path: '/home', component: Home },
         { path: '/login', component: Login },
         { path: '/register', component: Register },
-        { path: '/forget-password', component: ForgetPassword },
-        { path: '/register-xieyi', component: RegisterXieyi }
+        { path: '/forget-password', component: ForgetPassword }
+      
     ],
 })
 
