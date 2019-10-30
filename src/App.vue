@@ -3,21 +3,28 @@
     <a-layout>
       <a-layout-header>
         <a-row>
-          <a-col :span="4">
+          <a-col :span="3">
             <div class="item logo">遇见书</div>
           </a-col>
-          <a-col :span="10">
+          <a-col :span="13">
             <a-menu mode="horizontal">
-              <a-menu-item key="mail">
-                <!-- <a-icon type="mail"/> -->
-                <router-link to="/home">首页</router-link>
+              <a-menu-item key="app">
+                <a-icon type="appstore" @click="go_home_page" />
+                <span @click="go_home_page">首页</span>
               </a-menu-item>
-              <!-- <a-menu-item key="app">
-                <a-icon type="appstore"/>Navigation Two
+              <a-menu-item key="homan">
+                <a-icon type="smile" @click="go_my_page" />
+                <span @click="go_my_page" >个人中心</span>
+              </a-menu-item>
+
+              <!--               
+              <a-menu-item key="mail">-->
+              <!-- <a-icon type="mail"/> -->
+              <!--<router-link to="/home">首页</router-link>
               </a-menu-item>-->
             </a-menu>
           </a-col>
-          <a-col :span="10" class="header-right">
+          <a-col :span="8" class="header-right">
             <div class="item">
               <div v-if="$store.getters.isLogin">
                 {{$store.state.userInfo.name}}
@@ -44,18 +51,21 @@ export default {
     log_out() {
       Http.fetchGet("log-out")
         .then(response => {
-
-            this.$store.commit("setUserToken", "");
-            this.$store.commit("setUserInfo", null);
-           
-
-            window.console.log(response.data);
+          this.$store.commit("setUserToken", "");
+          this.$store.commit("setUserInfo", null);
+          window.console.log(response.data);
         })
         .catch(err => {
           window.console.log(err);
         });
-
-     
+    },
+    go_home_page(e) {
+      window.console.log(e);
+      this.$router.push("home");
+    },
+    go_my_page(e) {
+      window.console.log(e);
+      this.$router.push("my");
     }
   }
 };
@@ -78,7 +88,7 @@ export default {
   font-size: 24px;
   text-align: left;
 }
-.ant-layout-header .header-right{
+.ant-layout-header .header-right {
   text-align: right !important;
 }
 
