@@ -49,12 +49,12 @@ const store = {
 //路由
 const router = new VueRouter({
     routes: [
-        { path: '/', component: Home },
-        { path: '/home', component: Home },
-        { path: '/login', component: Login },
-        { path: '/register', component: Register },
-        { path: '/forget-password', component: ForgetPassword },
-        { path: '/my', component: My }
+        { path: '/', component: Home,meta:{"title":"遇见书"} },
+        { path: '/home', component: Home,meta:{"title":"遇见书"} },
+        { path: '/login', component: Login,meta:{"title":"登录"} },
+        { path: '/register', component: Register,meta:{"title":"注册"} },
+        { path: '/forget-password', component: ForgetPassword,meta:{"title":"忘记密码"} },
+        { path: '/my', component: My,meta:{"auth":true,"title":"个人中心"} }
     ],
 })
 

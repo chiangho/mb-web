@@ -56,6 +56,8 @@ export default {
           window.console.log(response.data);
         })
         .catch(err => {
+          this.$store.commit("setUserToken", "");
+          this.$store.commit("setUserInfo", null);
           window.console.log(err);
         });
     },

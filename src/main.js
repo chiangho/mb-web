@@ -25,6 +25,7 @@ const store = new Vuex.Store(Common.store)
 
 //如果token不存在则调整到登录页面
 Common.router.beforeEach((to,from,next)=>{
+  window.document.title = to.meta.title || '遇见书'
   if(to.meta&&to.meta.auth&&to.meta.auth==true){
     if(Common.store.state.userToken){
        next();
