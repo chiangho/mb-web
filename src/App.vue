@@ -16,7 +16,10 @@
                 <a-icon type="smile" @click="go_my_page" />
                 <span @click="go_my_page" >个人中心</span>
               </a-menu-item>
-
+              <a-menu-item key="homan">
+                <a-icon type="book" @click="go_publish_page" />
+                <span @click="go_publish_page" >发布图书</span>
+              </a-menu-item>
               <!--               
               <a-menu-item key="mail">-->
               <!-- <a-icon type="mail"/> -->
@@ -68,7 +71,11 @@ export default {
     go_my_page(e) {
       window.console.log(e);
       this.$router.push("my");
+    },
+    go_publish_page(){
+      this.$router.push("publish-book");
     }
+
   }
 };
 </script>
