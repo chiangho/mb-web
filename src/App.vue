@@ -9,22 +9,17 @@
           <a-col :span="13">
             <a-menu mode="horizontal">
               <a-menu-item key="app">
-                <a-icon type="appstore" @click="go_home_page" />
+                <a-icon type="appstore"/>
                 <span @click="go_home_page">首页</span>
               </a-menu-item>
               <a-menu-item key="homan">
-                <a-icon type="smile" @click="go_my_page" />
+                <a-icon type="smile"/>
                 <span @click="go_my_page" >个人中心</span>
               </a-menu-item>
-              <a-menu-item key="homan">
-                <a-icon type="book" @click="go_publish_page" />
-                <span @click="go_publish_page" >发布图书</span>
+              <a-menu-item key="publicBook">
+                <a-icon type="book"/>
+                <span @click="go_publish_page">发布图书</span>
               </a-menu-item>
-              <!--               
-              <a-menu-item key="mail">-->
-              <!-- <a-icon type="mail"/> -->
-              <!--<router-link to="/home">首页</router-link>
-              </a-menu-item>-->
             </a-menu>
           </a-col>
           <a-col :span="8" class="header-right">
@@ -64,16 +59,16 @@ export default {
           window.console.log(err);
         });
     },
-    go_home_page(e) {
-      window.console.log(e);
+    go_home_page() {
       this.$router.push("home");
     },
-    go_my_page(e) {
-      window.console.log(e);
+    go_my_page() {
       this.$router.push("my");
     },
     go_publish_page(){
-      this.$router.push("publish-book");
+      this.$router.push("publish-book").catch(err=>{
+        window.console.log(err);
+      });
     }
 
   }

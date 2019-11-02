@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from "./view/Home.vue"
 import Login from "./view/Login.vue";
@@ -5,8 +6,7 @@ import Register from "./view/Register.vue";
 import ForgetPassword from "./view/ForgetPassword.vue";
 import My from "./view/My.vue";
 import PublishBook from "./view/PublishBook.vue";
-
-
+import Vuex from "vuex";
 
 //配置信息
 var Config = {
@@ -18,7 +18,7 @@ var Config = {
 }
 
 //全局状态信息
-const store = {
+const storeInfo = {
     state: {
         /***
          * userInfo：{name:"",email:"",icon:""}
@@ -38,7 +38,7 @@ const store = {
     },
     getters: {
         isLogin: state => {
-            if (state.userToken && state.userToken != "") {
+            if (state && state.userToken && state.userToken != "") {
                 return true;
             }
             return false;
@@ -46,17 +46,19 @@ const store = {
     }
 };
 
+Vue.use(Vuex);
+const store = new Vuex.Store(storeInfo)
 
 //路由
 const router = new VueRouter({
     routes: [
-        { path: '/', component: Home,meta:{"title":"遇见书"} },
-        { path: '/home', component: Home,meta:{"title":"遇见书"} },
-        { path: '/login', component: Login,meta:{"title":"登录"} },
-        { path: '/register', component: Register,meta:{"title":"注册"} },
-        { path: '/forget-password', component: ForgetPassword,meta:{"title":"忘记密码"} },
-        { path: '/my', component: My,meta:{"auth":true,"title":"个人中心"} },
-        { path: '/publish-book',component:PublishBook,meta:{"auth":false,"title":"发布图书"}}
+        { path: '/', component: Home, meta: { "title": "遇见书" } },
+        { path: '/home', component: Home, meta: { "title": "遇见书" } },
+        { path: '/login', component: Login, meta: { "title": "登录" } },
+        { path: '/register', component: Register, meta: { "title": "注册" } },
+        { path: '/forget-password', component: ForgetPassword, meta: { "title": "忘记密码" } },
+        { path: '/my', component: My, meta: { "auth": true, "title": "个人中心" } },
+        { path: '/publish-book', component: PublishBook, meta: { "auth": true, "title": "发布图书" } }
     ],
 })
 

@@ -12,7 +12,13 @@ axios.interceptors.request.use((config) => {
     if (config.method === 'post') {
         config.data = qs.stringify(config.data);
     }
-    const token  =  Common.store.state.userToken;
+    let token = "";
+    try {
+        token = Common.store.state.userToken;
+    } catch (e) {
+        token = ""
+    }
+
     config.headers.Authorization = token;
     return config;
 }, (error) => {
@@ -23,22 +29,25 @@ axios.interceptors.request.use((config) => {
 //返回状态判断(添加响应拦截器)
 axios.interceptors.response.use((res) => {
     //对响应数据做些事
-    if (res.status === 200) { 
+    if (res.status === 200) {
         let status = res.data.status;
-        if(status === 200){
+        if (status === 200) {
             return Promise.resolve(res.data);
-        }else{
-            let error  = res.data.error.code;
-            if(error==Common.Config.unauthorization||error==Common.Config.unauthorized){
+        } else {
+            let error = res.data.error.code;
+            if (error == Common.Config.unauthorization || error == Common.Config.unauthorized) {
                 window.console.log("未认证，请先登录！");
+                //清楚登录信息
+                Common.store.commit("setUserToken", "");
+                Common.store.commit("setUserInfo", "");
                 Common.router.push("login");
-            }else{
-                return Promise.resolve(res.data);      
+            } else {
+                return Promise.resolve(res.data);
             }
         }
-    } else {            
-        return Promise.reject(res);        
-    }    
+    } else {
+        return Promise.reject(res);
+    }
 }, (error) => {
     window.console.log('网络异常')
     return Promise.reject(error);
@@ -51,10 +60,10 @@ export function fetchPost(url, params) {
             .then(
                 (response) => {
                     resolve(response);
-                }, 
+                },
                 (err) => {
                     reject(err);
-                }            
+                }
             )
             .catch((error) => {
                 reject(error)
