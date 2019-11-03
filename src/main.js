@@ -28,8 +28,7 @@ Common.router.beforeEach((to, from, next) => {
     window.document.title = to.meta.title || '遇见书'
     if (to.meta && to.meta.auth && to.meta.auth == true) {
         let isLoginState = Common.store.getters.isLogin;
-        window.console.log(isLoginState);
-        if (isLoginState == true) {
+        if (isLoginState) {
             next();
         } else {
             next({ path: '/login' });

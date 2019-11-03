@@ -60,13 +60,13 @@ export default {
         });
     },
     loadLinkData() {
-      
+       
     },
     addNewMemberAddress(){
         this.modelvisible = true;
     },
     handleOk(){
-
+        this.modelvisible = false;
     }
   }
 };
