@@ -1,20 +1,23 @@
 <template>
   <div>
-    <a-form id="addMemberAddressForm" :form="form">
+    <a-form id="addMemberAddressForm" :form="form" @submit="handleSubmitAddMemberAddess">
       <a-form-item label="省" :label-col="{span:4}" :wrapper-col="{span:16}">
-        <a-select @change="handleProvinceChange" placeholder="请选择省份"
-         v-decorator="[
+        <a-select
+          @change="handleProvinceChange"
+          placeholder="请选择省份"
+          v-decorator="[
           'province',
           { rules: [{ required: true, message: '请选择省份' }] },
         ]"
-        
         >
           <a-select-option v-for="province in provinceData" :key="province.id">{{province.name}}</a-select-option>
         </a-select>
       </a-form-item>
       <a-form-item label="市" :label-col="{span:4}" :wrapper-col="{span:16}">
-        <a-select @change="handleCityChange" placeholder="请选择地市"
-         v-decorator="[
+        <a-select
+          @change="handleCityChange"
+          placeholder="请选择地市"
+          v-decorator="[
           'city',
           { rules: [{ required: true, message: '请选择地市' }] },
         ]"
@@ -23,8 +26,9 @@
         </a-select>
       </a-form-item>
       <a-form-item label="区/县" :label-col="{span:4}" :wrapper-col="{span:16}">
-        <a-select @change="handleCountyChange" placeholder="请选择区县"
-        v-decorator="[
+        <a-select
+          placeholder="请选择区县"
+          v-decorator="[
           'county',
           { rules: [{ required: true, message: '请选择区县' }] },
         ]"
@@ -35,11 +39,15 @@
       <a-form-item label="详细地址" :label-col="{span:4}" :wrapper-col="{span:16}">
         <a-input
           v-decorator="[
-          'adress',
+          'address',
           { rules: [{ required: true, message: '请输入详细地址' }] },
         ]"
           placeholder="请填写详细的联系地址"
         ></a-input>
+      </a-form-item>
+
+      <a-form-item :wrapper-col="{span:16,offset:4}">
+        <a-button type="primary" block html-type="submit">提交</a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -51,9 +59,9 @@ export default {
   name: "add-member-address",
   data() {
     return {
-      provinceData: null,
-      cityData: null,
-      countyData: null
+      provinceData: [],
+      cityData: [],
+      countyData: []
     };
   },
   beforeCreate() {
@@ -72,9 +80,50 @@ export default {
           alert(err);
         });
     },
-    handleProvinceChange() {},
-    handleCityChange() {},
-    handleCountyChange() {}
+    handleProvinceChange(value) {
+      this.cityData = null;
+      this.countyData = null;
+      let provinceId = value;
+      if (provinceId == null || provinceId == "") {
+        return;
+      }
+      const params = { provinceId: provinceId };
+      Http.fetchGet("area/city", params)
+        .then(res => {
+          this.cityData = res.data;
+        })
+        .catch(err => {
+          alert(err);
+        });
+    },
+    handleCityChange(value) {
+      this.countyData = null;
+      let cityId = value;
+      if (cityId == null || cityId == "") {
+        return;
+      }
+      const params = { cityId: cityId };
+      Http.fetchGet("area/county", params)
+        .then(res => {
+          this.countyData = res.data;
+        })
+        .catch(err => {
+          alert(err);
+        });
+    },
+    handleSubmitAddMemberAddess() {
+      this.form.validateFields((err, values) => {
+        if (!err) {
+          Http.fetchPost("member/address/add", values)
+            .then(res => {
+              window.console.log(res.data);
+            })
+            .catch(err => {
+              window.console.log(err);
+            });
+        }
+      });
+    }
   }
 };
 </script>

@@ -13,15 +13,12 @@
       </a-form-item>
     </a-form>
 
-
     <a-modal
-      title="添加换书区域"
-      :visible="modelvisible"
-      @ok="handleOk"
+      title="换书区域" v-model="modelvisible"
+      footer = ""
     >
-      <AddMemberAddress></AddMemberAddress>
+      <div><AddMemberAddress></AddMemberAddress></div>
     </a-modal>
-
   </div>
 </template>
 <script>
@@ -33,10 +30,10 @@ export default {
     return {
       addressData: null, //地址信息
       linkData: null, //连接信息
-      modelvisible:false
+      modelvisible: false
     };
   },
-  components:{
+  components: {
     AddMemberAddress
   },
   beforeCreate() {
@@ -47,9 +44,7 @@ export default {
     this.loadAddressData();
   },
   methods: {
-    publishBook() {
-      
-    },
+    publishBook() {},
     loadAddressData() {
       Http.fetchPost("member/address/query", null)
         .then(res => {
@@ -59,15 +54,11 @@ export default {
           window.console.log(err);
         });
     },
-    loadLinkData() {
-       
+    loadLinkData() {},
+    addNewMemberAddress() {
+      this.modelvisible = true;
     },
-    addNewMemberAddress(){
-        this.modelvisible = true;
-    },
-    handleOk(){
-        this.modelvisible = false;
-    }
+  
   }
 };
 </script>
