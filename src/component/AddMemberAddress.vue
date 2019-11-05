@@ -118,7 +118,7 @@ export default {
             .then(res => {
               if(res.status===200){
                 //alert("success");
-                this.$emit('addMemberSuccess');
+                this.$emit('addMemberAddressSuccess');
               }else{
                 alert(res.error.message);
               }
