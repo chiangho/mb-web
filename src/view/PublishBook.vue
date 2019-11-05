@@ -14,7 +14,7 @@
         </div>
       </a-form-item>
 
-      <a-form-item label="还书联系人" :label-col="{span:8}" :wrapper-col="{span:8}">
+      <a-form-item label="换书联系人" :label-col="{span:8}" :wrapper-col="{span:8}">
         <div>
           <a-select>
             <a-select-option
@@ -28,10 +28,19 @@
       <a-form-item :wrapper-col="{span:8,offset:8}">
         <div>
           <div>
-            <a-tag closable @close="delBookInfo" :key="i" v-for="(item,i) in bookIsbnArray">{{item}}</a-tag>
+            <a-tag
+              closable
+              :afterClose="() => delBookInfo(item)"
+              :key="item"
+              v-for="item in bookIsbnArray"
+            >{{item}}</a-tag>
           </div>
-          <a-button type="primary" @click="openAddBookWindow">添加图书</a-button>
+          <a-button  @click="openAddBookWindow">添加图书</a-button>
         </div>
+      </a-form-item>
+
+      <a-form-item :wrapper-col="{span:8,offset:8}">
+        <a-button block type="primary" @click="publishbook">发布</a-button>
       </a-form-item>
     </a-form>
 
@@ -48,7 +57,7 @@
     </a-modal>
 
     <a-modal
-      title="添加联图书"
+      title="添加图书"
       v-model="modelAddModelVisibal"
       cancelText="取消"
       okText="添加"
@@ -56,6 +65,7 @@
       @cancel="handleCancelBookIsbn"
     >
       <div>
+        <a-alert v-if="alertVisible" :type="alertType" :message="alertMessage" closable />
         <a-input v-model="bookInfo" placeholder="填写图书的条码"></a-input>
       </div>
     </a-modal>
@@ -74,7 +84,10 @@ export default {
       modelLinkVisible: false,
       modelAddModelVisibal: false,
       bookInfo: "",
-      bookIsbnArray: []
+      bookIsbnArray: [],
+      alertVisible: false,
+      alertType: "error",
+      alertMessage: ""
     };
   },
   components: {
@@ -127,16 +140,44 @@ export default {
       this.modelAddModelVisibal = true;
     },
     handleOkBookIsbn() {
-      this.bookIsbnArray.push(this.bookInfo);
-      this.modelAddModelVisibal = false;
+      this.alertVisible = false;
+      this.alertType = "success";
+      this.alertMessage = "";
+      //校验值是否存在
+
+      let notExistBook = this.bookIsbnArray.every(element => {
+        if (element == this.bookInfo) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+
+      if (notExistBook) {
+        this.bookIsbnArray.push(this.bookInfo);
+        this.modelAddModelVisibal = false;
+      } else {
+        this.alertVisible = true;
+        this.alertType = "error";
+        this.alertMessage = "图书条码不能重复";
+      }
       this.bookInfo = "";
     },
     handleCancelBookIsbn() {
       this.modelAddModelVisibal = false;
       this.bookInfo = "";
     },
-    delBookInfo() {
-     
+    delBookInfo(removedTag) {
+      this.bookIsbnArray = this.bookIsbnArray.filter(tag => {
+        if (tag === removedTag) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+    },
+    publishbook(){
+      alert(1);
     }
   }
 };
