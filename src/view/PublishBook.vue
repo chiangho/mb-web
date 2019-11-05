@@ -1,19 +1,33 @@
 <template>
   <div>
-    <h1>发布图书</h1>
+    <h1 style="text-align: center">发布图书</h1>
     <a-form :form="form" @submit="publishBook">
-      <a-form-item label="换书区域">
-        <a-select>
-          <a-select-option
-            v-for="address in addressData"
-            :key="address.code"
-          >{{address.areaName+'，'+address.address}}</a-select-option>
-        </a-select>
-        <a-button @click="addNewMemberAddress">添加</a-button>
+      <a-form-item label="换书区域" :label-col="{span:4}" :wrapper-col="{span:16}">
+        <div>
+          <a-select>
+            <a-select-option
+              v-for="address in addressData"
+              :key="address.code"
+            >{{address.areaName+'，'+address.address}}</a-select-option>
+          </a-select>
+          <div class="addSpan" @click="addNewMemberAddress">添加区域</div>
+        </div>
+      </a-form-item>
+
+      <a-form-item label="还书联系人" :label-col="{span:4}" :wrapper-col="{span:16}">
+        <div>
+          <a-select>
+            <a-select-option
+              v-for="address in addressData"
+              :key="address.code"
+            >{{address.areaName+'，'+address.address}}</a-select-option>
+          </a-select>
+          <div class="addSpan" @click="addNewMemberAddress">添加联系人</div>
+        </div>
       </a-form-item>
     </a-form>
 
-    <a-modal title="换书人" v-model="modelvisible" footer>
+    <a-modal title="添加区域信息" v-model="modelvisible" footer>
       <div>
         <AddMemberAddress @addMemberSuccess="addMemberSuccess"></AddMemberAddress>
       </div>
@@ -64,3 +78,14 @@ export default {
   }
 };
 </script>
+<style>
+.addSpan {
+  position: relative;
+  float: right;
+  top: -40px;
+  right: -130px;
+  text-align: left;
+  width: 120px;
+  cursor:pointer;
+}
+</style>
