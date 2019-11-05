@@ -116,7 +116,12 @@ export default {
         if (!err) {
           Http.fetchPost("member/address/add", values)
             .then(res => {
-              window.console.log(res.data);
+              if(res.status===200){
+                //alert("success");
+                this.$emit('addMemberSuccess');
+              }else{
+                alert(res.error.message);
+              }
             })
             .catch(err => {
               window.console.log(err);

@@ -2,22 +2,21 @@
   <div>
     <h1>发布图书</h1>
     <a-form :form="form" @submit="publishBook">
-      <a-form-item label="联系人">
+      <a-form-item label="换书区域">
         <a-select>
           <a-select-option
-            v-for="i in 25"
-            :key="(i + 9).toString(36) + i"
-          >{{(i + 9).toString(36) + i}}</a-select-option>
+            v-for="address in addressData"
+            :key="address.code"
+          >{{address.areaName+'，'+address.address}}</a-select-option>
         </a-select>
         <a-button @click="addNewMemberAddress">添加</a-button>
       </a-form-item>
     </a-form>
 
-    <a-modal
-      title="换书区域" v-model="modelvisible"
-      footer = ""
-    >
-      <div><AddMemberAddress></AddMemberAddress></div>
+    <a-modal title="换书人" v-model="modelvisible" footer>
+      <div>
+        <AddMemberAddress @addMemberSuccess="addMemberSuccess"></AddMemberAddress>
+      </div>
     </a-modal>
   </div>
 </template>
@@ -48,7 +47,7 @@ export default {
     loadAddressData() {
       Http.fetchPost("member/address/query", null)
         .then(res => {
-          window.console.log(res);
+          this.addressData = res.data;
         })
         .catch(err => {
           window.console.log(err);
@@ -58,7 +57,10 @@ export default {
     addNewMemberAddress() {
       this.modelvisible = true;
     },
-  
+    addMemberSuccess() {
+      this.modelvisible = false;
+      this.loadAddressData();
+    }
   }
 };
 </script>
