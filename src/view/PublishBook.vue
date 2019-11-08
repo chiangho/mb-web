@@ -4,7 +4,11 @@
     <a-form :form="form" @submit="publishBook">
       <a-form-item label="换书区域" :label-col="{span:8}" :wrapper-col="{span:8}">
         <div>
-          <a-select>
+          <a-select   
+          v-decorator="[
+          'address',
+          { rules: [{ required: true, message: '请输入区域地址!' }] },
+        ]">
             <a-select-option
               v-for="address in addressData"
               :key="address.code"
@@ -16,7 +20,13 @@
 
       <a-form-item label="换书联系人" :label-col="{span:8}" :wrapper-col="{span:8}">
         <div>
-          <a-select>
+          <a-select
+          
+            v-decorator="[
+          'persion',
+          { rules: [{ required: true, message: '请输入联系人!' }] },
+        ]"
+          >
             <a-select-option
               v-for="link in linkData"
               :key="link.code"
@@ -177,7 +187,18 @@ export default {
       });
     },
     publishbook(){
-      alert(1);
+      //method, url, params, data
+       Http.ajax("post","release",{"a":123},{
+         "isbns":this.bookIsbnArray,
+         "memberLinkCode":this.form.getFieldValue("address"),
+         "memberAddressCode":this.form.getFieldValue("persion")
+       })
+        .then(res => {
+          this.linkData = res.data;
+        })
+        .catch(err => {
+          window.console.log(err);
+        });
     }
   }
 };

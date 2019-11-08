@@ -3,14 +3,15 @@ import qs from 'qs'
 import Common from "./Common.js"
 
 axios.defaults.timeout = 5000; //响应时间
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'; //配置请求头
+axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'; //配置请求头
+//axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'; //配置请求头
 axios.defaults.baseURL = Common.Config.host; //配置接口地址
 
 //POST传参序列化(添加请求拦截器)
 axios.interceptors.request.use((config) => {
     //在发送请求之前做某件事
     if (config.method === 'post') {
-        config.data = qs.stringify(config.data);
+        config.params = qs.stringify(config.data);
     }
     let token = "";
     try {
@@ -84,7 +85,29 @@ export function fetchGet(url, param) {
             })
     })
 }
+
+export function ajax(method, url, params, data) {
+    // method = method.tolocaleUpperCase();
+    return new Promise((resolve, reject) => {
+        axios.request({
+                url: url,
+                method: method,
+                params: params,
+                data: data
+            })
+            .then(response => {
+                resolve(response)
+            }, err => {
+                reject(err)
+            })
+            .catch((error) => {
+                reject(error)
+            })
+    });
+}
+
 export default {
     fetchPost,
     fetchGet,
+    ajax
 }
