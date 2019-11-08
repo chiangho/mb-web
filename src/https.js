@@ -11,7 +11,29 @@ axios.defaults.baseURL = Common.Config.host; //配置接口地址
 axios.interceptors.request.use((config) => {
     //在发送请求之前做某件事
     if (config.method === 'post') {
-        config.params = qs.stringify(config.data);
+        if(config.params){
+            let queryString  = qs.stringify(config.params);
+            window.console.log("==========>"+config.url);
+            if(!config.data){
+                config.data=queryString;
+                
+            }
+
+            // if(config.url.indexOf("?")>0){
+            //     let lastChar = config.url.substr(config.url.length-1,1);
+            //     if(lastChar=="&"){
+            //         config.url = config.url+ queryString;
+            //     }else{
+            //         config.url = config.url+"&"+ queryString;
+            //     }
+            // }else{
+            //     config.url = config.url+"?"+ queryString;
+            // }
+            // window.console.log("==========>"+config.url);
+            // config.params=null;
+
+
+        }
     }
     let token = "";
     try {
@@ -57,24 +79,26 @@ axios.interceptors.response.use((res) => {
 //返回一个Promise(发送post请求)
 export function fetchPost(url, params) {
     return new Promise((resolve, reject) => {
-        axios.post(url, params)
-            .then(
-                (response) => {
-                    resolve(response);
-                },
-                (err) => {
-                    reject(err);
-                }
-            )
-            .catch((error) => {
-                reject(error)
-            })
+        ajax("post",url,params,null).then(
+            (response) => {
+                resolve(response);
+            },
+            (err) => {
+                reject(err);
+            }
+        )
+        .catch((error) => {
+            reject(error)
+        })      
     })
 }
 ////返回一个Promise(发送get请求)
-export function fetchGet(url, param) {
+export function fetchGet(url, params) {
+    let config = {
+        params:params
+    }
     return new Promise((resolve, reject) => {
-        axios.get(url, { params: param })
+        axios.get(url, config)
             .then(response => {
                 resolve(response)
             }, err => {
