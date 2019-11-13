@@ -1,14 +1,24 @@
 <template>
   <div>
     <h1 style="text-align: center">发布图书</h1>
-    <a-form :form="form" @submit="publishBook">
+    <a-form :form="form" >
+      <a-form-item  :wrapper-col="{span:8,offset:8}">
+        <a-alert
+          v-if="publishAlertVisible"
+          :type="publishAlertType"
+          :message="publishAlertMessage"
+          closable
+        />
+      </a-form-item>
+
       <a-form-item label="换书区域" :label-col="{span:8}" :wrapper-col="{span:8}">
         <div>
-          <a-select   
-          v-decorator="[
+          <a-select
+            v-decorator="[
           'address',
           { rules: [{ required: true, message: '请输入区域地址!' }] },
-        ]">
+        ]"
+          >
             <a-select-option
               v-for="address in addressData"
               :key="address.code"
@@ -21,7 +31,6 @@
       <a-form-item label="换书联系人" :label-col="{span:8}" :wrapper-col="{span:8}">
         <div>
           <a-select
-          
             v-decorator="[
           'persion',
           { rules: [{ required: true, message: '请输入联系人!' }] },
@@ -45,7 +54,7 @@
               v-for="item in bookIsbnArray"
             >{{item}}</a-tag>
           </div>
-          <a-button  @click="openAddBookWindow">添加图书</a-button>
+          <a-button @click="openAddBookWindow">添加图书</a-button>
         </div>
       </a-form-item>
 
@@ -64,6 +73,18 @@
       <div>
         <AddMemberLink @addMemberLinkSuccess="addMemberLinkSuccess"></AddMemberLink>
       </div>
+    </a-modal>
+
+    <a-modal 
+      title="发布图书成功"
+      v-model="modelPublishSuccess"
+      cancelText="继续"
+      okText="去看看首页"
+      @ok="handleOkPublishSuccess"
+      @cancel="handleCancelPublishSuccess">
+      <p>
+        图书已经发布成功，请等待审核！
+      </p>
     </a-modal>
 
     <a-modal
@@ -97,7 +118,12 @@ export default {
       bookIsbnArray: [],
       alertVisible: false,
       alertType: "error",
-      alertMessage: ""
+      alertMessage: "",
+
+      publishAlertVisible: false,
+      publishAlertType: "error",
+      publishAlertMessage: "",
+      modelPublishSuccess:false
     };
   },
   components: {
@@ -112,7 +138,13 @@ export default {
     this.loadAddressData();
   },
   methods: {
-    publishBook() {},
+    handleOkPublishSuccess(){
+      this.$router.push('home');
+    },
+    handleCancelPublishSuccess(){
+      this.$router.push('publish-book');
+    },
+    
     loadAddressData() {
       Http.fetchPost("member/address/query", null)
         .then(res => {
@@ -186,19 +218,46 @@ export default {
         }
       });
     },
-    publishbook(){
-      //method, url, params, data
-       Http.ajax("post","release",{"a":123},{
-         "isbns":this.bookIsbnArray,
-         "memberLinkCode":this.form.getFieldValue("address"),
-         "memberAddressCode":this.form.getFieldValue("persion")
-       })
-        .then(res => {
-          this.linkData = res.data;
-        })
-        .catch(err => {
-          window.console.log(err);
-        });
+    publishbook() {
+      this.publishAlertVisible = false;
+      this.publishAlertType = "error";
+      this.publishAlertMessage = "";
+
+      if (this.bookIsbnArray.length == 0) {
+        this.publishAlertVisible = true;
+        this.publishAlertType = "error";
+        this.publishAlertMessage = "请输入图书信息";
+        return;
+      }
+
+      this.form.validateFields(err => {
+        if (!err) {
+          Http.ajax(
+            "post",
+            "release",
+            { a: 123 },
+            {
+              isbns: this.bookIsbnArray,
+              memberLinkCode: this.form.getFieldValue("persion"),
+              memberAddressCode: this.form.getFieldValue("address")
+            }
+          )
+            .then(res => {
+              if(res.status==200){
+                this.modelPublishSuccess=true;
+              }else{
+                this.publishAlertVisible = true;
+                this.publishAlertType = "error";
+                this.publishAlertMessage = res.error.message;
+              }
+
+
+            })
+            .catch(err => {
+              window.console.log(err);
+            });
+        }
+      });
     }
   }
 };
