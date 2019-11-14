@@ -13,12 +13,10 @@ axios.interceptors.request.use((config) => {
     if (config.method === 'post') {
         if(config.params){
             let queryString  = qs.stringify(config.params);
-            window.console.log("==========>"+config.url);
             if(!config.data){
                 config.data=queryString;
                 
             }
-
             // if(config.url.indexOf("?")>0){
             //     let lastChar = config.url.substr(config.url.length-1,1);
             //     if(lastChar=="&"){
@@ -31,8 +29,6 @@ axios.interceptors.request.use((config) => {
             // }
             // window.console.log("==========>"+config.url);
             // config.params=null;
-
-
         }
     }
     let token = "";
