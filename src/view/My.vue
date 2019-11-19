@@ -16,7 +16,7 @@
           <a-menu-item key="12">我的换书记录</a-menu-item>
         </a-menu>
       </a-layout-sider>
-      <a-layout>
+      <a-layout class="content_border">
         <a-layout-content>
           <router-view></router-view>
         </a-layout-content>
@@ -44,3 +44,14 @@ export default {
   }
 };
 </script>
+<style scoped>
+.ant-layout-sider{
+  background-color: #FFF;
+}
+.content_border{
+  background-color: #FFF;
+}
+.ant-layout-content{
+  margin: 10px 10px;
+}
+</style>

@@ -44,7 +44,7 @@ import Http from "./Https.js";
 export default {
   methods: {
     to_login_page() {
-      this.$router.push("login");
+      this.$router.push("/login");
     },
     log_out() {
       Http.fetchGet("log-out")
@@ -60,13 +60,13 @@ export default {
         });
     },
     go_home_page() {
-      this.$router.push("home");
+      this.$router.push("/home");
     },
     go_my_page() {
-      this.$router.push("my");
+      this.$router.push("/my");
     },
     go_publish_page(){
-      this.$router.push("publish-book").catch(err=>{
+      this.$router.push("/publish-book").catch(err=>{
         window.console.log(err);
       });
     }

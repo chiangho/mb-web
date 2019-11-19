@@ -139,10 +139,10 @@ export default {
   },
   methods: {
     handleOkPublishSuccess(){
-      this.$router.push('home');
+      this.$router.push('/home');
     },
     handleCancelPublishSuccess(){
-      this.$router.push('publish-book');
+      this.$router.push('/publish-book');
     },
     
     loadAddressData() {

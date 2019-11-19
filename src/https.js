@@ -59,9 +59,9 @@ axios.interceptors.response.use((res) => {
                 //清楚登录信息
                 Common.store.commit("setUserToken", "");
                 Common.store.commit("setUserInfo", "");
-                Common.router.push("login");
+                Common.router.push("/login");
             } else {
-                return Promise.resolve(res.data);
+                return Promise.reject(res.error);
             }
         }
     } else {

@@ -105,7 +105,7 @@ export default {
               if(response.status==200){
                 this.$store.commit("setUserToken",response.data.token);
                 this.$store.commit("setUserInfo",response.data.member);
-                this.$router.push('home');
+                this.$router.push('/home');
               }else{
                 this.alertVisible = true;
                 this.alertMessage=response.error.message;
@@ -119,10 +119,10 @@ export default {
       });
     },
     to_forgot_password() {
-      this.$router.push("forget-password");
+      this.$router.push("/forget-password");
     },
     to_register() {
-      this.$router.push("register");
+      this.$router.push("/register");
     },
     handleCloseAlert(){
       this.visible = false;
