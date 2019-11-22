@@ -7,23 +7,34 @@
         </a-list-item-meta>
         <div>
           <a-button @click="delMemberAddress(item.code)">删除</a-button>
-          <a-button>编辑</a-button>
+          <a-button @click="openEditAddressWindow(item.code)">编辑</a-button>
         </div>
       </a-list-item>
     </a-list>
+
+    <a-modal title="添加区域信息" v-model="modelvisible" footer>
+      <div>
+        <AddMemberAddress :code="editMemberCode" @addMemberAddressSuccess="addMemberAddressSuccess"></AddMemberAddress>
+      </div>
+    </a-modal>
   </div>
 </template>
 <script>
 import http from "./../../Https";
-
+import AddMemberAddress from "./../../component/AddMemberAddress";
 export default {
   data() {
     return {
-      addressArray: []
+      addressArray: [],
+      modelvisible:false,
+      editMemberCode:null
     };
   },
   created() {
     this.loadMemberAddress();
+  },
+  components: {
+    AddMemberAddress
   },
   methods: {
     loadMemberAddress() {
@@ -36,13 +47,24 @@ export default {
           alert(JSON.stringify(err));
         });
     },
-    delMemberAddress(code){
-      http.ajax("post","member/address/delete",{code:code},null).then(res=>{
-        window.console.log(res.status);
-        this.loadMemberAddress();
-      }).catch(err=>{
-        alert(err.message);
-      });
+    delMemberAddress(code) {
+      http
+        .ajax("post", "member/address/delete", { code: code }, null)
+        .then(res => {
+          window.console.log(res.status);
+          this.loadMemberAddress();
+        })
+        .catch(err => {
+          alert(err.message);
+        });
+    },
+    openEditAddressWindow(code) {
+      this.editMemberCode = code;
+      this.modelvisible = true;
+    },
+    addMemberAddressSuccess(){
+      this.modelvisible = false;
+      this.loadMemberAddress();
     }
   }
 };

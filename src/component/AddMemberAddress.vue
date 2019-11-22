@@ -69,7 +69,11 @@ export default {
   },
   created() {
     this.loadProvinceData(); //加载省份信息
+    this.loadMemberAddressInfo();
   },
+  props:[
+    "code"
+  ],
   methods: {
     loadProvinceData() {
       Http.fetchGet("area/province", null)
@@ -128,6 +132,11 @@ export default {
             });
         }
       });
+    },
+    loadMemberAddressInfo(){
+      if(this.code){
+        //加载地址信息，并默认显示
+      }
     }
   }
 };
