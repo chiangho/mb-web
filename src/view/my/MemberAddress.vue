@@ -1,16 +1,16 @@
 <template>
   <div>
-    <a-button type="primary" @click="addNewMemberAddress()">添加新地址</a-button>
+    <div style="text-align:right">
+      <a-button type="primary" @click="addNewMemberAddress()">添加区域</a-button>
+    </div>
     <a-divider />
     <a-list :dataSource="addressArray">
       <a-list-item slot="renderItem" slot-scope="item">
+        <a slot="actions" @click="delMemberAddress(item.code)">删除</a>
+        <a slot="actions" @click="openEditAddressWindow(item.code)">编辑</a>
         <a-list-item-meta :description="item.address">
           <span slot="title">{{item.areaName}}</span>
         </a-list-item-meta>
-        <div>
-          <a-button @click="delMemberAddress(item.code)">删除</a-button>
-          <a-button @click="openEditAddressWindow(item.code)">编辑</a-button>
-        </div>
       </a-list-item>
     </a-list>
 

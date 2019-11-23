@@ -4,14 +4,14 @@
       <a-layout-sider>
         <a-menu
           style="width: 200px"
-          :defaultSelectedKeys="['1']"
-          :openKeys.sync="openKeys"
           mode="inline"
         >
-          <a-menu-item key="9">
+          <a-menu-item key="my_menu_memberaddress">
             <span @click="go_member_address_page">换书区域</span>
           </a-menu-item>
-          <a-menu-item key="10">换书联系人</a-menu-item>
+          <a-menu-item key="my_menu_memberlink">
+            <span @click="go_member_link_page">换书联系人</span>
+          </a-menu-item>
           <a-menu-item key="11">我发起的换书</a-menu-item>
           <a-menu-item key="12">我的换书记录</a-menu-item>
         </a-menu>
@@ -35,6 +35,9 @@ export default {
   methods: {
     go_member_address_page() {
       this.$router.push("/my/member-address");
+    },
+    go_member_link_page(){
+      this.$router.push("/my/member-link");
     }
   },
   watch: {
@@ -45,13 +48,13 @@ export default {
 };
 </script>
 <style scoped>
-.ant-layout-sider{
-  background-color: #FFF;
+.ant-layout-sider {
+  background-color: #fff;
 }
-.content_border{
-  background-color: #FFF;
+.content_border {
+  background-color: #fff;
 }
-.ant-layout-content{
+.ant-layout-content {
   margin: 10px 10px;
 }
 </style>

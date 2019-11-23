@@ -7,6 +7,7 @@ import ForgetPassword from "./view/ForgetPassword.vue";
 import My from "./view/My.vue";
 import PublishBook from "./view/PublishBook.vue";
 import MyMemberAddress from "./view/my/MemberAddress.vue";
+import MyMemberLink from "./view/my/MemberLink.vue";
 import Vuex from "vuex";
 
 //配置信息
@@ -61,7 +62,8 @@ const router = new VueRouter({
         {
             path: '/my', component: My, meta: { "auth": true, "title": "个人中心" },
             children: [
-                { path: "member-address", component: MyMemberAddress, meta: { "auth": true, "title": "区域信息" } }
+                { path: "member-address", component: MyMemberAddress, meta: { "auth": true, "title": "区域信息" } },
+                { path: "member-link",component:MyMemberLink,meta:{"auth":true,title:"联系人信息编辑"}}
             ]
         },
         { path: '/publish-book', component: PublishBook, meta: { "auth": true, "title": "发布图书" } }
