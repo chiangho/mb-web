@@ -12,8 +12,9 @@
           <a-menu-item key="my_menu_memberlink">
             <span @click="go_member_link_page">换书联系人</span>
           </a-menu-item>
-          <a-menu-item key="11">我发起的换书</a-menu-item>
-          <a-menu-item key="12">我的换书记录</a-menu-item>
+          <a-menu-item key="11">发布的图书</a-menu-item>
+          <a-menu-item key="12">申请的图书</a-menu-item>
+          <a-menu-item key="13">交换的图书</a-menu-item>
         </a-menu>
       </a-layout-sider>
       <a-layout class="content_border">
