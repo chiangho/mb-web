@@ -1,5 +1,7 @@
 <template>
   <div>
+    <a-button type="primary" @click="addNewMemberAddress()">添加新地址</a-button>
+    <a-divider />
     <a-list :dataSource="addressArray">
       <a-list-item slot="renderItem" slot-scope="item">
         <a-list-item-meta :description="item.address">
@@ -12,7 +14,7 @@
       </a-list-item>
     </a-list>
 
-    <a-modal title="添加区域信息" v-model="modelvisible" footer>
+    <a-modal title="添加区域信息" v-model="modelvisible" :destroyOnClose="destroyOnClose" footer>
       <div>
         <AddMemberAddress :code="editMemberCode" @addMemberAddressSuccess="addMemberAddressSuccess"></AddMemberAddress>
       </div>
@@ -27,6 +29,7 @@ export default {
     return {
       addressArray: [],
       modelvisible:false,
+      destroyOnClose:true,
       editMemberCode:null
     };
   },
@@ -44,7 +47,7 @@ export default {
           this.addressArray = res.data;
         })
         .catch(err => {
-          alert(JSON.stringify(err));
+          window.console.log(JSON.stringify(err));
         });
     },
     delMemberAddress(code) {
@@ -55,7 +58,7 @@ export default {
           this.loadMemberAddress();
         })
         .catch(err => {
-          alert(err.message);
+          window.console.log(err.message);
         });
     },
     openEditAddressWindow(code) {
@@ -65,6 +68,10 @@ export default {
     addMemberAddressSuccess(){
       this.modelvisible = false;
       this.loadMemberAddress();
+    },
+    addNewMemberAddress(){
+      this.editMemberCode = null;
+      this.modelvisible = true;
     }
   }
 };

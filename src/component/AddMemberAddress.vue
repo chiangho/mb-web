@@ -7,7 +7,7 @@
           placeholder="请选择省份"
           v-decorator="[
           'province',
-          { rules: [{ required: true, message: '请选择省份' }] },
+           { rules: [{ required: true, message: '请选择省份' }],initialValue:provinceDefaultValue },
         ]"
         >
           <a-select-option v-for="province in provinceData" :key="province.id">{{province.name}}</a-select-option>
@@ -19,7 +19,7 @@
           placeholder="请选择地市"
           v-decorator="[
           'city',
-          { rules: [{ required: true, message: '请选择地市' }] },
+          { rules: [{ required: true, message: '请选择地市' }],initialValue:cityDefaultValue },
         ]"
         >
           <a-select-option v-for="city in cityData" :key="city.id">{{city.name}}</a-select-option>
@@ -30,7 +30,7 @@
           placeholder="请选择区县"
           v-decorator="[
           'county',
-          { rules: [{ required: true, message: '请选择区县' }] },
+          { rules: [{ required: true, message: '请选择区县' }],initialValue:countyDefaultValue },
         ]"
         >
           <a-select-option v-for="county in countyData" :key="county.id">{{county.name}}</a-select-option>
@@ -40,7 +40,7 @@
         <a-input
           v-decorator="[
           'address',
-          { rules: [{ required: true, message: '请输入详细地址' }] },
+          { rules: [{ required: true, message: '请输入详细地址' }],initialValue:addressDefaultValue },
         ]"
           placeholder="请填写详细的联系地址"
         ></a-input>
@@ -61,7 +61,11 @@ export default {
     return {
       provinceData: [],
       cityData: [],
-      countyData: []
+      countyData: [],
+      provinceDefaultValue:null,
+      cityDefaultValue:null,
+      countyDefaultValue:null,
+      addressDefaultValue:null
     };
   },
   beforeCreate() {
@@ -118,24 +122,38 @@ export default {
     handleSubmitAddMemberAddess() {
       this.form.validateFields((err, values) => {
         if (!err) {
-          Http.fetchPost("member/address/add", values)
+          let url = "member/address/add";
+          if(this.code){
+            url="member/address/update";
+            values["code"]=this.code;
+          }
+          Http.fetchPost(url, values)
             .then(res => {
               if(res.status===200){
                 //alert("success");
                 this.$emit('addMemberAddressSuccess');
               }else{
-                alert(res.error.message);
+                this.$message.error(res.error.message);
               }
             })
             .catch(err => {
-              window.console.log(err);
+              this.$message.error(err);
             });
         }
       });
     },
     loadMemberAddressInfo(){
       if(this.code){
-        //加载地址信息，并默认显示
+        Http.ajax("post","member/address/detail",{"code":this.code},null).then(res=>{
+          this.provinceDefaultValue = res.data.provinceId;
+          this.handleProvinceChange(this.provinceDefaultValue);
+          this.cityDefaultValue = res.data.cityId;
+          this.handleCityChange(this.cityDefaultValue);
+          this.countyDefaultValue = res.data.countyId;
+          this.addressDefaultValue = res.data.address
+        }).catch(err=>{
+          this.$message.error(err.message);
+        });
       }
     }
   }
