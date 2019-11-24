@@ -20,7 +20,11 @@ export default {
           this.publishBookList = res.data;
         })
         .catch(err => {
-          this.$message.error(JSON.stringify(err));
+          if(err.message){
+            this.$message.error(err.message);  
+          }else{
+            this.$message.error(err);
+          }
         });
     }
   }
