@@ -1,10 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-
+import AMap from 'vue-amap';
 import Antd from 'ant-design-vue'
 import App from './App.vue'
 import 'ant-design-vue/dist/antd.css';
-
 import Common from "./Common.js"
 
 Vue.config.productionTip = false;
@@ -12,15 +11,13 @@ Vue.config.productionTip = false;
 
 
 Vue.use(VueRouter)
-
+Vue.use(AMap);
 Vue.use(Antd);
-
-/**
- * 1、 判断是否登陆，userInfo token 是否存在
- */
-
-
-
+AMap.initAMapApiLoader({
+    key: 'f9645b34f7a07297a3c90fff903a736b',//刚刚开发者申请哪里的key
+    plugin: ['AMap.Autocomplete', 'AMap.Geolocation','AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor'],
+    v: '1.4.4'
+});
 
 
 //如果token不存在则调整到登录页面
