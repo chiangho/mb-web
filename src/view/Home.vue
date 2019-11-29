@@ -1,5 +1,9 @@
 <template>
   <div>
+    
+    
+    
+    
     <div class="amap-page-container">
       <el-amap vid="amap" :plugin="plugin" class="amap-demo" :center="center"></el-amap>
     </div>
@@ -18,8 +22,8 @@ export default {
       pageNo: 1,
       lng: 0,
       lat: 0,
-      bookInfo:"",
-      addressCode:"",
+      bookInfo: "",
+      addressCode: "",
       plugin: [
         {
           pName: "Geolocation",
@@ -40,9 +44,7 @@ export default {
       ]
     };
   },
-  created() {
-    
-  },
+  created() {},
   watch: {
     lng: function(newLng) {
       window.console.log(newLng);
@@ -60,23 +62,19 @@ export default {
         "get",
         "book/publish-book/query",
         {
-          name:this.bookInfo,
+          name: this.bookInfo,
           addressCode: this.addressCode,
           location: this.lng + "," + this.lat,
           pageSize: this.pageSize,
           pageNo: this.pageNo
         },
         null
-      )
-        .then(res => {
-          this.publishBookList = res.data;
-          window.console.log(this.publishBookList);
+      ).then(res => {
+          this.publishBookList = res.data.items;
         })
         .catch(err => {
-          if (err.message) {
+          if (!err) {
             this.$message.error(err.message);
-          } else {
-            this.$message.error(err);
           }
         });
     }

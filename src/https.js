@@ -53,6 +53,7 @@ axios.interceptors.response.use((res) => {
         if (status === 200) {
             return Promise.resolve(res.data);
         } else {
+            window.console.log(res.data.error);
             let error = res.data.error.code;
             if (error == Common.Config.unauthorization || error == Common.Config.unauthorized) {
                 window.console.log("未认证，请先登录！");
@@ -61,7 +62,7 @@ axios.interceptors.response.use((res) => {
                 Common.store.commit("setUserInfo", "");
                 Common.router.push("/login");
             } else {
-                return Promise.reject(res.error);
+                return Promise.reject(res.data.error);
             }
         }
     } else {
