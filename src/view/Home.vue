@@ -2,13 +2,9 @@
   <div>
     <a-row>
       <a-col span="14" offset="5">
-        <a-list
-          itemLayout="vertical"
-          size="large"
-          :dataSource="publishBookList"
-        >
+        <a-list itemLayout="vertical" size="large" :dataSource="publishBookList">
           <div slot="footer">
-            <a-pagination v-model="pageNo" :total="pageTotal" @change="onChangePage"/>
+            <a-pagination v-model="pageNo" :total="pageTotal" @change="onChangePage" />
           </div>
           <a-list-item slot="renderItem" slot-scope="item" key="item.bookName">
             <img
@@ -21,14 +17,14 @@
             <a-list-item-meta>
               <a slot="title" :href="item.bookName">{{item.bookName}}</a>
               <div slot="description">
-                作者：{{item.bookAuthor}}<br/>
-                ISBN：{{item.isbn}}<br/>
+                作者：{{item.bookAuthor}}
+                <br />
+                ISBN：{{item.isbn}}
+                <br />
                 {{item.address}}
               </div>
             </a-list-item-meta>
-            <div>
-              {{item.bookTitle}}
-            </div>
+            <div>{{item.bookTitle}}</div>
             <div slot="actions">
               <a-button @click="transactionApplication(item.code)">请求读它</a-button>
             </div>
@@ -37,6 +33,13 @@
       </a-col>
     </a-row>
 
+    <a-modal title="登记交换图书" v-model="registerModelvisible" :destroyOnClose="destroyOnClose"  footer>
+      <div>
+        <RegisteredBook :code="releaseBookCode" @registerBookSuccess="registerBookSuccess"></RegisteredBook>
+      </div>
+    </a-modal>
+
+
     <div class="amap-page-container">
       <el-amap vid="amap" :plugin="plugin" class="amap-demo" :center="center"></el-amap>
     </div>
@@ -44,18 +47,25 @@
 </template>
 <script>
 import Http from "./../Https";
-import Common from "./../Common.js"
+import Common from "./../Common.js";
+import RegisteredBook from "./../component/RegisteredBook"
 
 export default {
+  components: {
+    RegisteredBook
+  },
   data() {
     let self = this;
     return {
-      host:Common.Config.host,
+      releaseBookCode:null,
+      destroyOnClose:true,
+      registerModelvisible:false,
+      host: Common.Config.host,
       publishBookList: [],
       center: [121.59996, 31.197646],
       pageSize: 25,
       pageNo: 1,
-      pageTotal:0,
+      pageTotal: 0,
       lng: 0,
       lat: 0,
       bookInfo: "",
@@ -92,11 +102,22 @@ export default {
     }
   },
   methods: {
-    onChangePage(pageNumber) {
-        alert('Page: ', pageNumber);
+    registerBookSuccess(){
+      this.registerModelvisible = false;
     },
-    transactionApplication(code){
-      alert(code);
+    onChangePage(pageNumber) {
+      this.pageNo = pageNumber;
+      this.loadPublishBookList();
+    },
+    transactionApplication(code) {
+      let isLoginState = this.$store.getters.isLogin;
+      if(isLoginState){
+        this.releaseBookCode = code;
+        this.registerModelvisible = true;
+      }else{
+        this.$store.commit("setCatchUti",this.$route.path);
+        this.$router.push("/login");
+      }
     },
     //加载发布的图书
     loadPublishBookList() {
@@ -111,9 +132,10 @@ export default {
           pageNo: this.pageNo
         },
         null
-      ).then(res => {
+      )
+        .then(res => {
           this.publishBookList = res.data.items;
-          let tempTotal = Number(res.data.total) ;
+          let tempTotal = Number(res.data.total);
           this.pageTotal = tempTotal;
         })
         .catch(err => {

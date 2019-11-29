@@ -1,22 +1,21 @@
 <template>
   <div>
-    
-
     <a-form
       id="components-form-demo-normal-login"
       :form="form"
       class="login-form"
       @submit="handleSubmit"
     >
-      <a-form-item  
-       :label-col="formTailLayout.labelCol" :wrapper-col="formTailLayout.wrapperCol">
-
-        <a-alert v-if="alertVisible" type="error" :message="alertMessage"
-         closable
-         :afterClose="handleCloseAlert" />
-
+      <a-form-item :label-col="formTailLayout.labelCol" :wrapper-col="formTailLayout.wrapperCol">
+        <a-alert
+          v-if="alertVisible"
+          type="error"
+          :message="alertMessage"
+          closable
+          :afterClose="handleCloseAlert"
+        />
       </a-form-item>
-      
+
       <a-form-item
         :label-col="formItemLayout.labelCol"
         :wrapper-col="formItemLayout.wrapperCol"
@@ -86,7 +85,7 @@ export default {
       formItemLayout,
       formTailLayout,
       alertVisible: false,
-      alertMessage:""
+      alertMessage: ""
     };
   },
   beforeCreate() {
@@ -95,25 +94,32 @@ export default {
   methods: {
     handleSubmit(e) {
       this.alertVisible = false;
-      this.alertMessage="";
+      this.alertMessage = "";
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
           //调用登录接口
           Http.fetchPost("login", values)
             .then(response => {
-              if(response.status==200){
-                this.$store.commit("setUserToken",response.data.token);
-                this.$store.commit("setUserInfo",response.data.member);
-                this.$router.push('/home');
-              }else{
+              if (response.status == 200) {
+                this.$store.commit("setUserToken", response.data.token);
+                this.$store.commit("setUserInfo", response.data.member);
+                let catchUri = this.$store.getters.getCatchUri;
+                window.console.log("登录成功=======》"+catchUri);
+                this.$store.commit("setCatchUti", "");
+                if (catchUri) {
+                  this.$router.push(catchUri);
+                } else {
+                  this.$router.push("/home");
+                }
+              } else {
                 this.alertVisible = true;
-                this.alertMessage=response.error.message;
+                this.alertMessage = response.error.message;
               }
             })
             .catch(err => {
               this.alertVisible = true;
-              this.alertMessage=err.message;
+              this.alertMessage = err.message;
             });
         }
       });
@@ -124,7 +130,7 @@ export default {
     to_register() {
       this.$router.push("/register");
     },
-    handleCloseAlert(){
+    handleCloseAlert() {
       this.visible = false;
     }
   }

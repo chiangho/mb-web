@@ -51,7 +51,8 @@ export default {
         .then(response => {
           this.$store.commit("setUserToken", "");
           this.$store.commit("setUserInfo", null);
-          window.console.log(response.data);
+          this.$router.push("/home");
+          window.console.log(response.data)
         })
         .catch(err => {
           this.$store.commit("setUserToken", "");

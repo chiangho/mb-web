@@ -1,0 +1,179 @@
+<template>
+  <div>
+    <a-form :form="form">
+      <a-form-item :wrapper-col="{span:18,offset:4}">
+        <a-alert
+          v-if="publishAlertVisible"
+          :type="publishAlertType"
+          :message="publishAlertMessage"
+          closable
+        />
+      </a-form-item>
+      <a-form-item label="区域" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-select
+          v-decorator="[
+          'address',
+          { rules: [{ required: true, message: '请输入区域地址!' }] },
+        ]"
+        >
+          <a-select-option
+            v-for="address in addressData"
+            :key="address.code"
+          >{{address.areaName+'，'+address.address}}</a-select-option>
+        </a-select>
+        <span style="cursor: pointer" @click="addNewMemberAddress">添加区域</span>
+      </a-form-item>
+      <a-form-item label="联系人" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-select
+          v-decorator="[
+          'persion',
+          { rules: [{ required: true, message: '请输入联系人!' }] },
+        ]"
+        >
+          <a-select-option
+            v-for="link in linkData"
+            :key="link.code"
+          >{{link.linkmanName+'，'+link.mobile+' '+(link.wechat==null?'':('，'+link.wechat))}}</a-select-option>
+        </a-select>
+
+        <span style="cursor: pointer" @click="addNewMemberLink">添加联系人</span>
+      </a-form-item>
+       <a-form-item label="图书ISBN" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-input
+          v-decorator="[
+          'bookisbn',
+          { rules: [{ required: true, message: '请输入图书ISBN编号!' }] },
+        ]"
+          placeholder="图书ISBN编号"
+        ></a-input>
+      </a-form-item>
+
+      <a-form-item :wrapper-col="{span:18,offset:4}">
+        <a-button block type="primary" @click="publishbook">提交</a-button>
+      </a-form-item>
+    </a-form>
+
+    <a-modal title="添加区域信息" v-model="modelvisible" footer>
+      <div>
+        <AddMemberAddress @addMemberAddressSuccess="addMemberAddressSuccess"></AddMemberAddress>
+      </div>
+    </a-modal>
+
+    <a-modal title="添加联系人" v-model="modelLinkVisible" footer>
+      <div>
+        <AddMemberLink @addMemberLinkSuccess="addMemberLinkSuccess"></AddMemberLink>
+      </div>
+    </a-modal>
+
+   
+  </div>
+</template>
+<script>
+import Http from "./../Https.js";
+import AddMemberAddress from "./AddMemberAddress";
+import AddMemberLink from "./AddMemberLink";
+export default {
+  name: "registered-book",
+  data() {
+    return {
+      addressData: null, //地址信息
+      linkData: null, //连接信息
+      modelvisible: false,
+      modelLinkVisible: false,
+      modelAddModelVisibal: false,
+      alertVisible: false,
+      alertType: "error",
+      alertMessage: "",
+      publishAlertVisible: false,
+      publishAlertType: "error",
+      publishAlertMessage: "",
+    };
+  },
+  components: {
+    AddMemberAddress,
+    AddMemberLink
+  },
+  props:[
+    "code"
+  ],
+  beforeCreate() {
+    this.form = this.$form.createForm(this, { name: "publish-book" });
+  },
+  created() {
+    this.loadLinkData();
+    this.loadAddressData();
+  },
+  methods: {
+    
+    loadAddressData() {
+      Http.fetchPost("member/address/query", null)
+        .then(res => {
+          this.addressData = res.data;
+        })
+        .catch(err => {
+          window.console.log(err);
+        });
+    },
+    loadLinkData() {
+      Http.fetchGet("member/link/query", null)
+        .then(res => {
+          this.linkData = res.data;
+        })
+        .catch(err => {
+          window.console.log(err);
+        });
+    },
+    addNewMemberAddress() {
+      this.modelvisible = true;
+    },
+    addMemberAddressSuccess() {
+      this.modelvisible = false;
+      this.loadAddressData();
+    },
+
+
+    addMemberLinkSuccess() {
+      this.modelLinkVisible = false;
+      this.loadLinkData();
+    },
+    addNewMemberLink() {
+      this.modelLinkVisible = true;
+    },
+    
+    publishbook() {
+      this.publishAlertVisible = false;
+      this.publishAlertType = "error";
+      this.publishAlertMessage = "";
+      this.form.validateFields((err,vlaues) => {
+        if (!err) {
+          vlaues["bookReleaseCode"]=this.code;
+          Http.ajax(
+            "get",
+            "apply/register-book",
+            vlaues,
+            null
+          ).then(res => {
+             window.console.log(res);
+                window.console.log(res);
+                this.$emit("registerBookSuccess");
+            })
+            .catch(err => {
+              if(err){
+                this.publishAlertVisible = true;
+                this.publishAlertType = "error";
+                this.publishAlertMessage = err.message;
+              }else{
+                this.publishAlertVisible = true;
+                this.publishAlertType = "error";
+                this.publishAlertMessage = "未知异常";
+              }
+              window.console.log(err);
+            });
+        }
+      });
+    }
+  }
+};
+</script>
+<style>
+</style>

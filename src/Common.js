@@ -26,7 +26,8 @@ const storeInfo = {
          * userInfo：{name:"",email:"",icon:""}
          */
         userInfo: JSON.parse(localStorage.getItem(Config.userInfoCacheKey)),
-        userToken: localStorage.getItem(Config.userTokenCacheKey)
+        userToken: localStorage.getItem(Config.userTokenCacheKey),
+        catchUri:''
     },
     mutations: {
         setUserInfo(state, userInfo) {
@@ -36,7 +37,11 @@ const storeInfo = {
         setUserToken(state, token) {
             state.userToken = token;
             localStorage.setItem(Config.userTokenCacheKey, token);
+        },
+        setCatchUti(state,uri){
+            state.catchUri = uri;
         }
+
     },
     getters: {
         isLogin: state => {
@@ -44,6 +49,9 @@ const storeInfo = {
                 return true;
             }
             return false;
+        },
+        getCatchUri: state=>{
+            return state.catchUri;
         }
     }
 };

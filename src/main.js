@@ -28,6 +28,8 @@ Common.router.beforeEach((to, from, next) => {
         if (isLoginState) {
             next();
         } else {
+            window.console.log("未认证，请先登录！"+to.path);
+            Common.store.commit("setCatchUti", to.path);
             next({ path: '/login' });
         }
     } else {
