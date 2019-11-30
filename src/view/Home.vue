@@ -4,7 +4,13 @@
       <a-col span="14" offset="5">
         <a-list itemLayout="vertical" size="large" :dataSource="publishBookList">
           <div slot="footer">
-            <a-pagination v-model="pageNo" :total="pageTotal" @change="onChangePage" />
+            <a-pagination v-model="pageNo" :total="pageTotal" :pageSize.sync="pageSize" showSizeChanger
+      @showSizeChange="onShowSizeChange" @change="onChangePage" :pageSizeOptions="pageSizeOptions"> 
+            <template slot="buildOptionText" slot-scope="props">
+              <span >{{props.value}}条/页</span>
+              
+            </template>
+            </a-pagination>
           </div>
           <a-list-item slot="renderItem" slot-scope="item" key="item.bookName">
             <img
@@ -57,13 +63,14 @@ export default {
   data() {
     let self = this;
     return {
+      pageSizeOptions:[1,25,50],
       releaseBookCode:null,
       destroyOnClose:true,
       registerModelvisible:false,
       host: Common.Config.host,
       publishBookList: [],
       center: [121.59996, 31.197646],
-      pageSize: 25,
+      pageSize: 1,
       pageNo: 1,
       pageTotal: 0,
       lng: 0,
@@ -108,6 +115,10 @@ export default {
     onChangePage(pageNumber) {
       this.pageNo = pageNumber;
       this.loadPublishBookList();
+    },
+    onShowSizeChange(current, pageSize){
+      this.pageNo  = current;
+      this.pageSize = pageSize;
     },
     transactionApplication(code) {
       let isLoginState = this.$store.getters.isLogin;
