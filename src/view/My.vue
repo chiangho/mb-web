@@ -12,7 +12,9 @@
           <a-menu-item key="my_menu_memberlink">
             <span @click="go_member_link_page">换书联系人</span>
           </a-menu-item>
-          <a-menu-item key="11">发布的图书</a-menu-item>
+          <a-menu-item key="11">
+             <span @click="go_member_publish_page">发布的图书</span>
+          </a-menu-item>
           <a-menu-item key="12">申请的图书</a-menu-item>
           <a-menu-item key="13">交换的图书</a-menu-item>
         </a-menu>
@@ -39,6 +41,9 @@ export default {
     },
     go_member_link_page(){
       this.$router.push("/my/member-link");
+    },
+    go_member_publish_page(){
+      this.$router.push("/my/member-release");
     }
   },
   watch: {

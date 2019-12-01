@@ -8,6 +8,7 @@ import My from "./view/My.vue";
 import PublishBook from "./view/PublishBook.vue";
 import MyMemberAddress from "./view/my/MemberAddress.vue";
 import MyMemberLink from "./view/my/MemberLink.vue";
+import MyMemberRelease from "./view/my/MemberRelease.vue";
 import Vuex from "vuex";
 
 //配置信息
@@ -71,16 +72,41 @@ const router = new VueRouter({
             path: '/my', component: My, meta: { "auth": true, "title": "个人中心" },
             children: [
                 { path: "member-address", component: MyMemberAddress, meta: { "auth": true, "title": "区域信息" } },
-                { path: "member-link",component:MyMemberLink,meta:{"auth":true,title:"联系人信息编辑"}}
+                { path: "member-link",component:MyMemberLink,meta:{"auth":true,title:"联系人信息编辑"}},
+                { path: "member-release",component:MyMemberRelease,meta:{"auth":true,title:"我发布的图书"}}
             ]
         },
         { path: '/publish-book', component: PublishBook, meta: { "auth": true, "title": "发布图书" } }
     ],
 })
 
+const  formatDate =function(date, fmt) {
+    if (/(y+)/.test(fmt)) {
+        fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+    }
+    let o = {
+        'M+': date.getMonth() + 1,
+        'd+': date.getDate(),
+        'h+': date.getHours(),
+        'm+': date.getMinutes(),
+        's+': date.getSeconds()
+    };
+    for (let k in o) {
+        if (new RegExp(`(${k})`).test(fmt)) {
+            let str = o[k] + '';
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : padLeftZero(str));
+        }
+    }
+    return fmt;
+};
+ 
+function padLeftZero (str) {
+    return ('00' + str).substr(str.length);
+}
 
 export default {
     Config,
     store,
-    router
+    router,
+    formatDate
 }
