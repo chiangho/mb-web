@@ -13,7 +13,7 @@
       <span slot="action" slot-scope="text, record">
         <a @click="deleteRow(record.code)">删除</a>
         <a-divider type="vertical" />
-        <a @click="editRow(record.code)">编辑</a>
+        <a @click="selectTagBook(record.code)">选择想要交换的图书</a>
       </span>
     </a-table>
   </div>
@@ -78,12 +78,15 @@ export default {
       data: [],
       pagination: {
         showSizeChanger: true,
-        pageSizeOptions: ['1', '25', '50'],
+        pageSizeOptions: ["10", "25", "50"],
         pageSize: 25,
         current: 1,
         total: 0,
         showQuickJumper: false
       },
+      sorterField: "",
+      sorterOrder: "",
+      filters: null,
       loading: false,
       columns
     };
@@ -104,13 +107,43 @@ export default {
     }
   },
   methods: {
-      deleteRow(code){
-          alert(code);
-      },
+    deleteRow(code) {
+      //删除换书记录
+      http
+        .ajax("get", "my/publish-book/del", { code: code }, null)
+        .then(res => {
+          window.console.log(res.data);
+          let param = {};
+          param.pageSize = this.pagination.pageSize;
+          param.pageNo = this.pagination.current;
+          param.sorter = this.sorterField;
+          param.order = this.sorterOrder;
+          if (this.filters.status) {
+            param.status = this.filters.status.toString();
+          }
+          this.fetch(param);
+        })
+        .catch(err => {
+          this.loading = false;
+          window.console.log(JSON.stringify(err));
+        });
+    },
     handleTableChange(pagination, filters, sorter) {
-      alert(JSON.stringify(pagination));
-      alert(JSON.stringify(filters));
-      alert(JSON.stringify(sorter));
+      let param = {};
+
+      this.sorterField = sorter.field;
+      this.sorterOrder = sorter.order;
+      this.filters = filters;
+
+      param.pageSize = pagination.pageSize;
+      param.pageNo = pagination.current;
+      param.sorter = sorter.field;
+      param.order = sorter.order;
+      if (filters.status) {
+        param.status = filters.status.toString();
+      }
+
+      this.fetch(param);
     },
     fetch(param = {}) {
       this.loading = true;
@@ -124,6 +157,8 @@ export default {
           let tempTotal = Number(res.data.total);
           _pagination.total = tempTotal;
           this.pagination = _pagination;
+          this.pagination.pageSize = param.pageSize;
+          this.pagination.current = param.pageNo;
           //window.console.log(this.pagination);
           this.loading = false;
           this.data = res.data.items;
