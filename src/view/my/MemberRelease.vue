@@ -16,6 +16,14 @@
         <a @click="selectTagBook(record.code)">选择想要交换的图书</a>
       </span>
     </a-table>
+
+    <a-drawer
+      width="640"
+      placement="right"
+      :closable="false"
+      @close="onClose"
+      :visible="visible"
+    >asdfasdf</a-drawer>
   </div>
 </template>
 <script>
@@ -75,11 +83,12 @@ export default {
   },
   data() {
     return {
+      visible: false,
       data: [],
       pagination: {
         showSizeChanger: true,
         pageSizeOptions: ["10", "25", "50"],
-        pageSize: 25,
+        pageSize: 10,
         current: 1,
         total: 0,
         showQuickJumper: false
@@ -107,19 +116,30 @@ export default {
     }
   },
   methods: {
+    onClose() {
+      this.visible = false;
+    },
+    selectTagBook(code) {
+      this.visible = true;
+      this.loadApplicationList(code);
+    },
+    loadApplicationList(code) {
+      window.console.log(code);
+      //http.ajax()
+    },
     deleteRow(code) {
       //删除换书记录
       http
         .ajax("get", "my/publish-book/del", { code: code }, null)
-        .then(res => {
-          window.console.log(res.data);
-          let param = {};
-          param.pageSize = this.pagination.pageSize;
-          param.pageNo = this.pagination.current;
-          param.sorter = this.sorterField;
-          param.order = this.sorterOrder;
-          if (this.filters.status) {
-            param.status = this.filters.status.toString();
+        .then(() => {
+          let param = {
+            pageSize: this.pagination.pageSize,
+            pageNo: this.pagination.current,
+            sorter: this.sorterField,
+            order: this.sorterOrder
+          };
+          if (this.filters && this.filters.status) {
+            param["status"] = this.filters.status.toString();
           }
           this.fetch(param);
         })
@@ -150,13 +170,18 @@ export default {
       if (!param.status) {
         param.status = 1;
       }
+      if (!param.pageSize) {
+        param.pageSize = this.pagination.pageSize;
+      }
+      if (!param.pageNo) {
+        param.pageNo = this.pagination.current;
+      }
+
       http
         .ajax("get", "my/publish-book/query", param, null)
         .then(res => {
-          const _pagination = { ...this.pagination };
           let tempTotal = Number(res.data.total);
-          _pagination.total = tempTotal;
-          this.pagination = _pagination;
+          this.pagination.total = tempTotal;
           this.pagination.pageSize = param.pageSize;
           this.pagination.current = param.pageNo;
           //window.console.log(this.pagination);

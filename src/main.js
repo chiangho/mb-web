@@ -5,6 +5,7 @@ import Antd from 'ant-design-vue'
 import App from './App.vue'
 import 'ant-design-vue/dist/antd.css';
 import Common from "./Common.js"
+import wsConnection from './Socket.js'
 
 Vue.config.productionTip = false;
 
@@ -37,6 +38,8 @@ Common.router.beforeEach((to, from, next) => {
     }
 });
 
+Vue.prototype.$setWs = wsConnection;
+wsConnection.initWebSocket();
 
 new Vue({
     router: Common.router,

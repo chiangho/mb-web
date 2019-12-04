@@ -41,11 +41,10 @@
 </template>
 <script>
 import Http from "./Https.js";
-import Common from "./Common.js";
 export default {
   data() {
     return {
-      socket: null
+      
     };
   },
   computed: {
@@ -58,48 +57,10 @@ export default {
       window.console.log(loginState);
     }
   },
-  destroyed() {
-    // 销毁监听
-    this.socket.onclose = this.close;
-  },
-  mounted() {
-    // 初始化
-    this.initWebSocket();
-  },
+ 
+ 
   methods: {
-    initWebSocket: function() {
-      if (typeof WebSocket === "undefined") {
-        alert("您的浏览器不支持socket");
-      } else {
-        // 实例化socket
-        this.socket = new WebSocket(Common.Config.webSocketHost);
-        // 监听socket连接
-        this.socket.onopen = this.open;
-        // 监听socket错误信息
-        this.socket.onerror = this.error;
-        // 监听socket消息
-        this.socket.onmessage = this.getMessage;
-      }
-    },
-    open() {
-      window.console.log("Socket 已打开");
-      let WebSocketOutVo = {
-        type: 4,
-        content: this.$store.state.userToken
-      }
-      this.send(JSON.stringify(WebSocketOutVo));
-    },
-    getMessage(msg) {
-      window.console.log(msg);
-    },
-    error() {},
-    send: function(content) {
-      alert(1);
-      this.socket.send(content);
-    },
-    close: function() {
-      window.console.log("socket已经关闭");
-    },
+ 
     to_login_page() {
       this.$router.push("/login");
     },
