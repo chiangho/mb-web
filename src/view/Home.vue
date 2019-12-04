@@ -63,7 +63,7 @@ export default {
   data() {
     let self = this;
     return {
-      pageSizeOptions:[1,25,50],
+      pageSizeOptions:['1','25','50'],
       releaseBookCode:null,
       destroyOnClose:true,
       registerModelvisible:false,

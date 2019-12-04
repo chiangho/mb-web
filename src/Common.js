@@ -16,6 +16,7 @@ var Config = {
     userInfoCacheKey: "UserInfo",
     userTokenCacheKey: "UserToken",
     host: "http://127.0.0.1:9001",
+    webSocketHost:"ws://127.0.0.1:9001/websocket",
     unauthorized: "unauthorized",
     unauthorization: "unauthorization"
 }
@@ -28,7 +29,7 @@ const storeInfo = {
          */
         userInfo: JSON.parse(localStorage.getItem(Config.userInfoCacheKey)),
         userToken: localStorage.getItem(Config.userTokenCacheKey),
-        catchUri:''
+        catchUri: ''
     },
     mutations: {
         setUserInfo(state, userInfo) {
@@ -39,7 +40,7 @@ const storeInfo = {
             state.userToken = token;
             localStorage.setItem(Config.userTokenCacheKey, token);
         },
-        setCatchUti(state,uri){
+        setCatchUti(state, uri) {
             state.catchUri = uri;
         }
 
@@ -51,7 +52,7 @@ const storeInfo = {
             }
             return false;
         },
-        getCatchUri: state=>{
+        getCatchUri: state => {
             return state.catchUri;
         }
     }
@@ -72,15 +73,15 @@ const router = new VueRouter({
             path: '/my', component: My, meta: { "auth": true, "title": "个人中心" },
             children: [
                 { path: "member-address", component: MyMemberAddress, meta: { "auth": true, "title": "区域信息" } },
-                { path: "member-link",component:MyMemberLink,meta:{"auth":true,title:"联系人信息编辑"}},
-                { path: "member-release",component:MyMemberRelease,meta:{"auth":true,title:"我发布的图书"}}
+                { path: "member-link", component: MyMemberLink, meta: { "auth": true, title: "联系人信息编辑" } },
+                { path: "member-release", component: MyMemberRelease, meta: { "auth": true, title: "我发布的图书" } }
             ]
         },
         { path: '/publish-book', component: PublishBook, meta: { "auth": true, "title": "发布图书" } }
     ],
 })
 
-const  formatDate =function(date, fmt) {
+const formatDate = function (date, fmt) {
     if (/(y+)/.test(fmt)) {
         fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
     }
@@ -99,14 +100,63 @@ const  formatDate =function(date, fmt) {
     }
     return fmt;
 };
- 
-function padLeftZero (str) {
+
+function padLeftZero(str) {
     return ('00' + str).substr(str.length);
 }
+
+const defalutWebSocketParam = {
+    open: function () { },
+    message: function (msg) { 
+        window.console.log(msg); 
+    },
+    close: function () { },
+    error: function () { }
+}
+
+const webSocket = function (param = defalutWebSocketParam) {
+    if (typeof (WebSocket) == "undefined") {
+        window.console.log("您的浏览器不支持WebSocket");
+    }else if(!store.state.userToken){
+        window.console.log("token不能为空");
+    } else {
+        let socket = new WebSocket("ws://localhost:9001/websocket");
+        socket.onopen = function () {
+            window.console.log("Socket 已打开");
+            param.open();
+            let WebSocketOutVo={
+                type:4,
+                content:store.state.userToken
+            }
+            socket.send(JSON.stringify(WebSocketOutVo));
+        };
+        //获得消息事件  
+        socket.onmessage = function (msg) {
+            window.console.log(msg.data);
+            //发现消息进入    开始处理前端触发逻辑
+            param.message(msg);
+        };
+        //关闭事件  
+        socket.onclose = function () {
+            window.console.log("Socket已关闭");
+            param.close();
+        };
+        //发生了错误事件  
+        socket.onerror = function () {
+            window.console.log("Socket发生了错误");
+            //此时可以尝试刷新页面
+            param.error();
+        }
+        return socket;
+    }
+}
+
+
 
 export default {
     Config,
     store,
     router,
-    formatDate
+    formatDate,
+    webSocket
 }
