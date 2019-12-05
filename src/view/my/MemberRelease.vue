@@ -17,13 +17,31 @@
       </span>
     </a-table>
 
-    <a-drawer
-      width="640"
-      placement="right"
-      :closable="false"
-      @close="onClose"
-      :visible="visible"
-    >asdfasdf</a-drawer>
+    <a-drawer width="50%" placement="right" :closable="false" @close="onClose" :visible="visible">
+      <a-list itemLayout="vertical" :dataSource="applicationData">
+        <a-list-item slot="renderItem" slot-scope="item">
+          <img
+            slot="extra"
+            width="180"
+            height="180"
+            alt="logo"
+            :src="host+'/book/down/image?isbn='+item.isbn"
+          />
+          <a-list-item-meta>
+            <span slot="title">{{item.bookName}}</span>
+            <div slot="description">
+              <span>ISBN：{{item.isbn}}</span>
+              <br/>>
+              <span>来自：{{item.address}}</span>
+            </div>
+          </a-list-item-meta>
+          <div>{{item.remark}}</div>
+          <div slot="actions">
+            <a-button @click="transactionApplication(item.code)">确定换这本书</a-button>
+          </div>
+        </a-list-item>
+      </a-list>
+    </a-drawer>
   </div>
 </template>
 <script>
@@ -83,6 +101,9 @@ export default {
   },
   data() {
     return {
+      editCode: null,
+      host: Common.Config.host,
+      applicationData: [],
       visible: false,
       data: [],
       pagination: {
@@ -116,6 +137,19 @@ export default {
     }
   },
   methods: {
+    transactionApplication(tagCode) {
+      http
+        .ajax("get", "trancaction/add", { applayCode: tagCode }, null)
+        .then(() => {
+          this.$message.info("确定换书成功，请到换书记录中查看详情！");
+          this.onClose();
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          }
+        });
+    },
     onClose() {
       this.visible = false;
     },
@@ -124,8 +158,23 @@ export default {
       this.loadApplicationList(code);
     },
     loadApplicationList(code) {
+      this.editCode = code;
       window.console.log(code);
-      //http.ajax()
+      http
+        .ajax(
+          "get",
+          "apply/query-release-application-record",
+          { code: code, pageNo: 1, pageSize: 9999 },
+          null
+        )
+        .then(resp => {
+          this.applicationData = resp.data.items;
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          }
+        });
     },
     deleteRow(code) {
       //删除换书记录

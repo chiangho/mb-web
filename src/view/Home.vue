@@ -21,7 +21,7 @@
               :src="host+'/book/down/image?isbn='+item.isbn"
             />
             <a-list-item-meta>
-              <a slot="title" :href="item.bookName">{{item.bookName}}</a>
+              <span slot="title">{{item.bookName}}</span>
               <div slot="description">
                 作者：{{item.bookAuthor}}
                 <br />

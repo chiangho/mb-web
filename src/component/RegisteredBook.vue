@@ -38,7 +38,7 @@
 
         <span style="cursor: pointer" @click="addNewMemberLink">添加联系人</span>
       </a-form-item>
-       <a-form-item label="图书ISBN" :label-col="{span:4}" :wrapper-col="{span:18}">
+      <a-form-item label="图书ISBN" :label-col="{span:4}" :wrapper-col="{span:18}">
         <a-input
           v-decorator="[
           'bookisbn',
@@ -47,6 +47,17 @@
           placeholder="图书ISBN编号"
         ></a-input>
       </a-form-item>
+
+      <a-form-item label="留言" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-input
+          v-decorator="[
+          'remark',
+          { rules: [{ required: true, message: '留言' }] },
+        ]"
+          placeholder="留言"
+        ></a-input>
+      </a-form-item>
+
 
       <a-form-item :wrapper-col="{span:18,offset:4}">
         <a-button block type="primary" @click="publishbook">提交</a-button>
@@ -64,8 +75,6 @@
         <AddMemberLink @addMemberLinkSuccess="addMemberLinkSuccess"></AddMemberLink>
       </div>
     </a-modal>
-
-   
   </div>
 </template>
 <script>
@@ -86,16 +95,14 @@ export default {
       alertMessage: "",
       publishAlertVisible: false,
       publishAlertType: "error",
-      publishAlertMessage: "",
+      publishAlertMessage: ""
     };
   },
   components: {
     AddMemberAddress,
     AddMemberLink
   },
-  props:[
-    "code"
-  ],
+  props: ["code"],
   beforeCreate() {
     this.form = this.$form.createForm(this, { name: "publish-book" });
   },
@@ -104,7 +111,6 @@ export default {
     this.loadAddressData();
   },
   methods: {
-    
     loadAddressData() {
       Http.fetchPost("member/address/query", null)
         .then(res => {
@@ -131,7 +137,6 @@ export default {
       this.loadAddressData();
     },
 
-
     addMemberLinkSuccess() {
       this.modelLinkVisible = false;
       this.loadLinkData();
@@ -139,30 +144,26 @@ export default {
     addNewMemberLink() {
       this.modelLinkVisible = true;
     },
-    
+
     publishbook() {
       this.publishAlertVisible = false;
       this.publishAlertType = "error";
       this.publishAlertMessage = "";
-      this.form.validateFields((err,vlaues) => {
+      this.form.validateFields((err, vlaues) => {
         if (!err) {
-          vlaues["bookReleaseCode"]=this.code;
-          Http.ajax(
-            "get",
-            "apply/register-book",
-            vlaues,
-            null
-          ).then(res => {
-             window.console.log(res);
-                window.console.log(res);
-                this.$emit("registerBookSuccess");
+          vlaues["bookReleaseCode"] = this.code;
+          Http.ajax("get", "apply/register-book", vlaues, null)
+            .then(res => {
+              window.console.log(res);
+              window.console.log(res);
+              this.$emit("registerBookSuccess");
             })
             .catch(err => {
-              if(err){
+              if (err) {
                 this.publishAlertVisible = true;
                 this.publishAlertType = "error";
                 this.publishAlertMessage = err.message;
-              }else{
+              } else {
                 this.publishAlertVisible = true;
                 this.publishAlertType = "error";
                 this.publishAlertMessage = "未知异常";
