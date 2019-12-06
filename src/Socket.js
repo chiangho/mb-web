@@ -9,16 +9,12 @@ let wsConnection = {
   timeoutNum: null,
   serverTimeoutObj: null,
   //初始化webSocket长连接
-  initWebSocket:function () {
-    if(Common.store.state.userToken){
-        this.$ws = new WebSocket(Common.Config.webSocketHost);//写入地址 这里的地址可以在initWebSocket方法加入参数
-        this.$ws.onopen = this.wsOpen;
-        this.$ws.onclose = this.wsClose;
-        this.$ws.onmessage = this.wsMsg;
-        this.$ws.onerror = this.wsError;
-    }else{
-        wsConnection.reconnect();
-    }
+  initWebSocket: function () {
+    this.$ws = new WebSocket(Common.Config.webSocketHost);//写入地址 这里的地址可以在initWebSocket方法加入参数
+    this.$ws.onopen = this.wsOpen;
+    this.$ws.onclose = this.wsClose;
+    this.$ws.onmessage = this.wsMsg;
+    this.$ws.onerror = this.wsError;
   },
   //打开websocket
   wsOpen: function (e) {
@@ -62,10 +58,10 @@ let wsConnection = {
       //判断websocket当前状态
       if (_this.$ws.readyState != 1) {
         _this.reconnect();
-      }else{
-         let WebSocketOutVo = {
-            type: 3,
-            content: "心跳检测"
+      } else {
+        let WebSocketOutVo = {
+          type: 3,
+          content: "心跳检测"
         }
         _this.$ws.send(JSON.stringify(WebSocketOutVo));
       }
@@ -78,14 +74,23 @@ let wsConnection = {
     clearTimeout(_this.serverTimeoutObj);
     _this.startWsHeartbeat()
   },
-  sendMessage:(msg)=>{
+  sendMessage: (msg) => {
     //发送信息
     wsConnection.$ws.send(msg);
   },
-  login:()=>{
-    let WebSocketOutVo = {
+  login: () => {
+    if (Common.store.state.userToken) {
+      let WebSocketOutVo = {
         type: 4,
         content: Common.store.state.userToken
+      }
+      wsConnection.sendMessage(JSON.stringify(WebSocketOutVo));
+    }
+  },
+  logout: () => {
+    let WebSocketOutVo = {
+      type: 5,
+      content: "退出系统"
     }
     wsConnection.sendMessage(JSON.stringify(WebSocketOutVo));
   }

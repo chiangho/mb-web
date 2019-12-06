@@ -108,6 +108,7 @@ export default {
                 window.console.log("登录成功=======》"+catchUri);
                 this.$store.commit("setCatchUti", "");
                 if (catchUri) {
+                  this.$setWs.login();
                   this.$router.push(catchUri);
                 } else {
                   this.$router.push("/home");

@@ -16,7 +16,7 @@ var Config = {
     userInfoCacheKey: "UserInfo",
     userTokenCacheKey: "UserToken",
     host: "http://127.0.0.1:9001",
-    webSocketHost:"ws://127.0.0.1:9001/websocket",
+    webSocketHost: "ws://127.0.0.1:9001/websocket",
     unauthorized: "unauthorized",
     unauthorization: "unauthorization"
 }
@@ -29,7 +29,8 @@ const storeInfo = {
          */
         userInfo: JSON.parse(localStorage.getItem(Config.userInfoCacheKey)),
         userToken: localStorage.getItem(Config.userTokenCacheKey),
-        catchUri: ''
+        catchUri: '',
+        dialogueData: {}
     },
     mutations: {
         setUserInfo(state, userInfo) {
@@ -42,8 +43,24 @@ const storeInfo = {
         },
         setCatchUti(state, uri) {
             state.catchUri = uri;
+        },
+        addDialogue(state, info) {
+            let userCode = info["userCode"];
+            if (state.dialogueData[userCode]) {
+                state.dialogueData[userCode].push(info.item);
+            } else {
+                let arr = new Array();
+                arr.push(info.item)
+                state.dialogueData[userCode] = arr;
+            }
+        },
+        resetDialogue(state, info) {
+            let userCode = info["userCode"];
+            state.dialogueData[userCode] = [];
+            if (info.items) {
+                state.dialogueData[userCode].push(info.items);
+            }
         }
-
     },
     getters: {
         isLogin: state => {
@@ -54,6 +71,10 @@ const storeInfo = {
         },
         getCatchUri: state => {
             return state.catchUri;
+        },
+        getUserDialogueData: (state, getters) => (userCode) => {
+            window.console.log(getters);
+            return state.dialogueData[userCode];
         }
     }
 };
@@ -107,8 +128,8 @@ function padLeftZero(str) {
 
 const defalutWebSocketParam = {
     open: function () { },
-    message: function (msg) { 
-        window.console.log(msg); 
+    message: function (msg) {
+        window.console.log(msg);
     },
     close: function () { },
     error: function () { }
@@ -117,16 +138,16 @@ const defalutWebSocketParam = {
 const webSocket = function (param = defalutWebSocketParam) {
     if (typeof (WebSocket) == "undefined") {
         window.console.log("您的浏览器不支持WebSocket");
-    }else if(!store.state.userToken){
+    } else if (!store.state.userToken) {
         window.console.log("token不能为空");
     } else {
         let socket = new WebSocket("ws://localhost:9001/websocket");
         socket.onopen = function () {
             window.console.log("Socket 已打开");
             param.open();
-            let WebSocketOutVo={
-                type:4,
-                content:store.state.userToken
+            let WebSocketOutVo = {
+                type: 4,
+                content: store.state.userToken
             }
             socket.send(JSON.stringify(WebSocketOutVo));
         };

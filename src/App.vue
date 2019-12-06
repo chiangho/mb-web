@@ -67,12 +67,14 @@ export default {
     log_out() {
       Http.fetchGet("log-out")
         .then(response => {
+          this.$setWs.logout();
           this.$store.commit("setUserToken", "");
           this.$store.commit("setUserInfo", null);
           this.$router.push("/home");
           window.console.log(response.data);
         })
         .catch(err => {
+          this.$setWs.logout();
           this.$store.commit("setUserToken", "");
           this.$store.commit("setUserInfo", null);
           window.console.log(err);
