@@ -31,17 +31,34 @@
             <span slot="title">{{item.bookName}}</span>
             <div slot="description">
               <span>ISBN：{{item.isbn}}</span>
-              <br/>>
+              <br />
               <span>来自：{{item.address}}</span>
             </div>
           </a-list-item-meta>
           <div>{{item.remark}}</div>
           <div slot="actions">
             <a-button @click="transactionApplication(item.code)">确定换这本书</a-button>
+            <a-divider type="vertical" />
+            <a-button @click="openDialogue(item.memberCode)">和申请者对话</a-button>
           </div>
         </a-list-item>
       </a-list>
     </a-drawer>
+
+    <a-modal :title="'和'+targeMemberName+'的对话'" :visible="dialogueVisible">
+      <template slot="footer">
+        <div>
+          <a-textarea
+            placeholder="请输入要发送给对方的内容"
+            :autosize="{ minRows: 4, maxRows: 6 }"
+          />
+        </div>
+        <br />
+        <div>
+          <a-button type="primary" @click="handleOk">发送</a-button>
+        </div>
+      </template>
+    </a-modal>
   </div>
 </template>
 <script>
@@ -101,6 +118,9 @@ export default {
   },
   data() {
     return {
+      targeMemberName: "",
+      dialogueVisible: false,
+
       editCode: null,
       host: Common.Config.host,
       applicationData: [],
@@ -137,6 +157,21 @@ export default {
     }
   },
   methods: {
+    openDialogue(targeMemberCode) {
+      this.dialogueVisible = true;
+      //拉去用户信息
+      http.ajax("get","member/query-code",{code:targeMemberCode},null).then(resp=>{
+        this.targeMemberName=resp.data.name;
+      }).catch(err=>{
+          if(err&&err.message){
+            this.$message.error(err.message);
+          }
+
+      });
+      //判断是否含有
+
+
+    },
     transactionApplication(tagCode) {
       http
         .ajax("get", "trancaction/add", { applayCode: tagCode }, null)
