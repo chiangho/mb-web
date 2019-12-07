@@ -45,19 +45,15 @@
       </a-list>
     </a-drawer>
 
-    <a-modal :title="'和'+targeMemberName+'的对话'" :visible="dialogueVisible" :closable="true"> 
-      <template slot="footer">
-        <div>
-          <a-textarea
-            placeholder="请输入要发送给对方的内容"
-            :autosize="{ minRows: 4, maxRows: 6 }"
-          />
-        </div>
-        <br />
-        <div>
-          <a-button type="primary" @click="sendMessage()">发送</a-button>
-        </div>
-      </template>
+    <a-modal
+      title="Title"
+      @afterClose="closeDialogue()"
+      :visible="dialogueVisible"
+      @ok="handleOk"
+      :confirmLoading="confirmLoading"
+      @cancel="handleCancel"
+    >
+      <p></p>
     </a-modal>
   </div>
 </template>
@@ -120,6 +116,8 @@ export default {
     return {
       targeMemberName: "",
       dialogueVisible: false,
+      confirmLoading:false,
+
 
       editCode: null,
       host: Common.Config.host,
@@ -157,26 +155,36 @@ export default {
     }
   },
   methods: {
-    closeDialogue(){
+    handleOk() {
+      this.confirmLoading = true;
+      setTimeout(() => {
+        this.dialogueVisible = false;
+        this.confirmLoading = false;
+      }, 2000);
+    },
+    handleCancel(e) {
+      window.console.log("Clicked cancel button"+e);
       this.dialogueVisible = false;
     },
-    sendMessage(){
-
+    closeDialogue() {
+      alert(1);
+      this.dialogueVisible = false;
     },
+    sendMessage() {},
     openDialogue(targeMemberCode) {
       this.dialogueVisible = true;
       //拉去用户信息
-      http.ajax("get","member/query-code",{code:targeMemberCode},null).then(resp=>{
-        this.targeMemberName=resp.data.name;
-      }).catch(err=>{
-          if(err&&err.message){
+      http
+        .ajax("get", "member/query-code", { code: targeMemberCode }, null)
+        .then(resp => {
+          this.targeMemberName = resp.data.name;
+        })
+        .catch(err => {
+          if (err && err.message) {
             this.$message.error(err.message);
           }
-
-      });
+        });
       //判断是否含有
-
-
     },
     transactionApplication(tagCode) {
       http
