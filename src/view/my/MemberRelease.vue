@@ -45,7 +45,7 @@
       </a-list>
     </a-drawer>
 
-    <a-modal :title="'和'+targeMemberName+'的对话'" :visible="dialogueVisible">
+    <a-modal :title="'和'+targeMemberName+'的对话'" :visible="dialogueVisible" :closable="true"> 
       <template slot="footer">
         <div>
           <a-textarea
@@ -55,7 +55,7 @@
         </div>
         <br />
         <div>
-          <a-button type="primary" @click="handleOk">发送</a-button>
+          <a-button type="primary" @click="sendMessage()">发送</a-button>
         </div>
       </template>
     </a-modal>
@@ -157,6 +157,12 @@ export default {
     }
   },
   methods: {
+    closeDialogue(){
+      this.dialogueVisible = false;
+    },
+    sendMessage(){
+
+    },
     openDialogue(targeMemberCode) {
       this.dialogueVisible = true;
       //拉去用户信息
