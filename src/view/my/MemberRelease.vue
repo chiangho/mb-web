@@ -46,14 +46,20 @@
     </a-drawer>
 
     <a-modal
-      title="Title"
-      @afterClose="closeDialogue()"
       :visible="dialogueVisible"
       @ok="handleOk"
       :confirmLoading="confirmLoading"
       @cancel="handleCancel"
+      
     >
-      <p></p>
+      <div slot="title">
+        聊天对话框
+      </div>
+      <div slot = "footer">
+        <a-textarea v-model="sendMessage"  placeholder="填写要发送的内容" :rows="4" />
+        <br/>
+        <a-button @click="sendMessageAction()">发送</a-button>
+      </div>
     </a-modal>
   </div>
 </template>
@@ -117,6 +123,8 @@ export default {
       targeMemberName: "",
       dialogueVisible: false,
       confirmLoading:false,
+      sendMessage:"",
+      targeMemberCode:null,
 
 
       editCode: null,
@@ -155,24 +163,27 @@ export default {
     }
   },
   methods: {
-    handleOk() {
-      this.confirmLoading = true;
-      setTimeout(() => {
-        this.dialogueVisible = false;
-        this.confirmLoading = false;
-      }, 2000);
-    },
-    handleCancel(e) {
-      window.console.log("Clicked cancel button"+e);
+    handleOk() {},
+    handleCancel() {
       this.dialogueVisible = false;
     },
-    closeDialogue() {
-      alert(1);
-      this.dialogueVisible = false;
+    sendMessageAction() {
+      if(this.targeMemberCode&&this.sendMessage){
+
+        //添加自己发送的内容。
+        http.ajax("post","dialogue/send",{tagMemberCode:this.targeMemberCode,content:this.sendMessage},null).then(resp=>{
+          this.sendMessage = "";
+          window.console.log(resp);
+        }).catch(err=>{
+          if(err&&err.message){
+            this.$message.error(err.message);
+          }
+        });
+      }
     },
-    sendMessage() {},
     openDialogue(targeMemberCode) {
       this.dialogueVisible = true;
+      this.targeMemberCode = targeMemberCode,
       //拉去用户信息
       http
         .ajax("get", "member/query-code", { code: targeMemberCode }, null)
