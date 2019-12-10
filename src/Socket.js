@@ -79,6 +79,7 @@ let wsConnection = {
     wsConnection.$ws.send(msg);
   },
   login: () => {
+    alert("login");
     if (Common.store.state.userToken) {
       let WebSocketOutVo = {
         type: 4,
@@ -88,6 +89,7 @@ let wsConnection = {
     }
   },
   logout: () => {
+    alert("logout");
     let WebSocketOutVo = {
       type: 5,
       content: "退出系统"
