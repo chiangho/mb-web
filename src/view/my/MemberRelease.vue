@@ -37,9 +37,9 @@
           </a-list-item-meta>
           <div>{{item.remark}}</div>
           <div slot="actions">
-            <a-button @click="transactionApplication(item.code)">确定换这本书</a-button>
+            <a @click="transactionApplication(item.code)">确定换这本书</a>
             <a-divider type="vertical" />
-            <a-button @click="openDialogue(item.memberCode)">和申请者对话</a-button>
+            <a @click="openDialogue(item.memberCode)">和申请者对话</a>
           </div>
         </a-list-item>
       </a-list>

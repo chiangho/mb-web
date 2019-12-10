@@ -11,7 +11,7 @@
       <template slot="createTime" slot-scope="createTime">{{createTime | formatDate}}</template>
       <template slot="status" slot-scope="status">{{status | formatStatus}}</template>
       <span slot="action" slot-scope="text, record">
-        <a @click="deleteRow(record.code)">删除</a>
+        <a @click="getLinkInfo(record.code)">获取对方联系方式</a>
         <a-divider type="vertical" />
         <a @click="openDialogue(item.memberCode)">对话</a>
       </span>
@@ -21,19 +21,18 @@
 <script>
 import http from "./../../Https";
 import Common from "./../../Common";
-
 const columns = [
   {
     title: "对方书名",
     dataIndex: "releaseBookName",
-    key: "releaseBookName",
+    key: "releaseBookName"
   },
   {
     title: "对方ISBN",
     dataIndex: "releaseBookIsbn",
     key: "releaseBookIsbn"
   },
-  
+
   {
     title: "你的书名",
     dataIndex: "bookName",
@@ -45,21 +44,10 @@ const columns = [
     key: "isbn"
   },
   {
-    title: "申请时间",
+    title: "确认交换时间",
     dataIndex: "createTime",
     key: "createTime",
     scopedSlots: { customRender: "createTime" }
-  },
-  {
-    title: "状态",
-    dataIndex: "status",
-    key: "status",
-    scopedSlots: { customRender: "status" },
-    filters: [
-      { text: "成功", value: "1" },
-      { text: "失败", value: "0" },
-      { text: "待审核", value: "-1" }
-    ]
   },
   {
     title: "操作",
@@ -68,7 +56,6 @@ const columns = [
     scopedSlots: { customRender: "action" }
   }
 ];
-
 export default {
   data() {
     return {
@@ -84,9 +71,6 @@ export default {
         total: 0,
         showQuickJumper: false
       },
-      sorterField: "",
-      sorterOrder: "",
-      filters: null,
       loading: false,
       columns
     };
@@ -95,15 +79,6 @@ export default {
     formatDate(time) {
       var date = new Date(time);
       return Common.formatDate(date, "yyyy-MM-dd hh:mm:ss");
-    },
-    formatStatus(status) {
-      if (status == 1) {
-        return "申请成功";
-      } else if (status == 0) {
-        return "申请失败";
-      } else {
-        return "系统审核中..";
-      }
     }
   },
   mounted() {
@@ -113,39 +88,16 @@ export default {
     openDialogue(targeMemberCode){
       alert(targeMemberCode)
     },
-    deleteRow(code) {
-      http.ajax("get","apply/del",{code:code},null).then(resp=>{
-          window.console.log(resp);
-          this.fetch();
-      }).catch(err=>{
-          if(err&&err.message){
-            this.$message.error(err.message);
-          }
-      });
-      window.console.log(code);
-    },
     handleTableChange(pagination, filters, sorter) {
       let param = {};
-
-      this.sorterField = sorter.field;
-      this.sorterOrder = sorter.order;
-      this.filters = filters;
-
       param.pageSize = pagination.pageSize;
       param.pageNo = pagination.current;
-      param.sorter = sorter.field;
-      param.order = sorter.order;
-      if (filters.status) {
-        param.status = filters.status.toString();
-      }
-
       this.fetch(param);
+      window.console.log(filters);
+      window.console.log(sorter);
     },
     fetch(param = {}) {
       this.loading = true;
-      if (!param.status) {
-        param.status = 1;
-      }
       if (!param.pageSize) {
         param.pageSize = this.pagination.pageSize;
       }
@@ -154,13 +106,12 @@ export default {
       }
 
       http
-        .ajax("get", "apply/user-application-record", param, null)
+        .ajax("get", "transaction/query", param, null)
         .then(res => {
           let tempTotal = Number(res.data.total);
           this.pagination.total = tempTotal;
           this.pagination.pageSize = param.pageSize;
           this.pagination.current = param.pageNo;
-          //window.console.log(this.pagination);
           this.loading = false;
           this.data = res.data.items;
         })

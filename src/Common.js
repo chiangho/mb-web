@@ -10,7 +10,12 @@ import MyMemberAddress from "./view/my/MemberAddress.vue";
 import MyMemberLink from "./view/my/MemberLink.vue";
 import MyMemberRelease from "./view/my/MemberRelease.vue";
 
+
+
+
 import MyMemberApplication from "./view/my/MemberApplication.vue";
+import MyMemberTrancation from "./view/my/MemberTrancation.vue";
+
 
 import Vuex from "vuex";
 
@@ -99,7 +104,9 @@ const router = new VueRouter({
                 { path: "member-address", component: MyMemberAddress, meta: { "auth": true, "title": "区域信息" } },
                 { path: "member-link", component: MyMemberLink, meta: { "auth": true, title: "联系人信息编辑" } },
                 { path: "member-release", component: MyMemberRelease, meta: { "auth": true, title: "我发布的图书" } },
-                { path: "member-application",component:MyMemberApplication,meta:{auth:true,title:"我申请的图书"}}
+                { path: "member-application",component:MyMemberApplication,meta:{auth:true,title:"我申请的图书"}},
+                { path: "member-trancation",component:MyMemberTrancation,meta:{auth:true,title:"我的换书记录"}}
+                
             ]
         },
         { path: '/publish-book', component: PublishBook, meta: { "auth": true, "title": "发布图书" } }

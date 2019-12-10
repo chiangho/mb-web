@@ -105,10 +105,10 @@ export default {
                 this.$store.commit("setUserToken", response.data.token);
                 this.$store.commit("setUserInfo", response.data.member);
                 let catchUri = this.$store.getters.getCatchUri;
-                window.console.log("登录成功=======》"+catchUri);
+                window.console.log("登录成功=======》" + catchUri);
                 this.$store.commit("setCatchUti", "");
+                this.$setWs.login();
                 if (catchUri) {
-                  this.$setWs.login();
                   this.$router.push(catchUri);
                 } else {
                   this.$router.push("/home");
