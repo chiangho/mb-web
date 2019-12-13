@@ -18,6 +18,9 @@
           <a-menu-item key="member_trancation">
             <span @click="go_member_member_trancation">双方确认换书的记录</span>
           </a-menu-item>
+          <a-menu-item key="member_setting">
+            <span @click="go_member_setting">个人设置</span>
+          </a-menu-item>
         </a-menu>
       </a-layout-sider>
       <a-layout class="content_border">
@@ -37,6 +40,9 @@ export default {
     };
   },
   methods: {
+    go_member_setting(){
+      this.$router.push("/my/member-setting");
+    },
     go_member_member_trancation() {
       this.$router.push("/my/member-trancation");
     },

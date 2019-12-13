@@ -15,6 +15,7 @@ import MyMemberRelease from "./view/my/MemberRelease.vue";
 
 import MyMemberApplication from "./view/my/MemberApplication.vue";
 import MyMemberTrancation from "./view/my/MemberTrancation.vue";
+import MyMemberSetting from "./view/my/MemberSetting.vue";
 
 
 import Vuex from "vuex";
@@ -44,6 +45,12 @@ const storeInfo = {
         setUserInfo(state, userInfo) {
             state.userInfo = userInfo;
             localStorage.setItem(Config.userInfoCacheKey, JSON.stringify(userInfo));
+        },
+        setUserName(state, userName){
+            if(state.userInfo){
+                state.userInfo["name"]=userName;
+            }
+            localStorage.setItem(Config.userInfoCacheKey, JSON.stringify(state.userInfo));
         },
         setUserToken(state, token) {
             state.userToken = token;
@@ -105,8 +112,8 @@ const router = new VueRouter({
                 { path: "member-link", component: MyMemberLink, meta: { "auth": true, title: "联系人信息编辑" } },
                 { path: "member-release", component: MyMemberRelease, meta: { "auth": true, title: "我发布的图书" } },
                 { path: "member-application",component:MyMemberApplication,meta:{auth:true,title:"我申请的图书"}},
-                { path: "member-trancation",component:MyMemberTrancation,meta:{auth:true,title:"我的换书记录"}}
-                
+                { path: "member-trancation",component:MyMemberTrancation,meta:{auth:true,title:"我的换书记录"}},
+                { path: "member-setting",component:MyMemberSetting,meta:{auth:true,title:"个人信息设置"}}
             ]
         },
         { path: '/publish-book', component: PublishBook, meta: { "auth": true, "title": "发布图书" } }

@@ -13,9 +13,19 @@
       <span slot="action" slot-scope="text, record">
         <a @click="getLinkInfo(record.code)">获取对方联系方式</a>
         <a-divider type="vertical" />
-        <a @click="openDialogue(item.memberCode)">对话</a>
+        <a @click="openDialogue(record.tagerMemberCode)">对话</a>
       </span>
     </a-table>
+
+    <a-modal
+      title="对方图书信息"
+      :visible="memberLinkVisible"
+      @ok="handOkMememberLink"
+      @cancel="handleCancelMememberLink"
+      :destroyOnClose="true"
+    >
+      <p>{{memberInfo}}</p>
+    </a-modal>
   </div>
 </template>
 <script>
@@ -24,24 +34,24 @@ import Common from "./../../Common";
 const columns = [
   {
     title: "对方书名",
-    dataIndex: "releaseBookName",
-    key: "releaseBookName"
+    dataIndex: "tagerBookName",
+    key: "tagerBookName"
   },
   {
     title: "对方ISBN",
-    dataIndex: "releaseBookIsbn",
-    key: "releaseBookIsbn"
+    dataIndex: "tagerBookIsbn",
+    key: "tagerBookIsbn"
   },
 
   {
     title: "你的书名",
-    dataIndex: "bookName",
-    key: "bookName"
+    dataIndex: "selfBookName",
+    key: "selfBookName"
   },
   {
     title: "你书的ISBN",
-    dataIndex: "isbn",
-    key: "isbn"
+    dataIndex: "selfBookIsbn",
+    key: "selfBookIsbn"
   },
   {
     title: "确认交换时间",
@@ -59,8 +69,10 @@ const columns = [
 export default {
   data() {
     return {
+      memberInfo: "",
+      memberLinkVisible: false,
+
       host: Common.Config.host,
-      applicationData: [],
       visible: false,
       data: [],
       pagination: {
@@ -85,8 +97,27 @@ export default {
     this.fetch();
   },
   methods: {
-    openDialogue(targeMemberCode){
-      alert(targeMemberCode)
+    getLinkInfo(code) {
+      this.memberLinkVisible = true;
+      http
+        .ajax("get", "transaction/query-link-address", { code: code }, null)
+        .then(resp => {
+          this.memberInfo = resp.data;
+        })
+        .catch(err => {
+          if(err&&err.message){
+            this.$message.error(err.message);
+          }
+        });
+    },
+    handOkMememberLink() {
+      this.memberLinkVisible = false;
+    },
+    handleCancelMememberLink() {
+      this.memberLinkVisible = false;
+    },
+    openDialogue(targeMemberCode) {
+      alert(targeMemberCode);
     },
     handleTableChange(pagination, filters, sorter) {
       let param = {};
