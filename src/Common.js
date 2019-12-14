@@ -39,7 +39,21 @@ const storeInfo = {
         userInfo: JSON.parse(localStorage.getItem(Config.userInfoCacheKey)),
         userToken: localStorage.getItem(Config.userTokenCacheKey),
         catchUri: '',
-        dialogueData: {}
+
+
+        /*
+         {
+           12121212:{
+               windowCount:1,//打开窗口数量
+               unReadCount:2,//未读数量
+               data:[        //数据
+                   {showPersionCode,showPersionName,time,content,isSelf}
+               ]
+           }  
+         }
+        */
+        dialogueData: {},
+        isTipsDialogue:false
     },
     mutations: {
         setUserInfo(state, userInfo) {
@@ -59,23 +73,57 @@ const storeInfo = {
         setCatchUti(state, uri) {
             state.catchUri = uri;
         },
-        addDialogue(state, info) {
-            let userCode = info["userCode"];
+        addDialogue(state, dialogue) {
+            //设置对话数据
+            let userCode = dialogue["tagMemberCode"];
+            let md  = null;
             if (state.dialogueData[userCode]) {
-                state.dialogueData[userCode].push(info.item);
+                md = state.dialogueData[userCode];
             } else {
-                let arr = new Array();
-                arr.push(info.item)
-                state.dialogueData[userCode] = arr;
+                md = {
+                    data:[],
+                    windowCount:0,
+                    unReadCount:0
+                };
             }
+            md.data.push(dialogue);
+            if(!(md.windowCount&&md.windowCount>0)){
+                if(!dialogue.isSelf){
+                    md.unReadCount=md.unReadCount+1;
+                }
+            }
+            state.dialogueData[userCode]=md;
         },
-        resetDialogue(state, info) {
-            let userCode = info["userCode"];
-            state.dialogueData[userCode] = [];
-            if (info.items) {
-                state.dialogueData[userCode].push(info.items);
+        openDialogueWindow(state,tagMemberCode){
+            let md  = null;
+            if (state.dialogueData[tagMemberCode]) {
+                md = state.dialogueData[tagMemberCode];
+            } else {
+                md = {
+                    data:[],
+                    windowCount:0,
+                    unReadCount:0
+                };
             }
-        }
+            md.unReadCount=md.unReadCount+1;
+            md.unReadCount=0;
+            state.dialogueData[tagMemberCode]=md;
+        },
+        closeDialogueWindow(state,tagMemberCode){
+            let md  = null;
+            if (state.dialogueData[tagMemberCode]) {
+                md = state.dialogueData[tagMemberCode];
+            } else {
+                md = {
+                    data:[],
+                    windowCount:0,
+                    unReadCount:0
+                };
+            }
+            md.unReadCount=md.unReadCount-1;
+            state.dialogueData[tagMemberCode]=md;
+        },
+        
     },
     getters: {
         isLogin: state => {

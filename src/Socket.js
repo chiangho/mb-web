@@ -26,12 +26,19 @@ let wsConnection = {
   },
   wsClose: function (e) {
     window.console.log(e, 'ws close')
+    wsConnection.reconnect()
   },
   wsMsg: function (msg) {
     //每次接收到服务端消息后 重置websocket心跳
     wsConnection.resetHeartbeat();
     //服务端发送来的消息存到vuex
     window.console.log(msg);
+    if(msg.data){
+      let jsonContent  = JSON.parse(msg.data);
+      if(jsonContent.type&&jsonContent.type===1){
+        Common.store.commit("addDialogue",jsonContent.content);
+      }
+    }
   },
   wsError: function (err) {
     window.console.log(err, 'ws error');
@@ -79,17 +86,17 @@ let wsConnection = {
     wsConnection.$ws.send(msg);
   },
   login: () => {
-    alert("login");
     if (Common.store.state.userToken) {
       let WebSocketOutVo = {
         type: 4,
         content: Common.store.state.userToken
       }
       wsConnection.sendMessage(JSON.stringify(WebSocketOutVo));
+    }else{
+      wsConnection.logout();
     }
   },
   logout: () => {
-    alert("logout");
     let WebSocketOutVo = {
       type: 5,
       content: "退出系统"
