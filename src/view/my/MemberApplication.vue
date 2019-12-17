@@ -16,6 +16,23 @@
         <a @click="openDialogue(item.memberCode)">对话</a>
       </span>
     </a-table>
+
+    <a-modal
+      :visible="dialogueVisible"
+      @ok="handleOk"
+      :confirmLoading="confirmLoading"
+      @cancel="handleCancel"
+      :destroyOnClose="true"
+      :foorter="false"
+    >
+      <MyChat
+        :tagMemberCode="targeMemberCode"
+        :maxHeight="450"
+        :getUpperData="getUpperData"
+        :getUnderData="getUnderData"
+      ></MyChat>
+      <div slot="title">聊天</div>
+    </a-modal>
   </div>
 </template>
 <script>
@@ -26,14 +43,14 @@ const columns = [
   {
     title: "对方书名",
     dataIndex: "releaseBookName",
-    key: "releaseBookName",
+    key: "releaseBookName"
   },
   {
     title: "对方ISBN",
     dataIndex: "releaseBookIsbn",
     key: "releaseBookIsbn"
   },
-  
+
   {
     title: "你的书名",
     dataIndex: "bookName",
@@ -72,6 +89,10 @@ const columns = [
 export default {
   data() {
     return {
+      dialogueVisible: false,
+      confirmLoading: false,
+      targeMemberCode:null,
+
       host: Common.Config.host,
       applicationData: [],
       visible: false,
@@ -110,18 +131,28 @@ export default {
     this.fetch();
   },
   methods: {
-    openDialogue(targeMemberCode){
-      alert(targeMemberCode)
+    handleOk() {
+      this.dialogueVisible = false;
+    },
+    handleCancel() {
+      this.dialogueVisible = false;
+    },
+    openDialogue(targeMemberCode) {
+      this.targeMemberCode = targeMemberCode;
+      this.dialogueVisible=true;
     },
     deleteRow(code) {
-      http.ajax("get","apply/del",{code:code},null).then(resp=>{
+      http
+        .ajax("get", "apply/del", { code: code }, null)
+        .then(resp => {
           window.console.log(resp);
           this.fetch();
-      }).catch(err=>{
-          if(err&&err.message){
+        })
+        .catch(err => {
+          if (err && err.message) {
             this.$message.error(err.message);
           }
-      });
+        });
       window.console.log(code);
     },
     handleTableChange(pagination, filters, sorter) {

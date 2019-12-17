@@ -51,16 +51,12 @@
       :confirmLoading="confirmLoading"
       @cancel="handleCancel"
       :destroyOnClose="true"
+      :footer="null"
     >
       
-      <MyChat :tagMemberCode="targeMemberCode" :maxHeight="450" :getUpperData="getUpperData" :getUnderData="getUnderData"></MyChat>
+      <MyChat :tagMemberCode="targeMemberCode" ></MyChat>
       <div slot="title">
-        <!-- 聊天对话框 -->
-      </div>
-      <div slot = "footer">
-        <!-- <a-textarea v-model="sendMessage"  placeholder="填写要发送的内容" :rows="4" />
-        <br/>
-        <a-button @click="sendMessageAction()">发送</a-button> -->
+        聊天
       </div>
     </a-modal>
   </div>
