@@ -1,6 +1,6 @@
 <template>
   <div class="my-chat">
-    <a-row v-for="data in this.$store.getters.getUserDialogueData(this.tagMemberCode)" :key="data.code">
+    <a-row v-for="data in dataArray" :key="data.code">
       <a-col :span="12">{{data.showPersionName}}</a-col>
       <a-col :span="12">{{data.content}}</a-col>
     </a-row>
@@ -16,6 +16,7 @@
 
 <script>
 import http from "./../Https.js";
+// import { mapGetters } from 'vuex'
 
 export default {
   name: "MyChat",
@@ -66,10 +67,12 @@ export default {
       isRefreshedAll: false,
       isLoadedAll: false,
 
-      minHeight: 700
+      minHeight: 700,
+
+      dataArray:[]
     };
   },
-  mounted() {
+  created() {
     if (this.$store.getters.isNullDialogueForMember(this.tagMemberCode)) {
       http
         .ajax(
@@ -85,8 +88,24 @@ export default {
         })
         .catch(() => {});
     }
+    this.dataArray = this.$store.getters.getUserDialogueData(this.tagMemberCode);
+    this.setMessage();
   },
   methods: {
+    setMessage() {
+      setTimeout(()=>{
+        this.$store.commit("addDialogue", {
+          code: 121212,
+          memberCode: this.tagMemberCode,
+          tagMemberCode: this.tagMemberCode,
+          showPersionCode: "12345",
+          showPersionName: "1234567",
+          time: 1576581617000,
+          content: "1234567890",
+          isSelf: 0
+        });
+      }, 10000);
+    },
     //向上拉刷新
     refresh(done) {
       var me = this;
