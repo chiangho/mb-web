@@ -10,7 +10,7 @@ let wsConnection = {
   serverTimeoutObj: null,
   //初始化webSocket长连接
   initWebSocket: function () {
-    this.$ws = new WebSocket(Common.Config.webSocketHost);//写入地址 这里的地址可以在initWebSocket方法加入参数
+    this.$ws = new WebSocket(Common.Config.webSocketHost); //写入地址 这里的地址可以在initWebSocket方法加入参数
     this.$ws.onopen = this.wsOpen;
     this.$ws.onclose = this.wsClose;
     this.$ws.onmessage = this.wsMsg;
@@ -33,11 +33,15 @@ let wsConnection = {
     wsConnection.resetHeartbeat();
     //服务端发送来的消息存到vuex
     window.console.log(msg);
-    if(msg.data){
-      let jsonContent  = JSON.parse(msg.data);
-      if(jsonContent.type&&jsonContent.type===1){
-        Common.store.commit("addDialogue",jsonContent.content);
+    try {
+      if (msg.data) {
+        let jsonContent = JSON.parse(msg.data);
+        if (jsonContent.type && jsonContent.type === 1) {
+          Common.store.commit("addDialogue", jsonContent.content);
+        }
       }
+    } catch (err) {
+      window.console.log(err);
     }
   },
   wsError: function (err) {
@@ -92,7 +96,7 @@ let wsConnection = {
         content: Common.store.state.userToken
       }
       wsConnection.sendMessage(JSON.stringify(WebSocketOutVo));
-    }else{
+    } else {
       wsConnection.logout();
     }
   },

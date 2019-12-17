@@ -9,14 +9,9 @@ import PublishBook from "./view/PublishBook.vue";
 import MyMemberAddress from "./view/my/MemberAddress.vue";
 import MyMemberLink from "./view/my/MemberLink.vue";
 import MyMemberRelease from "./view/my/MemberRelease.vue";
-
-
-
-
 import MyMemberApplication from "./view/my/MemberApplication.vue";
 import MyMemberTrancation from "./view/my/MemberTrancation.vue";
 import MyMemberSetting from "./view/my/MemberSetting.vue";
-
 
 import Vuex from "vuex";
 
@@ -53,16 +48,16 @@ const storeInfo = {
          }
         */
         dialogueData: {},
-        isTipsDialogue:false
+        isTipsDialogue: false
     },
     mutations: {
         setUserInfo(state, userInfo) {
             state.userInfo = userInfo;
             localStorage.setItem(Config.userInfoCacheKey, JSON.stringify(userInfo));
         },
-        setUserName(state, userName){
-            if(state.userInfo){
-                state.userInfo["name"]=userName;
+        setUserName(state, userName) {
+            if (state.userInfo) {
+                state.userInfo["name"] = userName;
             }
             localStorage.setItem(Config.userInfoCacheKey, JSON.stringify(state.userInfo));
         },
@@ -73,58 +68,88 @@ const storeInfo = {
         setCatchUti(state, uri) {
             state.catchUri = uri;
         },
+        cleanUserDialogueData(state,userCode){
+            if(state.dialogueData[userCode]) {
+                state.dialogueData[userCode].data=[];
+            }
+        },
         addDialogue(state, dialogue) {
             //设置对话数据
             let userCode = dialogue["tagMemberCode"];
-            let md  = null;
+            let md = null;
             if (state.dialogueData[userCode]) {
                 md = state.dialogueData[userCode];
             } else {
                 md = {
-                    data:[],
-                    windowCount:0,
-                    unReadCount:0
+                    data: [],
+                    windowCount: 0,
+                    unReadCount: 0
                 };
             }
             md.data.push(dialogue);
-            if(!(md.windowCount&&md.windowCount>0)){
-                if(!dialogue.isSelf){
-                    md.unReadCount=md.unReadCount+1;
+            if (!(md.windowCount && md.windowCount > 0)) {
+                if (!dialogue.isSelf) {
+                    md.unReadCount = md.unReadCount + 1;
                 }
             }
-            state.dialogueData[userCode]=md;
+            if (md.unReadCount > 0) {
+                state.isTipsDialogue = true;
+            }
+            state.dialogueData[userCode] = md;
         },
-        openDialogueWindow(state,tagMemberCode){
-            let md  = null;
+        openDialogueWindow(state, tagMemberCode) {
+            let md = null;
             if (state.dialogueData[tagMemberCode]) {
                 md = state.dialogueData[tagMemberCode];
             } else {
                 md = {
-                    data:[],
-                    windowCount:0,
-                    unReadCount:0
+                    data: [],
+                    windowCount: 0,
+                    unReadCount: 0
                 };
             }
-            md.unReadCount=md.unReadCount+1;
-            md.unReadCount=0;
-            state.dialogueData[tagMemberCode]=md;
+            md.unReadCount = md.unReadCount + 1;
+            md.unReadCount = 0;
+            state.dialogueData[tagMemberCode] = md;
+
+            this.state.isTipsDialogue = false;
+            for (let key in state.dialogueData) {
+                let _a = state.dialogueData[key].unReadCount;
+                if (_a > 0) {
+                    this.state.isTipsDialogue = true;
+                    break;
+                }
+            }
+
         },
-        closeDialogueWindow(state,tagMemberCode){
-            let md  = null;
+        closeDialogueWindow(state, tagMemberCode) {
+            let md = null;
             if (state.dialogueData[tagMemberCode]) {
                 md = state.dialogueData[tagMemberCode];
             } else {
                 md = {
-                    data:[],
-                    windowCount:0,
-                    unReadCount:0
+                    data: [],
+                    windowCount: 0,
+                    unReadCount: 0
                 };
             }
-            md.unReadCount=md.unReadCount-1;
-            state.dialogueData[tagMemberCode]=md;
-        },
-        
+            md.unReadCount = md.unReadCount - 1;
+            state.dialogueData[tagMemberCode] = md;
+
+            this.state.isTipsDialogue = false;
+            for (let key in state.dialogueData) {
+                let _a = state.dialogueData[key].unReadCount;
+                if (_a > 0) {
+                    this.state.isTipsDialogue = true;
+                    break;
+                }
+            }
+        }
     },
+    actions:{
+        
+    }
+    ,
     getters: {
         isLogin: state => {
             if (state && state.userToken && state.userToken != "") {
@@ -135,9 +160,24 @@ const storeInfo = {
         getCatchUri: state => {
             return state.catchUri;
         },
-        getUserDialogueData: (state, getters) => (userCode) => {
-            window.console.log(getters);
-            return state.dialogueData[userCode];
+        getUserDialogueData: (state) => (userCode) => {
+            if (!state.dialogueData[userCode]) {
+                return [];
+            }
+            return state.dialogueData[userCode].data;
+        },
+        
+        isNullDialogueForMember: (state) => (memberCode) => {
+            let init = false;
+            if (!state.dialogueData[memberCode]) {
+                state.dialogueData[memberCode] = {
+                    data: [],
+                    windowCount: 0,
+                    unReadCount: 0
+                };
+                init = true;
+            }
+            return init;
         }
     }
 };
@@ -147,24 +187,106 @@ const store = new Vuex.Store(storeInfo)
 
 //路由
 const router = new VueRouter({
-    routes: [
-        { path: '/', component: Home, meta: { "title": "遇见书" } },
-        { path: '/home', component: Home, meta: { "title": "遇见书" } },
-        { path: '/login', component: Login, meta: { "title": "登录" } },
-        { path: '/register', component: Register, meta: { "title": "注册" } },
-        { path: '/forget-password', component: ForgetPassword, meta: { "title": "忘记密码" } },
+    routes: [{
+            path: '/',
+            component: Home,
+            meta: {
+                "title": "遇见书"
+            }
+        },
         {
-            path: '/my', component: My, meta: { "auth": true, "title": "个人中心" },
-            children: [
-                { path: "member-address", component: MyMemberAddress, meta: { "auth": true, "title": "区域信息" } },
-                { path: "member-link", component: MyMemberLink, meta: { "auth": true, title: "联系人信息编辑" } },
-                { path: "member-release", component: MyMemberRelease, meta: { "auth": true, title: "我发布的图书" } },
-                { path: "member-application",component:MyMemberApplication,meta:{auth:true,title:"我申请的图书"}},
-                { path: "member-trancation",component:MyMemberTrancation,meta:{auth:true,title:"我的换书记录"}},
-                { path: "member-setting",component:MyMemberSetting,meta:{auth:true,title:"个人信息设置"}}
+            path: '/home',
+            component: Home,
+            meta: {
+                "title": "遇见书"
+            }
+        },
+        {
+            path: '/login',
+            component: Login,
+            meta: {
+                "title": "登录"
+            }
+        },
+        {
+            path: '/register',
+            component: Register,
+            meta: {
+                "title": "注册"
+            }
+        },
+        {
+            path: '/forget-password',
+            component: ForgetPassword,
+            meta: {
+                "title": "忘记密码"
+            }
+        },
+        {
+            path: '/my',
+            component: My,
+            meta: {
+                "auth": true,
+                "title": "个人中心"
+            },
+            children: [{
+                    path: "member-address",
+                    component: MyMemberAddress,
+                    meta: {
+                        "auth": true,
+                        "title": "区域信息"
+                    }
+                },
+                {
+                    path: "member-link",
+                    component: MyMemberLink,
+                    meta: {
+                        "auth": true,
+                        title: "联系人信息编辑"
+                    }
+                },
+                {
+                    path: "member-release",
+                    component: MyMemberRelease,
+                    meta: {
+                        "auth": true,
+                        title: "我发布的图书"
+                    }
+                },
+                {
+                    path: "member-application",
+                    component: MyMemberApplication,
+                    meta: {
+                        auth: true,
+                        title: "我申请的图书"
+                    }
+                },
+                {
+                    path: "member-trancation",
+                    component: MyMemberTrancation,
+                    meta: {
+                        auth: true,
+                        title: "我的换书记录"
+                    }
+                },
+                {
+                    path: "member-setting",
+                    component: MyMemberSetting,
+                    meta: {
+                        auth: true,
+                        title: "个人信息设置"
+                    }
+                }
             ]
         },
-        { path: '/publish-book', component: PublishBook, meta: { "auth": true, "title": "发布图书" } }
+        {
+            path: '/publish-book',
+            component: PublishBook,
+            meta: {
+                "auth": true,
+                "title": "发布图书"
+            }
+        }
     ],
 })
 
@@ -193,12 +315,12 @@ function padLeftZero(str) {
 }
 
 const defalutWebSocketParam = {
-    open: function () { },
+    open: function () {},
     message: function (msg) {
         window.console.log(msg);
     },
-    close: function () { },
-    error: function () { }
+    close: function () {},
+    error: function () {}
 }
 
 const webSocket = function (param = defalutWebSocketParam) {

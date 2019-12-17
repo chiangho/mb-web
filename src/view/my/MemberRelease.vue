@@ -50,15 +50,17 @@
       @ok="handleOk"
       :confirmLoading="confirmLoading"
       @cancel="handleCancel"
-      
+      :destroyOnClose="true"
     >
+      
+      <MyChat :tagMemberCode="targeMemberCode" :maxHeight="450" :getUpperData="getUpperData" :getUnderData="getUnderData"></MyChat>
       <div slot="title">
-        聊天对话框
+        <!-- 聊天对话框 -->
       </div>
       <div slot = "footer">
-        <a-textarea v-model="sendMessage"  placeholder="填写要发送的内容" :rows="4" />
+        <!-- <a-textarea v-model="sendMessage"  placeholder="填写要发送的内容" :rows="4" />
         <br/>
-        <a-button @click="sendMessageAction()">发送</a-button>
+        <a-button @click="sendMessageAction()">发送</a-button> -->
       </div>
     </a-modal>
   </div>
@@ -66,6 +68,9 @@
 <script>
 import http from "./../../Https";
 import Common from "./../../Common";
+import MyChat from "./../../component/MyChat";
+
+
 const columns = [
   {
     title: "书名",
@@ -118,6 +123,9 @@ export default {
   mounted() {
     this.fetch();
   },
+  components:{
+    MyChat
+  },
   data() {
     return {
       targeMemberName: "",
@@ -163,6 +171,8 @@ export default {
     }
   },
   methods: {
+    getUpperData(){alert(1)},
+    getUnderData(){alert(2)},
     handleOk() {},
     handleCancel() {
       this.dialogueVisible = false;

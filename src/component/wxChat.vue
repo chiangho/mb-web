@@ -328,7 +328,7 @@
                         }
                     })
                 } catch (error) {
-                    console.error('wxChat: props "getUpperData" must return a promise object!')
+                    window.console.error('wxChat: props "getUpperData" must return a promise object!')
                 }
                 me.isUpperLaoding = false;
             },
@@ -356,7 +356,7 @@
                         }
                     })
                 } catch (error) {
-                    console.error('wxChat: props "getUnderData" must return a promise object!')
+                    window.console.error('wxChat: props "getUnderData" must return a promise object!')
                 }
                 me.isUnderLaoding = false;
             }
