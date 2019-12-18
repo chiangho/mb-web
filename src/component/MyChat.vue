@@ -1,21 +1,21 @@
 <template>
   <div class="my-chat">
-    <div class="my-chat-dialogue">
+    <div class="my-chat-dialogue" id="dialogue_box">
       <a-row
-        :class="'my-chat-row '+(data.isSelf==0?'':'self')"
+        :class="'my-chat-row '+(data.isSelf==0?'an-move-left':'an-move-right')"
         v-for="data in dataArray"
         :key="data.code"
       >
         <a-col :span="24">
           <p class="time">
-            <span v-text="data.time"></span>
+            <span>{{data.time | formatDate}}</span>
           </p>
-          <p class="time system">
-            <span v-html="data.content"></span>
-          </p>
+          <div :class="'main ' + (data.isSelf==0?'':'self')">
+            <span class="avatar" width="45" height="45">{{data.showPersionName}}</span>
 
-          <!-- <div>{{data.showPersionName}}</div>
-          <div class="text">{{data.content}}</div> -->
+            <!-- 文本 -->
+            <div class="text" v-emotion="data.content"></div>
+          </div>
         </a-col>
       </a-row>
     </div>
@@ -119,11 +119,23 @@
 .my-chat-dialogue .image {
   max-width: 200px;
 }
+
+.an-move-left {
+  left: 0;
+  animation: moveLeft 0.7s ease;
+  -webkit-animation: moveLeft 0.7s ease;
+}
+.an-move-right {
+  left: 0;
+  animation: moveRight 0.7s ease;
+  -webkit-animation: moveRight 0.7s ease;
+}
 </style>
 
 
 <script>
 import http from "./../Https.js";
+import Common from "./../Common";
 // import { mapGetters } from 'vuex'
 
 export default {
@@ -155,6 +167,14 @@ export default {
       message: ""
     };
   },
+  watch:{
+    "dataArray":function(){
+      this.$nextTick(function() {
+        let div = document.getElementById("dialogue_box");
+        div.scrollTop = div.scrollHeight;
+      });
+    },
+  },
   created() {
     if (this.$store.getters.isNullDialogueForMember(this.tagMemberCode)) {
       http
@@ -174,10 +194,43 @@ export default {
     this.dataArray = this.$store.getters.getUserDialogueData(
       this.tagMemberCode
     );
+    this.scrollBottom();
+  },
+  filters: {
+    formatDate(time) {
+      var date = new Date(time);
+      return Common.formatDate(date, "yyyy-MM-dd hh:mm:ss");
+    }
   },
   methods: {
+    scrollBottom() {
+      this.$nextTick(function() {
+        let div = document.getElementById("dialogue_box");
+        div.scrollTop = div.scrollHeight;
+      });
+    },
+
     sendMessage() {
-      alert(this.message);
+      if (!this.message || this.message == "") {
+        this.$message.error("发送的内容不能为空");
+        return;
+      }
+      http
+        .ajax(
+          "post",
+          "dialogue/send",
+          { tagMemberCode: this.tagMemberCode, content: this.message },
+          null
+        )
+        .then(resp => {
+          this.$store.commit("addDialogue", resp.data);
+          this.message = "";
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          }
+        });
     }
   }
 };

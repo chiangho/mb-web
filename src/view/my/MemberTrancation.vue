@@ -18,7 +18,7 @@
     </a-table>
 
     <a-modal
-      title="对方图书信息"
+      title="对方联系"
       :visible="memberLinkVisible"
       @ok="handOkMememberLink"
       @cancel="handleCancelMememberLink"
@@ -26,11 +26,25 @@
     >
       <p>{{memberInfo}}</p>
     </a-modal>
+
+    <a-modal
+      :visible="dialogueVisible"
+      @ok="handleOk"
+      :confirmLoading="confirmLoading"
+      @cancel="handleCancel"
+      :destroyOnClose="true"
+      :footer="null"
+    >
+      <MyChat :tagMemberCode="targeMemberCode"></MyChat>
+      <div slot="title">聊天</div>
+    </a-modal>
   </div>
 </template>
 <script>
 import http from "./../../Https";
 import Common from "./../../Common";
+import MyChat from "./../../component/MyChat";
+
 const columns = [
   {
     title: "对方书名",
@@ -72,6 +86,10 @@ export default {
       memberInfo: "",
       memberLinkVisible: false,
 
+      targeMemberCode: null,
+      dialogueVisible: false,
+      confirmLoading: false,
+
       host: Common.Config.host,
       visible: false,
       data: [],
@@ -87,6 +105,9 @@ export default {
       columns
     };
   },
+   components:{
+    MyChat
+  },
   filters: {
     formatDate(time) {
       var date = new Date(time);
@@ -97,6 +118,12 @@ export default {
     this.fetch();
   },
   methods: {
+    handleOk() {
+      this.dialogueVisible = false;
+    },
+    handleCancel() {
+      this.dialogueVisible = false;
+    },
     getLinkInfo(code) {
       this.memberLinkVisible = true;
       http
@@ -105,7 +132,7 @@ export default {
           this.memberInfo = resp.data;
         })
         .catch(err => {
-          if(err&&err.message){
+          if (err && err.message) {
             this.$message.error(err.message);
           }
         });
@@ -117,7 +144,8 @@ export default {
       this.memberLinkVisible = false;
     },
     openDialogue(targeMemberCode) {
-      alert(targeMemberCode);
+      this.targeMemberCode=targeMemberCode;
+      this.dialogueVisible = true;
     },
     handleTableChange(pagination, filters, sorter) {
       let param = {};

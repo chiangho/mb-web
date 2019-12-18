@@ -13,7 +13,7 @@
       <span slot="action" slot-scope="text, record">
         <a @click="deleteRow(record.code)">删除</a>
         <a-divider type="vertical" />
-        <a @click="openDialogue(item.memberCode)">对话</a>
+        <a @click="openDialogue(record.releaseBookMemberCode)">对话</a>
       </span>
     </a-table>
 
@@ -23,21 +23,20 @@
       :confirmLoading="confirmLoading"
       @cancel="handleCancel"
       :destroyOnClose="true"
-      :foorter="false"
+      :footer="null"
     >
-      <MyChat
-        :tagMemberCode="targeMemberCode"
-        :maxHeight="450"
-        :getUpperData="getUpperData"
-        :getUnderData="getUnderData"
-      ></MyChat>
-      <div slot="title">聊天</div>
+      
+      <MyChat :tagMemberCode="targeMemberCode" ></MyChat>
+      <div slot="title">
+        聊天
+      </div>
     </a-modal>
   </div>
 </template>
 <script>
 import http from "./../../Https";
 import Common from "./../../Common";
+import MyChat from "./../../component/MyChat";
 
 const columns = [
   {
@@ -130,6 +129,9 @@ export default {
   mounted() {
     this.fetch();
   },
+  components:{
+    MyChat
+  },
   methods: {
     handleOk() {
       this.dialogueVisible = false;
@@ -137,8 +139,8 @@ export default {
     handleCancel() {
       this.dialogueVisible = false;
     },
-    openDialogue(targeMemberCode) {
-      this.targeMemberCode = targeMemberCode;
+    openDialogue(releaseBookMemberCode) {
+      this.targeMemberCode = releaseBookMemberCode;
       this.dialogueVisible=true;
     },
     deleteRow(code) {

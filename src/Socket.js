@@ -29,9 +29,7 @@ let wsConnection = {
     wsConnection.reconnect()
   },
   wsMsg: function (msg) {
-    //每次接收到服务端消息后 重置websocket心跳
     wsConnection.resetHeartbeat();
-    //服务端发送来的消息存到vuex
     window.console.log(msg);
     try {
       if (msg.data) {
@@ -87,7 +85,12 @@ let wsConnection = {
   },
   sendMessage: (msg) => {
     //发送信息
-    wsConnection.$ws.send(msg);
+    try{
+      wsConnection.$ws.send(msg);
+    }catch(err){
+      window.console.log(msg);
+    }
+    
   },
   login: () => {
     if (Common.store.state.userToken) {
