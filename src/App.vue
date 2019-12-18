@@ -26,9 +26,16 @@
             <div class="item">
               <div v-if="$store.getters.isLogin">
                 {{$store.state.userInfo.name}}
+                <a-badge v-if="this.$store.getters.getUnReadCount>0" :count="this.$store.getters.getUnReadCount">
+                  <a-icon type="bell" />
+                </a-badge>
+                <a-icon v-else type="bell" ></a-icon>
                 <a-button @click="log_out()">退出</a-button>
               </div>
               <a-button v-else @click="to_login_page()">登录</a-button>
+              
+
+              
             </div>
           </a-col>
         </a-row>
@@ -37,6 +44,9 @@
         <router-view></router-view>
       </a-layout-content>
     </a-layout>
+    <audio src="./assets/newmsg.mp3" controls="controls" id="audio_newmsg">
+      Your browser does not support the audio element.
+    </audio>
   </div>
 </template>
 <script>

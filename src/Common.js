@@ -68,9 +68,9 @@ const storeInfo = {
         setCatchUti(state, uri) {
             state.catchUri = uri;
         },
-        cleanUserDialogueData(state,userCode){
-            if(state.dialogueData[userCode]) {
-                state.dialogueData[userCode].data=[];
+        cleanUserDialogueData(state, userCode) {
+            if (state.dialogueData[userCode]) {
+                state.dialogueData[userCode].data = [];
             }
         },
         addDialogue(state, dialogue) {
@@ -94,6 +94,7 @@ const storeInfo = {
             }
             if (md.unReadCount > 0) {
                 state.isTipsDialogue = true;
+                play();
             }
             state.dialogueData[userCode] = md;
         },
@@ -146,8 +147,8 @@ const storeInfo = {
             }
         }
     },
-    actions:{
-        
+    actions: {
+
     }
     ,
     getters: {
@@ -166,7 +167,16 @@ const storeInfo = {
             }
             return state.dialogueData[userCode].data;
         },
-        
+        getUnReadCount: state => {
+            let count = 0;
+            for (let key in state.dialogueData) {
+                let _a = state.dialogueData[key].unReadCount;
+                if (_a > 0) {
+                    count = count + _a;
+                }
+            }
+            return count;
+        },
         isNullDialogueForMember: (state) => (memberCode) => {
             let init = false;
             if (!state.dialogueData[memberCode]) {
@@ -188,105 +198,105 @@ const store = new Vuex.Store(storeInfo)
 //路由
 const router = new VueRouter({
     routes: [{
-            path: '/',
-            component: Home,
-            meta: {
-                "title": "遇见书"
-            }
+        path: '/',
+        component: Home,
+        meta: {
+            "title": "遇见书"
+        }
+    },
+    {
+        path: '/home',
+        component: Home,
+        meta: {
+            "title": "遇见书"
+        }
+    },
+    {
+        path: '/login',
+        component: Login,
+        meta: {
+            "title": "登录"
+        }
+    },
+    {
+        path: '/register',
+        component: Register,
+        meta: {
+            "title": "注册"
+        }
+    },
+    {
+        path: '/forget-password',
+        component: ForgetPassword,
+        meta: {
+            "title": "忘记密码"
+        }
+    },
+    {
+        path: '/my',
+        component: My,
+        meta: {
+            "auth": true,
+            "title": "个人中心"
         },
-        {
-            path: '/home',
-            component: Home,
-            meta: {
-                "title": "遇见书"
-            }
-        },
-        {
-            path: '/login',
-            component: Login,
-            meta: {
-                "title": "登录"
-            }
-        },
-        {
-            path: '/register',
-            component: Register,
-            meta: {
-                "title": "注册"
-            }
-        },
-        {
-            path: '/forget-password',
-            component: ForgetPassword,
-            meta: {
-                "title": "忘记密码"
-            }
-        },
-        {
-            path: '/my',
-            component: My,
+        children: [{
+            path: "member-address",
+            component: MyMemberAddress,
             meta: {
                 "auth": true,
-                "title": "个人中心"
-            },
-            children: [{
-                    path: "member-address",
-                    component: MyMemberAddress,
-                    meta: {
-                        "auth": true,
-                        "title": "区域信息"
-                    }
-                },
-                {
-                    path: "member-link",
-                    component: MyMemberLink,
-                    meta: {
-                        "auth": true,
-                        title: "联系人信息编辑"
-                    }
-                },
-                {
-                    path: "member-release",
-                    component: MyMemberRelease,
-                    meta: {
-                        "auth": true,
-                        title: "我发布的图书"
-                    }
-                },
-                {
-                    path: "member-application",
-                    component: MyMemberApplication,
-                    meta: {
-                        auth: true,
-                        title: "我申请的图书"
-                    }
-                },
-                {
-                    path: "member-trancation",
-                    component: MyMemberTrancation,
-                    meta: {
-                        auth: true,
-                        title: "我的换书记录"
-                    }
-                },
-                {
-                    path: "member-setting",
-                    component: MyMemberSetting,
-                    meta: {
-                        auth: true,
-                        title: "个人信息设置"
-                    }
-                }
-            ]
+                "title": "区域信息"
+            }
         },
         {
-            path: '/publish-book',
-            component: PublishBook,
+            path: "member-link",
+            component: MyMemberLink,
             meta: {
                 "auth": true,
-                "title": "发布图书"
+                title: "联系人信息编辑"
+            }
+        },
+        {
+            path: "member-release",
+            component: MyMemberRelease,
+            meta: {
+                "auth": true,
+                title: "我发布的图书"
+            }
+        },
+        {
+            path: "member-application",
+            component: MyMemberApplication,
+            meta: {
+                auth: true,
+                title: "我申请的图书"
+            }
+        },
+        {
+            path: "member-trancation",
+            component: MyMemberTrancation,
+            meta: {
+                auth: true,
+                title: "我的换书记录"
+            }
+        },
+        {
+            path: "member-setting",
+            component: MyMemberSetting,
+            meta: {
+                auth: true,
+                title: "个人信息设置"
             }
         }
+        ]
+    },
+    {
+        path: '/publish-book',
+        component: PublishBook,
+        meta: {
+            "auth": true,
+            "title": "发布图书"
+        }
+    }
     ],
 })
 
@@ -315,12 +325,12 @@ function padLeftZero(str) {
 }
 
 const defalutWebSocketParam = {
-    open: function () {},
+    open: function () { },
     message: function (msg) {
         window.console.log(msg);
     },
-    close: function () {},
-    error: function () {}
+    close: function () { },
+    error: function () { }
 }
 
 const webSocket = function (param = defalutWebSocketParam) {
@@ -360,7 +370,32 @@ const webSocket = function (param = defalutWebSocketParam) {
     }
 }
 
-
+var lastRunTime;
+var currentTime;
+var isPlaying=false;
+var play = function() {
+    lastRunTime = Date.now()
+    let audio = document.querySelector('#audio_newmsg')
+    if (!isPlaying) {
+        audio.play()
+        isPlaying = true
+    }
+    let timeOut = setTimeout(() => {
+        stop(timeOut)
+    }, 15000)
+}
+var stop = function(timeOut){
+    currentTime = Date.now()
+    let audio = document.querySelector('#audio_newmsg')
+    if ((currentTime - lastRunTime )>= 15000) {
+        if (isPlaying) {
+            audio.currentTime = 0
+            audio.pause()
+            isPlaying = false
+        }
+    } 
+    clearTimeout(timeOut)
+}
 
 export default {
     Config,
