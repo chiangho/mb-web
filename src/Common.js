@@ -14,6 +14,7 @@ import MyMemberTrancation from "./view/my/MemberTrancation.vue";
 import MyMemberSetting from "./view/my/MemberSetting.vue";
 
 import Vuex from "vuex";
+import http from "./Https"
 
 //配置信息
 var Config = {
@@ -34,8 +35,7 @@ const storeInfo = {
         userInfo: JSON.parse(localStorage.getItem(Config.userInfoCacheKey)),
         userToken: localStorage.getItem(Config.userTokenCacheKey),
         catchUri: '',
-
-
+        unDialogueCount: 0,
         /*
          {
            12121212:{
@@ -47,8 +47,7 @@ const storeInfo = {
            }  
          }
         */
-        dialogueData: {},
-        isTipsDialogue: false
+        dialogueData: {}
     },
     mutations: {
         setUserInfo(state, userInfo) {
@@ -73,84 +72,99 @@ const storeInfo = {
                 state.dialogueData[userCode].data = [];
             }
         },
+        sumDialogueUnreadCount(state) {
+            let count = 0;
+            for (let key in state.dialogueData) {
+                let _a = state.dialogueData[key].unReadCount;
+                if (_a > 0) {
+                    count = count + _a;
+                }
+            }
+            state.unDialogueCount = count;
+        },
+        cleanUserDialogue(state){
+            state.dialogueData={};
+        },
         addDialogue(state, dialogue) {
             //设置对话数据
             let userCode = dialogue["tagMemberCode"];
             let md = null;
             if (state.dialogueData[userCode]) {
                 md = state.dialogueData[userCode];
-            } else {
+                md.data.push(dialogue);
+                if (!dialogue.isSelf) {
+                    if(md.windowCount<=0){
+                        md.unReadCount = md.unReadCount + 1;
+                    }
+                    play();
+                }
+                state.dialogueData[userCode] = md;
+                this.commit('sumDialogueUnreadCount');
+            }else{
                 md = {
                     data: [],
                     windowCount: 0,
                     unReadCount: 0
                 };
+                http
+                    .ajax(
+                        "get",
+                        "dialogue/load-member",
+                        { targeMemberCode: userCode },
+                        null
+                    )
+                    .then(resp => {
+                        resp.data.forEach(item => {
+                            md.data.push(item);
+                        });
+                        md.data.push(dialogue);
+                        if (!dialogue.isSelf) {
+                            if(md.windowCount<=0){
+                                md.unReadCount = md.unReadCount + 1;
+                            }
+                            play();
+                        }
+                        state.dialogueData[userCode] = md;
+                        this.commit('sumDialogueUnreadCount');
+
+                    })
+                    .catch(() => { 
+                        md.data.push(dialogue);
+                        if (!dialogue.isSelf) {
+                            if(md.windowCount<=0){
+                                md.unReadCount = md.unReadCount + 1;
+                            }
+                            play();
+                        }
+                       
+                        state.dialogueData[userCode] = md;
+                        this.commit('sumDialogueUnreadCount');
+                    }); 
             }
-            md.data.push(dialogue);
-            if (!(md.windowCount && md.windowCount > 0)) {
-                if (!dialogue.isSelf) {
-                    md.unReadCount = md.unReadCount + 1;
-                }
-            }
-            if (md.unReadCount > 0) {
-                state.isTipsDialogue = true;
-                play();
-            }
-            state.dialogueData[userCode] = md;
+            
         },
         openDialogueWindow(state, tagMemberCode) {
             let md = null;
             if (state.dialogueData[tagMemberCode]) {
                 md = state.dialogueData[tagMemberCode];
-            } else {
-                md = {
-                    data: [],
-                    windowCount: 0,
-                    unReadCount: 0
-                };
-            }
-            md.unReadCount = md.unReadCount + 1;
-            md.unReadCount = 0;
-            state.dialogueData[tagMemberCode] = md;
-
-            this.state.isTipsDialogue = false;
-            for (let key in state.dialogueData) {
-                let _a = state.dialogueData[key].unReadCount;
-                if (_a > 0) {
-                    this.state.isTipsDialogue = true;
-                    break;
-                }
-            }
-
+                md.windowCount = md.windowCount + 1;
+                md.unReadCount = 0;
+                state.dialogueData[tagMemberCode] = md;
+            } 
+            this.commit('sumDialogueUnreadCount');
         },
         closeDialogueWindow(state, tagMemberCode) {
             let md = null;
             if (state.dialogueData[tagMemberCode]) {
                 md = state.dialogueData[tagMemberCode];
-            } else {
-                md = {
-                    data: [],
-                    windowCount: 0,
-                    unReadCount: 0
-                };
-            }
-            md.unReadCount = md.unReadCount - 1;
-            state.dialogueData[tagMemberCode] = md;
-
-            this.state.isTipsDialogue = false;
-            for (let key in state.dialogueData) {
-                let _a = state.dialogueData[key].unReadCount;
-                if (_a > 0) {
-                    this.state.isTipsDialogue = true;
-                    break;
+                if( md.windowCount>0){
+                    md.windowCount = md.windowCount - 1;
+                    state.dialogueData[tagMemberCode] = md;
                 }
-            }
+            } 
+            this.commit('sumDialogueUnreadCount');
         }
     },
-    actions: {
-
-    }
-    ,
     getters: {
         isLogin: state => {
             if (state && state.userToken && state.userToken != "") {
@@ -163,19 +177,28 @@ const storeInfo = {
         },
         getUserDialogueData: (state) => (userCode) => {
             if (!state.dialogueData[userCode]) {
-                return [];
+                let md = {
+                    data: [],
+                    windowCount: 0,
+                    unReadCount: 0
+                };
+                state.dialogueData[userCode] = md;
+                http
+                    .ajax(
+                        "get",
+                        "dialogue/load-member",
+                        { targeMemberCode: userCode },
+                        null
+                    )
+                    .then(resp => {
+                        resp.data.forEach(item => {
+                            md.data.push(item);
+                        });
+                        state.dialogueData[userCode] = md;
+                    })
+                    .catch(() => { });
             }
             return state.dialogueData[userCode].data;
-        },
-        getUnReadCount: state => {
-            let count = 0;
-            for (let key in state.dialogueData) {
-                let _a = state.dialogueData[key].unReadCount;
-                if (_a > 0) {
-                    count = count + _a;
-                }
-            }
-            return count;
         },
         isNullDialogueForMember: (state) => (memberCode) => {
             let init = false;
@@ -370,31 +393,16 @@ const webSocket = function (param = defalutWebSocketParam) {
     }
 }
 
-var lastRunTime;
-var currentTime;
-var isPlaying=false;
-var play = function() {
-    lastRunTime = Date.now()
-    let audio = document.querySelector('#audio_newmsg')
-    if (!isPlaying) {
-        audio.play()
-        isPlaying = true
+
+var play = function () {
+    //let audio = document.querySelector('#audio_newmsg');
+    try{
+        Vue.prototype.playAudio();
+        //audio.play();
+    }catch(e){
+        window.console.log(e);
     }
-    let timeOut = setTimeout(() => {
-        stop(timeOut)
-    }, 15000)
-}
-var stop = function(timeOut){
-    currentTime = Date.now()
-    let audio = document.querySelector('#audio_newmsg')
-    if ((currentTime - lastRunTime )>= 15000) {
-        if (isPlaying) {
-            audio.currentTime = 0
-            audio.pause()
-            isPlaying = false
-        }
-    } 
-    clearTimeout(timeOut)
+    
 }
 
 export default {

@@ -176,25 +176,14 @@ export default {
     },
   },
   created() {
-    if (this.$store.getters.isNullDialogueForMember(this.tagMemberCode)) {
-      http
-        .ajax(
-          "get",
-          "dialogue/load-member",
-          { targeMemberCode: this.tagMemberCode },
-          null
-        )
-        .then(resp => {
-          resp.data.forEach(item => {
-            this.$store.commit("addDialogue", item);
-          });
-        })
-        .catch(() => {});
-    }
     this.dataArray = this.$store.getters.getUserDialogueData(
       this.tagMemberCode
     );
+    this.$store.commit("openDialogueWindow",this.tagMemberCode);
     this.scrollBottom();
+  },
+  destroyed(){
+    this.$store.commit("closeDialogueWindow",this.tagMemberCode);
   },
   filters: {
     formatDate(time) {

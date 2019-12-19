@@ -26,16 +26,16 @@
             <div class="item">
               <div v-if="$store.getters.isLogin">
                 {{$store.state.userInfo.name}}
-                <a-badge v-if="this.$store.getters.getUnReadCount>0" :count="this.$store.getters.getUnReadCount">
+                <a-badge v-if="$store.state.unDialogueCount>0"
+                  :numberStyle="{backgroundColor: 'red', color: '#FFF', boxShadow: '0 0 0 1px #d9d9d9 inset',borderRadius:'8px',width:'18px',height:'18px',lineHeight:'18px', textAlign:'center'}"
+                >
+                  <span slot="count">{{$store.state.unDialogueCount}}</span>
                   <a-icon type="bell" />
                 </a-badge>
-                <a-icon v-else type="bell" ></a-icon>
-                <a-button @click="log_out()">退出</a-button>
+                <a-icon type="bell" v-else />
+                <a-button style="margin-left:20px" @click="log_out()">退出</a-button>
               </div>
               <a-button v-else @click="to_login_page()">登录</a-button>
-              
-
-              
             </div>
           </a-col>
         </a-row>
@@ -44,17 +44,23 @@
         <router-view></router-view>
       </a-layout-content>
     </a-layout>
-    <audio src="./assets/newmsg.mp3" controls="controls" id="audio_newmsg">
-      Your browser does not support the audio element.
-    </audio>
+    <audio
+      :src="mp3"
+      controls="controls"
+      muted
+      id="audio_newmsg"
+      hidden
+    >Your browser does not support the audio element.</audio>
+    <div clickMusic='true' ></div>
   </div>
 </template>
 <script>
 import Http from "./Https.js";
+import mp3 from "./assets/newmsg.mp3";
 export default {
   data() {
     return {
-      
+      mp3: mp3
     };
   },
   computed: {
@@ -67,10 +73,8 @@ export default {
       window.console.log(loginState);
     }
   },
- 
- 
+  
   methods: {
- 
     to_login_page() {
       this.$router.push("/login");
     },
@@ -80,6 +84,7 @@ export default {
           this.$setWs.logout();
           this.$store.commit("setUserToken", "");
           this.$store.commit("setUserInfo", null);
+          this.$store.commit("cleanUserDialogue");
           this.$router.push("/home");
           window.console.log(response.data);
         })
@@ -87,6 +92,7 @@ export default {
           this.$setWs.logout();
           this.$store.commit("setUserToken", "");
           this.$store.commit("setUserInfo", null);
+          this.$store.commit("cleanUserDialogue");
           window.console.log(err);
         });
     },

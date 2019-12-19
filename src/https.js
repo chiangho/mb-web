@@ -65,6 +65,7 @@ axios.interceptors.response.use((res) => {
                 //清楚登录信息
                 Common.store.commit("setUserToken", "");
                 Common.store.commit("setUserInfo", "");
+                this.$store.commit("cleanUserDialogue");
                 Common.router.push("/login");
             } else {
                 return Promise.reject(res.data.error);
