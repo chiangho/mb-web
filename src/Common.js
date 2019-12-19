@@ -41,6 +41,7 @@ const storeInfo = {
            12121212:{
                windowCount:1,//打开窗口数量
                unReadCount:2,//未读数量
+               memberName:'zhangshan',
                data:[        //数据
                    {showPersionCode,showPersionName,time,content,isSelf}
                ]
@@ -89,12 +90,14 @@ const storeInfo = {
             //设置对话数据
             let userCode = dialogue["tagMemberCode"];
             let md = null;
+            let memberName = dialogue.showPersionName;
             if (state.dialogueData[userCode]) {
                 md = state.dialogueData[userCode];
                 md.data.push(dialogue);
                 if (!dialogue.isSelf) {
                     if(md.windowCount<=0){
                         md.unReadCount = md.unReadCount + 1;
+                        md.memberName = memberName;
                     }
                     play();
                 }
@@ -104,7 +107,8 @@ const storeInfo = {
                 md = {
                     data: [],
                     windowCount: 0,
-                    unReadCount: 0
+                    unReadCount: 0,
+                    memberName:memberName
                 };
                 http
                     .ajax(
@@ -121,6 +125,7 @@ const storeInfo = {
                         if (!dialogue.isSelf) {
                             if(md.windowCount<=0){
                                 md.unReadCount = md.unReadCount + 1;
+                                md.memberName = memberName;
                             }
                             play();
                         }
@@ -133,6 +138,7 @@ const storeInfo = {
                         if (!dialogue.isSelf) {
                             if(md.windowCount<=0){
                                 md.unReadCount = md.unReadCount + 1;
+                                md.memberName = memberName;
                             }
                             play();
                         }
@@ -175,12 +181,13 @@ const storeInfo = {
         getCatchUri: state => {
             return state.catchUri;
         },
-        getUserDialogueData: (state) => (userCode) => {
+        getUserDialogueData: (state) => (userCode,memberName) => {
             if (!state.dialogueData[userCode]) {
                 let md = {
                     data: [],
                     windowCount: 0,
-                    unReadCount: 0
+                    unReadCount: 0,
+                    memberName: memberName
                 };
                 state.dialogueData[userCode] = md;
                 http
@@ -200,17 +207,16 @@ const storeInfo = {
             }
             return state.dialogueData[userCode].data;
         },
-        isNullDialogueForMember: (state) => (memberCode) => {
-            let init = false;
-            if (!state.dialogueData[memberCode]) {
-                state.dialogueData[memberCode] = {
-                    data: [],
-                    windowCount: 0,
-                    unReadCount: 0
-                };
-                init = true;
+        getUnReadMemberInfo: (state) =>  {
+            let data = new Array();
+            for (let key in state.dialogueData) {
+                data.push({
+                    memberCode:key,
+                    memberName:state.dialogueData[key].memberName,
+                    count:state.dialogueData[key].unReadCount
+                });
             }
-            return init;
+            return data;
         }
     }
 };
@@ -362,7 +368,7 @@ const webSocket = function (param = defalutWebSocketParam) {
     } else if (!store.state.userToken) {
         window.console.log("token不能为空");
     } else {
-        let socket = new WebSocket("ws://localhost:9001/websocket");
+        let socket = new WebSocket(Config.webSocketHost);
         socket.onopen = function () {
             window.console.log("Socket 已打开");
             param.open();

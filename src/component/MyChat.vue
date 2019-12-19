@@ -20,12 +20,12 @@
       </a-row>
     </div>
     <a-divider />
-    <div class="my-chat-send">
+    <div class="my-chat-send" @keyup.ctrl.enter="sendMessage()">
       <div>
         <a-textarea v-model="message" placeholder="填写发送内容" :rows="4" />
       </div>
-      <div>
-        <a-button @click="sendMessage()">提交</a-button>
+      <div class="footer">
+        <a-button type="primary" @click="sendMessage()" >提交(快捷键ctrl+enter)</a-button>
       </div>
     </div>
   </div>
@@ -130,6 +130,10 @@
   animation: moveRight 0.7s ease;
   -webkit-animation: moveRight 0.7s ease;
 }
+.footer{
+  text-align: right;
+  margin-top: 5px;
+}
 </style>
 
 
@@ -176,9 +180,15 @@ export default {
     },
   },
   created() {
-    this.dataArray = this.$store.getters.getUserDialogueData(
-      this.tagMemberCode
-    );
+
+    http.ajax("get","member/query-code",{code:this.tagMemberCode},null).then(resp=>{
+      this.dataArray = this.$store.getters.getUserDialogueData(
+        this.tagMemberCode,resp.data.name
+      );
+    }).catch(()=>{});
+
+
+    
     this.$store.commit("openDialogueWindow",this.tagMemberCode);
     this.scrollBottom();
   },
@@ -217,7 +227,7 @@ export default {
         })
         .catch(err => {
           if (err && err.message) {
-            this.$message.error(err.message);
+            this.$message.error(err.message+"_asdfasdf");
           }
         });
     }

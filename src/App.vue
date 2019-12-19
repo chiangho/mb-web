@@ -26,12 +26,31 @@
             <div class="item">
               <div v-if="$store.getters.isLogin">
                 {{$store.state.userInfo.name}}
-                <a-badge v-if="$store.state.unDialogueCount>0"
-                  :numberStyle="{backgroundColor: 'red', color: '#FFF', boxShadow: '0 0 0 1px #d9d9d9 inset',borderRadius:'8px',width:'18px',height:'18px',lineHeight:'18px', textAlign:'center'}"
+                <a-popover
+                  placement="bottom"
+                  trigger="hover"
+                  @visibleChange="handleHoverChange"
+                  :visible="hovered"
+                  v-if="$store.state.unDialogueCount>0"
                 >
-                  <span slot="count">{{$store.state.unDialogueCount}}</span>
-                  <a-icon type="bell" />
-                </a-badge>
+                  <template slot="content">
+                    <a-list size="small" bordered :dataSource="unReadMemberInfoData">
+                      <a-list-item
+                        slot="renderItem"
+                        slot-scope="item"
+                        @click="openDialogue(item.memberCode)"
+                      >{{item.memberName+'的消息['+item.count+']条未读'}}</a-list-item>
+                    </a-list>
+                  </template>
+
+                  <a-badge
+                    :numberStyle="{backgroundColor: 'red', color: '#FFF', boxShadow: '0 0 0 1px #d9d9d9 inset',borderRadius:'8px',width:'18px',height:'18px',lineHeight:'18px', textAlign:'center'}"
+                  >
+                    <span slot="count">{{$store.state.unDialogueCount}}</span>
+                    <a-icon type="bell" />
+                  </a-badge>
+                </a-popover>
+
                 <a-icon type="bell" v-else />
                 <a-button style="margin-left:20px" @click="log_out()">退出</a-button>
               </div>
@@ -45,22 +64,41 @@
       </a-layout-content>
     </a-layout>
     <audio
-      :src="mp3"
       controls="controls"
       muted
       id="audio_newmsg"
       hidden
     >Your browser does not support the audio element.</audio>
-    <div clickMusic='true' ></div>
+    <div clickMusic="true"></div>
+
+    <a-modal
+      :visible="dialogueVisible"
+      @ok="handleOk"
+      :confirmLoading="confirmLoading"
+      @cancel="handleCancel"
+      :destroyOnClose="true"
+      :footer="null"
+    >
+      <MyChat :tagMemberCode="targeMemberCode"></MyChat>
+      <div slot="title">聊天</div>
+    </a-modal>
   </div>
 </template>
 <script>
 import Http from "./Https.js";
-import mp3 from "./assets/newmsg.mp3";
+import MyChat from "./component/MyChat";
+
 export default {
+  components: {
+    MyChat
+  },
   data() {
     return {
-      mp3: mp3
+      hovered: false,
+      unReadMemberInfoData: [],
+      targeMemberCode: null,
+      dialogueVisible: false,
+      confirmLoading: false
     };
   },
   computed: {
@@ -73,8 +111,23 @@ export default {
       window.console.log(loginState);
     }
   },
-  
   methods: {
+    handleOk() {
+      this.dialogueVisible = false;
+    },
+    handleCancel() {
+      this.dialogueVisible = false;
+    },
+    openDialogue(memberCode) {
+      this.dialogueVisible = true;
+      this.targeMemberCode = memberCode;
+    },
+    handleHoverChange(visible) {
+      this.hovered = visible;
+      if (this.hovered) {
+        this.unReadMemberInfoData = this.$store.getters.getUnReadMemberInfo;
+      }
+    },
     to_login_page() {
       this.$router.push("/login");
     },
