@@ -23,7 +23,7 @@
             </a-menu>
           </a-col>
           <a-col :span="8" class="header-right">
-            <div class="item">
+            <div class="item  noUnLink">
               <div v-if="$store.getters.isLogin">
                 {{$store.state.userInfo.name}}
                 <a-popover
@@ -52,9 +52,13 @@
                 </a-popover>
 
                 <a-icon type="bell" v-else />
-                <a-button style="margin-left:20px" @click="log_out()">退出</a-button>
+                <a style="margin-left:20px" @click="log_out()" >退出</a>
               </div>
-              <a-button v-else @click="to_login_page()">登录</a-button>
+              <div v-else>
+                <a @click="to_login_page()"  >登录</a>
+                <a-divider type="vertical" />
+                <router-link to="/register" >注册</router-link>
+              </div>
             </div>
           </a-col>
         </a-row>
@@ -203,6 +207,22 @@ export default {
 }
 .ant-layout-header a:active {
   color: #1890ff !important;
+}
+.noUnLink a {
+  color: white !important;
+  text-decoration: none  !important;
+}
+.noUnLink a:hover {
+  color: #1890ff !important;
+  text-decoration: none  !important;
+}
+.noUnLink a:link {
+  color: #1890ff !important;
+  text-decoration: none  !important;
+}
+.noUnLink a:active {
+  color: #1890ff !important;
+  text-decoration: none  !important;
 }
 </style>
 

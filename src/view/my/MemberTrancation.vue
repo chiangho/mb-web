@@ -14,6 +14,8 @@
         <a @click="getLinkInfo(record.code)">获取对方联系方式</a>
         <a-divider type="vertical" />
         <a @click="openDialogue(record.tagerMemberCode)">对话</a>
+        <!-- <a-divider type="vertical" />
+        <a @click="complaint(record.tagerMemberCode)">投诉对方</a> -->
       </span>
     </a-table>
 
@@ -118,6 +120,9 @@ export default {
     this.fetch();
   },
   methods: {
+    complaint(memberCode){
+      alert(memberCode);
+    },
     handleOk() {
       this.dialogueVisible = false;
     },
