@@ -1,17 +1,39 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from "./view/Home.vue"
-import Login from "./view/Login.vue";
-import Register from "./view/Register.vue";
-import ForgetPassword from "./view/ForgetPassword.vue";
-import My from "./view/My.vue";
-import PublishBook from "./view/PublishBook.vue";
-import MyMemberAddress from "./view/my/MemberAddress.vue";
-import MyMemberLink from "./view/my/MemberLink.vue";
-import MyMemberRelease from "./view/my/MemberRelease.vue";
-import MyMemberApplication from "./view/my/MemberApplication.vue";
-import MyMemberTrancation from "./view/my/MemberTrancation.vue";
-import MyMemberSetting from "./view/my/MemberSetting.vue";
+
+
+
+
+// import Home from "./view/Home.vue"
+// import Login from "./view/Login.vue";
+// import Register from "./view/Register.vue";
+// import ForgetPassword from "./view/ForgetPassword.vue";
+// import My from "./view/My.vue";
+// import PublishBook from "./view/PublishBook.vue";
+// import MyMemberAddress from "./view/my/MemberAddress.vue";
+// import MyMemberLink from "./view/my/MemberLink.vue";
+// import MyMemberRelease from "./view/my/MemberRelease.vue";
+// import MyMemberApplication from "./view/my/MemberApplication.vue";
+// import MyMemberTrancation from "./view/my/MemberTrancation.vue";
+// import MyMemberSetting from "./view/my/MemberSetting.vue";
+
+
+
+const Home = () => import('./view/Home.vue');
+const Login = () => import('./view/Login.vue');
+const Register = () => import('./view/Register.vue');
+const ForgetPassword = () => import('./view/ForgetPassword.vue');
+const My = () => import('./view/My.vue');
+const PublishBook = () => import('./view/PublishBook.vue');
+const MyMemberAddress = () => import('./view/my/MemberAddress.vue');
+const MyMemberLink = () => import('./view/my/MemberLink.vue');
+const MyMemberRelease = () => import('./view/my/MemberRelease.vue');
+const MyMemberApplication = () => import('./view/my/MemberApplication.vue');
+const MyMemberTrancation = () => import('./view/my/MemberTrancation.vue');
+const MyMemberSetting = () => import('./view/my/MemberSetting.vue');
+
+
+
 
 import Vuex from "vuex";
 import http from "./Https"
