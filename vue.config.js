@@ -1,16 +1,21 @@
 let webpack = require('webpack');
+const CompressionPlugin = require('compression-webpack-plugin')
 module.exports = {
     // 选项...
     publicPath: "./",
-    configureWebpack: {
-        plugins: [new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)],
-        // CDN 加载组件
-        // externals: {
-        //     // 'vue-router': 'VueRouter',
-        //     Vuex: 'Vuex',
-        //     axios: 'axios',
-        //     moment: 'moment'
-        // }
-    }
-
+    configureWebpack() {
+        const myConfig = {}
+        myConfig.plugins = [new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)]
+        if (process.env.NODE_ENV === 'production') {
+            myConfig.plugins.push(
+                new CompressionPlugin({
+                    test: new RegExp('\\.(' + ['js', 'css'].join('|') + ')$'),
+                    threshold: 8192,
+                    minRatio: 0.8
+                })
+            )
+        }
+        return myConfig
+    },
 }
+
