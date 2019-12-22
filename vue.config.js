@@ -36,7 +36,7 @@ module.exports = {
         myConfig.plugins.push(new MiniCssExtractPlugin({
             filename: 'css/[name].css', // 抽离出来样式的名字
         }))
-        myConfig.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 8919 }))
+        //myConfig.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 8919 }))
         myConfig.externals = {
             'moment': 'moment'
         }
