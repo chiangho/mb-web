@@ -1,5 +1,10 @@
 let webpack = require('webpack');
 const CompressionPlugin = require('compression-webpack-plugin')
+let MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+var path = require("path")
+
+
 module.exports = {
     // 选项...
     publicPath: "./",
@@ -28,6 +33,10 @@ module.exports = {
                 minRatio: 0.8
             })
         )
+        myConfig.plugins.push(new MiniCssExtractPlugin({
+            filename: 'css/[name].css', // 抽离出来样式的名字
+        }))
+        myConfig.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 8919 }))
         myConfig.externals = {
             'moment': 'moment'
         }
@@ -63,6 +72,23 @@ module.exports = {
                     }
                 }
             }
+        };
+
+        // {'@ant-design/icons/lib/dist$': path.resolve(__dirname, 'utils/antdIcon.js')}
+        myConfig.resolve={
+            modules: [path.resolve(__dirname, './src'), 'node_modules'], // <- 追加代码
+            extensions: ['.ts', '.js', '.vue', '.json'], // <- 追加代码
+            
+            alias:{'@ant-design/icons/lib/dist$':path.resolve(__dirname, './antdIcon.js')}
+            // alias: {
+            //     vue$: 'vue/dist/vue.esm.js',
+            //     '@ant-design/icons/lib/dist$': path.resolve(__dirname, './antdIcon.js'), // <- 追加代码
+            // },
+            // plugins: [ // <- 追加代码
+            //     new TsconfigPathsPlugin({
+            //         configFile: path.resolve(__dirname, './tsconfig.json'),
+            //     }),
+            // ],
         };
 
         return myConfig
