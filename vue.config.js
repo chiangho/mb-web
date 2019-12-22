@@ -76,8 +76,8 @@ module.exports = {
 
         // {'@ant-design/icons/lib/dist$': path.resolve(__dirname, 'utils/antdIcon.js')}
         myConfig.resolve={
-            modules: [path.resolve(__dirname, './src'), 'node_modules'], // <- 追加代码
-            extensions: ['.ts', '.js', '.vue', '.json'], // <- 追加代码
+            //modules: [path.resolve(__dirname, './src'), 'node_modules'], // <- 追加代码
+            //extensions: ['.ts', '.js', '.vue', '.json'], // <- 追加代码
             
             alias:{'@ant-design/icons/lib/dist$':path.resolve(__dirname, './antdIcon.js')}
             // alias: {
