@@ -63,14 +63,14 @@ export default {
   data() {
     let self = this;
     return {
-      pageSizeOptions:['1','25','50'],
+      pageSizeOptions:['10','25','50'],
       releaseBookCode:null,
       destroyOnClose:true,
       registerModelvisible:false,
       host: Common.Config.host,
       publishBookList: [],
       center: [121.59996, 31.197646],
-      pageSize: 1,
+      pageSize: 25,
       pageNo: 1,
       pageTotal: 0,
       lng: 0,
