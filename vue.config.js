@@ -1,7 +1,7 @@
 let webpack = require('webpack');
 const CompressionPlugin = require('compression-webpack-plugin')
 let MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 var path = require("path")
 
 
@@ -15,6 +15,7 @@ module.exports = {
                 javascriptEnabled: true
             }
         },
+        requireModuleExtension:true,
         extract: true, // 是否使用css分离插件 ExtractTextPlugin
         sourceMap: false, // 开启 CSS source maps
         modules: false // 启用 CSS modules for all css / pre-processor files.

@@ -1,14 +1,12 @@
 // 自己项目里面用到的Icon
 export {
-    CheckOutline,
-    CloseCircleOutline,
-    CloseSquareOutline,
     CloseOutline,
     SmileOutline,
-    DownSquareOutline,
-    LoadingOutline,
-    DownOutline,
-    SearchOutline
+    AppstoreOutline,
+    BookOutline,
+    BellOutline,
+    LockOutline,
+    QuestionOutline
 }
 from '@ant-design/icons'
 

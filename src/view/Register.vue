@@ -13,6 +13,7 @@
 
       <a-form-item v-bind="formItemLayout" label="邮箱">
         <a-input
+          placeholder="邮箱"
           v-decorator="[
           'email',
           {
@@ -32,6 +33,7 @@
       </a-form-item>
       <a-form-item v-bind="formItemLayout" label="密码">
         <a-input
+          placeholder="密码"
           v-decorator="[
           'password',
           {
@@ -51,6 +53,7 @@
       </a-form-item>
       <a-form-item v-bind="formItemLayout" label="确认密码">
         <a-input
+          placeholder="确认密码"
           v-decorator="[
           'confirm',
           {
@@ -73,10 +76,11 @@
         <span slot="label">
           昵称&nbsp;
           <a-tooltip title="希望大家怎样称呼你?">
-            <a-icon type="question-circle-o" />
+            <a-icon type="question" />
           </a-tooltip>
         </span>
         <a-input
+          placeholder="昵称"
           v-decorator="[
           'nickname',
           {
@@ -89,6 +93,7 @@
         <a-row :gutter="8">
           <a-col :span="12">
             <a-input
+              placeholder="验证码"
               v-decorator="[
               'captcha',
               { rules: [{ required: true, message: '请填写发送到你邮箱的验证码！' }] },
@@ -122,18 +127,12 @@
     >
       <p>
         1、我们将保护你的注册隐私
-        <br/>
-        2、换书过程请诚实守信
-        <br/>
-        3、平台只提供换书信息发布和沟通的渠道。不负责线下的换书结果，但是如果发现用户有违诚实守信原则我们将封账号
-        <br/>
-        4、你发布的图书必须符合中华人民共和国的相关法律法规。不得传播色情、暴力等内容
-        <br/>
-        5、我们将调查不守信行为
-        <br/>
-        6、如有失信行为，请投诉。
-        <br/>
-        7、网站的最终解释权在遇见书
+        <br />2、换书过程请诚实守信
+        <br />3、平台只提供换书信息发布和沟通的渠道。不负责线下的换书结果，但是如果发现用户有违诚实守信原则我们将封账号
+        <br />4、你发布的图书必须符合中华人民共和国的相关法律法规。不得传播色情、暴力等内容
+        <br />5、我们将调查不守信行为
+        <br />6、如有失信行为，请投诉。
+        <br />7、网站的最终解释权在遇见书
       </p>
     </a-modal>
   </div>
@@ -221,7 +220,7 @@ export default {
                   ),
                   onOk() {
                     routerTemp.push("login");
-                  },
+                  }
                 });
               } else {
                 this.alertVisible = true;

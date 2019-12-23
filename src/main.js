@@ -8,7 +8,9 @@ import Common from "./Common.js"
 import wsConnection from './Socket.js'
 import audio from './assets/newmsg.mp3'
 
-import { Base,Layout,Col,Row,Modal,Icon,Menu,List,Form,Input,Divider,Button,Checkbox,Tooltip,Pagination,Select,Table,Message,Alert,message} from 'ant-design-vue';
+import { Base,
+     Layout, Col, Row, Modal, Icon, Menu, List, Form, Input, Divider, Button, Checkbox, Tooltip, Pagination, Select,
+     Table, Message, Alert, message  } from 'ant-design-vue';
 
 
 Vue.config.productionTip = false;
@@ -18,7 +20,7 @@ Vue.use(VueRouter)
 Vue.use(AMap);
 // Vue.use(Antd);
 Vue.use(Base).use(Layout).use(Col).use(Row).use(Modal).use(Icon).use(Menu).use(List).
-use(Form).use(Input).use(Divider).use(Button).use(Checkbox).use(Tooltip).use(Pagination).use(Select).use(Table).use(Message).use(Alert);
+    use(Form).use(Input).use(Divider).use(Button).use(Checkbox).use(Tooltip).use(Pagination).use(Select).use(Table).use(Message).use(Alert);
 
 
 AMap.initAMapApiLoader({
