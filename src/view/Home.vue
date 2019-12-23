@@ -97,7 +97,9 @@ export default {
       ]
     };
   },
-  created() {},
+  created() {
+     this.loadPublishBookList();
+  },
   watch: {
     lng: function(newLng) {
       window.console.log(newLng);
