@@ -1,8 +1,8 @@
 <template>
   <div>
     <h1 style="text-align: center">发布图书</h1>
-    <a-form :form="form" >
-      <a-form-item  :wrapper-col="{span:8,offset:8}">
+    <a-form :form="form">
+      <a-form-item :wrapper-col="{span:8,offset:8}">
         <a-alert
           v-if="publishAlertVisible"
           :type="publishAlertType"
@@ -10,52 +10,82 @@
           closable
         />
       </a-form-item>
-
       <a-form-item label="换书区域" :label-col="{span:8}" :wrapper-col="{span:8}">
-        <div>
-          <a-select
-            v-decorator="[
+        <a-select
+          placeholder="请选择图书交换的地点"
+          v-decorator="[
           'address',
           { rules: [{ required: true, message: '请输入区域地址!' }] },
         ]"
-          >
-            <a-select-option
-              v-for="address in addressData"
-              :key="address.code"
-            >{{address.areaName+'，'+address.address}}</a-select-option>
-          </a-select>
-          <div class="addSpan" @click="addNewMemberAddress">添加区域</div>
-        </div>
+        >
+          <a-select-option
+            v-for="address in addressData"
+            :key="address.code"
+          >{{address.areaName+'，'+address.address}}</a-select-option>
+        </a-select>
+        <span style="cursor: pointer" @click="addNewMemberAddress">添加区域</span>
       </a-form-item>
 
       <a-form-item label="换书联系人" :label-col="{span:8}" :wrapper-col="{span:8}">
-        <div>
-          <a-select
-            v-decorator="[
+        <a-select
+          placeholder="请选择图书交换的联系人"
+          v-decorator="[
           'persion',
           { rules: [{ required: true, message: '请输入联系人!' }] },
         ]"
-          >
-            <a-select-option
-              v-for="link in linkData"
-              :key="link.code"
-            >{{link.linkmanName+'，'+link.mobile+' '+(link.wechat==null?'':('，'+link.wechat))}}</a-select-option>
-          </a-select>
-          <div class="addSpan" @click="addNewMemberLink">添加联系人</div>
-        </div>
+        >
+          <a-select-option
+            v-for="link in linkData"
+            :key="link.code"
+          >{{link.linkmanName+'，'+link.mobile+' '+(link.wechat==null?'':('，'+link.wechat))}}</a-select-option>
+        </a-select>
+        <span style="cursor: pointer" @click="addNewMemberLink">添加联系人</span>
       </a-form-item>
-      <a-form-item :wrapper-col="{span:8,offset:8}">
-        <div>
-          <div>
-            <a-tag
-              closable
-              :afterClose="() => delBookInfo(item)"
-              :key="item"
-              v-for="item in bookIsbnArray"
-            >{{item}}</a-tag>
-          </div>
-          <a-button @click="openAddBookWindow">添加图书</a-button>
-        </div>
+
+      <a-form-item label="图书ISBN" :label-col="{span:8}" :wrapper-col="{span:8}">
+        <a-input
+          v-decorator="[
+          'isbn',
+          { rules: [{ required: true, message: '请输入图书ISBN编号!' }] },
+        ]"
+          placeholder="图书ISBN编号"
+        ></a-input>
+      </a-form-item>
+
+      <a-form-item label="书名" :label-col="{span:8}" :wrapper-col="{span:8}" v-if="isShow">
+        <a-input
+          v-decorator="[
+          'bookName',
+          { rules: [{ required: false, message: '书名' }] },
+        ]"
+          placeholder="请填写书名"
+        ></a-input>
+      </a-form-item>
+
+      <a-form-item label="封面图片"  :label-col="{span:8}" :wrapper-col="{span:8}" v-if="isShow">
+        <a-upload
+          name="image"
+          :multiple="false"
+          :beforeUpload="beforeUpdateFile"
+          :action="host+'/upload-image'"
+          :data="updateData"
+          :headers="updateHeaders" 
+          @change="handleUpdateIcon"
+        >
+          <a-button>
+            <a-icon type="upload" />上传图书封面
+          </a-button>
+        </a-upload>
+      </a-form-item>
+
+      <a-form-item label="留言" :label-col="{span:8}" :wrapper-col="{span:8}">
+        <a-input
+          v-decorator="[
+          'remark',
+          { rules: [{ required: true, message: '留言' }] },
+        ]"
+          placeholder="留言"
+        ></a-input>
       </a-form-item>
 
       <a-form-item :wrapper-col="{span:8,offset:8}">
@@ -75,47 +105,32 @@
       </div>
     </a-modal>
 
-    <a-modal 
+    <a-modal
       title="发布图书成功"
       v-model="modelPublishSuccess"
       cancelText="继续"
       okText="去看看首页"
       @ok="handleOkPublishSuccess"
-      @cancel="handleCancelPublishSuccess">
-      <p>
-        图书已经发布成功，请等待审核！
-      </p>
-    </a-modal>
-
-    <a-modal
-      title="添加图书"
-      v-model="modelAddModelVisibal"
-      cancelText="取消"
-      okText="添加"
-      @ok="handleOkBookIsbn"
-      @cancel="handleCancelBookIsbn"
+      @cancel="handleCancelPublishSuccess"
     >
-      <div>
-        <a-alert v-if="alertVisible" :type="alertType" :message="alertMessage" closable />
-        <a-input v-model="bookInfo" placeholder="填写图书的条码"></a-input>
-      </div>
+      <p>图书已经发布成功，请等待审核！</p>
     </a-modal>
   </div>
 </template>
 <script>
 import Http from "../Https.js";
+import Common from "./../Common";
 import AddMemberAddress from "./../component/AddMemberAddress";
 import AddMemberLink from "./../component/AddMemberLink";
 export default {
   data() {
     return {
+      host:Common.Config.host,
       addressData: null, //地址信息
       linkData: null, //连接信息
       modelvisible: false,
       modelLinkVisible: false,
-      modelAddModelVisibal: false,
-      bookInfo: "",
-      bookIsbnArray: [],
+
       alertVisible: false,
       alertType: "error",
       alertMessage: "",
@@ -123,7 +138,13 @@ export default {
       publishAlertVisible: false,
       publishAlertType: "error",
       publishAlertMessage: "",
-      modelPublishSuccess:false
+      modelPublishSuccess: false,
+
+      isShow: false,
+      updateData: null,
+      updateHeaders:{
+        Authorization:this.$store.state.userToken
+      }
     };
   },
   components: {
@@ -138,13 +159,29 @@ export default {
     this.loadAddressData();
   },
   methods: {
-    handleOkPublishSuccess(){
-      this.$router.push('/home');
+    beforeUpdateFile() {
+      this.updateData = {
+        isbn: this.form.getFieldValue("isbn")
+      };
     },
-    handleCancelPublishSuccess(){
-      this.$router.push('/publish-book');
+    handleUpdateIcon(info) {
+      if (info.file.status !== "uploading") {
+        window.console.log(info.file, info.fileList);
+      }
+      if (info.file.status === "done") {
+        alert(JSON.stringify(info.file.response));
+      } else if (info.file.status === "error") {
+        this.$message.error(`${info.file.name} file upload failed.`);
+      }
     },
-    
+    handleOkPublishSuccess() {
+      this.$router.push("/home");
+    },
+    handleCancelPublishSuccess() {
+      this.$router.go(0);
+      //this.$router.push("/publish-book");
+    },
+
     loadAddressData() {
       Http.fetchPost("member/address/query", null)
         .then(res => {
@@ -177,84 +214,37 @@ export default {
     addNewMemberLink() {
       this.modelLinkVisible = true;
     },
-    openAddBookWindow() {
-      this.bookInfo = "";
-      this.modelAddModelVisibal = true;
-    },
-    handleOkBookIsbn() {
-      this.alertVisible = false;
-      this.alertType = "success";
-      this.alertMessage = "";
-      //校验值是否存在
 
-      let notExistBook = this.bookIsbnArray.every(element => {
-        if (element == this.bookInfo) {
-          return false;
-        } else {
-          return true;
-        }
-      });
-
-      if (notExistBook) {
-        this.bookIsbnArray.push(this.bookInfo);
-        this.modelAddModelVisibal = false;
-      } else {
-        this.alertVisible = true;
-        this.alertType = "error";
-        this.alertMessage = "图书条码不能重复";
-      }
-      this.bookInfo = "";
-    },
-    handleCancelBookIsbn() {
-      this.modelAddModelVisibal = false;
-      this.bookInfo = "";
-    },
-    delBookInfo(removedTag) {
-      this.bookIsbnArray = this.bookIsbnArray.filter(tag => {
-        if (tag === removedTag) {
-          return false;
-        } else {
-          return true;
-        }
-      });
-    },
     publishbook() {
       this.publishAlertVisible = false;
       this.publishAlertType = "error";
       this.publishAlertMessage = "";
 
-      if (this.bookIsbnArray.length == 0) {
-        this.publishAlertVisible = true;
-        this.publishAlertType = "error";
-        this.publishAlertMessage = "请输入图书信息";
-        return;
-      }
-
       this.form.validateFields(err => {
         if (!err) {
-          Http.ajax(
-            "post",
-            "release",
-            { a: 123 },
-            {
-              isbns: this.bookIsbnArray,
-              memberLinkCode: this.form.getFieldValue("persion"),
-              memberAddressCode: this.form.getFieldValue("address")
-            }
-          )
-            .then(res => {
-              if(res.status==200){
-                this.modelPublishSuccess=true;
-              }else{
-                this.publishAlertVisible = true;
-                this.publishAlertType = "error";
-                this.publishAlertMessage = res.error.message;
-              }
-
-
+          Http.ajax("post", "release", null, {
+            bookName:this.form.getFieldValue("bookName"),
+            isbn: this.form.getFieldValue("isbn"),
+            memberLinkCode: this.form.getFieldValue("persion"),
+            memberAddressCode: this.form.getFieldValue("address"),
+            remark: this.form.getFieldValue("remark")
+          })
+            .then(() => {
+              this.modelPublishSuccess = true;
             })
             .catch(err => {
-              window.console.log(err);
+              if (err && err.code && err.code == 1) {
+                this.$message.success(err.message);
+                this.isShow = true;
+              } else {
+                this.publishAlertVisible = true;
+                this.publishAlertType = "error";
+                let messge = "发布失败";
+                if (err && err.message) {
+                  messge = err.message;
+                }
+                this.publishAlertMessage = messge;
+              }
             });
         }
       });

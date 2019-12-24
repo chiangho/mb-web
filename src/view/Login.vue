@@ -59,7 +59,9 @@
         >记住账号</a-checkbox>
 
         <a class="login-form-button" @click="to_forgot_password">忘记密码</a>
-        <a-button type="primary" html-type="submit" class="login-form-button">登录</a-button>Or
+        <br/>
+        <a-button type="primary" html-type="submit" >登录</a-button>
+        <br/>或者
         <a style="color:#000" @click="to_register">没有账号，赶紧注册吧!</a>
       </a-form-item>
     </a-form>
@@ -70,20 +72,33 @@
 import Http from "../Https.js";
 
 const formItemLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 8 }
+  labelCol: {
+    xs: { span: 16 },
+    sm: { span: 8 }
+  },
+  wrapperCol: {
+    xs: { span: 16 },
+    sm: { span: 8 }
+  }
 };
-
-const formTailLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 8, offset: 4 }
+const tailFormItemLayout = {
+  wrapperCol: {
+    xs: {
+      span: 24,
+      offset: 0
+    },
+    sm: {
+      span: 16,
+      offset: 8
+    }
+  }
 };
 
 export default {
   data() {
     return {
-      formItemLayout,
-      formTailLayout,
+      formItemLayout: formItemLayout,
+      formTailLayout: tailFormItemLayout,
       alertVisible: false,
       alertMessage: ""
     };

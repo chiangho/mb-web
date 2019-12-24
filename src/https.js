@@ -3,7 +3,7 @@ import qs from 'qs'
 import Common from "./Common.js"
 import wsConnection from "./Socket.js"
 
-axios.defaults.timeout = 5000; //响应时间
+axios.defaults.timeout = 10000; //响应时间
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'; //配置请求头
 //axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'; //配置请求头
 axios.defaults.baseURL = Common.Config.host; //配置接口地址
