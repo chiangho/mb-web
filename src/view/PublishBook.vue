@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1 style="text-align: center">发布图书</h1>
     <a-form :form="form">
       <a-form-item :wrapper-col="{span:8,offset:8}">
         <a-alert
@@ -52,32 +51,6 @@
         ></a-input>
       </a-form-item>
 
-      <a-form-item label="书名" :label-col="{span:8}" :wrapper-col="{span:8}" v-if="isShow">
-        <a-input
-          v-decorator="[
-          'bookName',
-          { rules: [{ required: false, message: '书名' }] },
-        ]"
-          placeholder="请填写书名"
-        ></a-input>
-      </a-form-item>
-
-      <a-form-item label="封面图片"  :label-col="{span:8}" :wrapper-col="{span:8}" v-if="isShow">
-        <a-upload
-          name="image"
-          :multiple="false"
-          :beforeUpload="beforeUpdateFile"
-          :action="host+'/upload-image'"
-          :data="updateData"
-          :headers="updateHeaders" 
-          @change="handleUpdateIcon"
-        >
-          <a-button>
-            <a-icon type="upload" />上传图书封面
-          </a-button>
-        </a-upload>
-      </a-form-item>
-
       <a-form-item label="留言" :label-col="{span:8}" :wrapper-col="{span:8}">
         <a-input
           v-decorator="[
@@ -115,6 +88,17 @@
     >
       <p>图书已经发布成功，请等待审核！</p>
     </a-modal>
+
+
+    <a-modal
+      title="登记图书"
+      v-model="isOpenInputBookWindow"
+      :footer="null"
+    >
+      <InputNewBook :isbn="tagIsbn" type="0" ></InputNewBook>
+    </a-modal>
+
+
   </div>
 </template>
 <script>
@@ -122,6 +106,8 @@ import Http from "../Https.js";
 import Common from "./../Common";
 import AddMemberAddress from "./../component/AddMemberAddress";
 import AddMemberLink from "./../component/AddMemberLink";
+import InputNewBook from "./../component/InputNewBook";
+
 export default {
   data() {
     return {
@@ -140,16 +126,14 @@ export default {
       publishAlertMessage: "",
       modelPublishSuccess: false,
 
-      isShow: false,
-      updateData: null,
-      updateHeaders:{
-        Authorization:this.$store.state.userToken
-      }
+      isOpenInputBookWindow: false,
+      tagIsbn:null
     };
   },
   components: {
     AddMemberAddress,
-    AddMemberLink
+    AddMemberLink,
+    InputNewBook
   },
   beforeCreate() {
     this.form = this.$form.createForm(this, { name: "publish-book" });
@@ -159,21 +143,7 @@ export default {
     this.loadAddressData();
   },
   methods: {
-    beforeUpdateFile() {
-      this.updateData = {
-        isbn: this.form.getFieldValue("isbn")
-      };
-    },
-    handleUpdateIcon(info) {
-      if (info.file.status !== "uploading") {
-        window.console.log(info.file, info.fileList);
-      }
-      if (info.file.status === "done") {
-        alert(JSON.stringify(info.file.response));
-      } else if (info.file.status === "error") {
-        this.$message.error(`${info.file.name} file upload failed.`);
-      }
-    },
+    
     handleOkPublishSuccess() {
       this.$router.push("/home");
     },
@@ -223,7 +193,6 @@ export default {
       this.form.validateFields(err => {
         if (!err) {
           Http.ajax("post", "release", null, {
-            bookName:this.form.getFieldValue("bookName"),
             isbn: this.form.getFieldValue("isbn"),
             memberLinkCode: this.form.getFieldValue("persion"),
             memberAddressCode: this.form.getFieldValue("address"),
@@ -235,7 +204,8 @@ export default {
             .catch(err => {
               if (err && err.code && err.code == 1) {
                 this.$message.success(err.message);
-                this.isShow = true;
+                this.isOpenInputBookWindow=true;
+                this.tagIsbn = this.form.getFieldValue("isbn");
               } else {
                 this.publishAlertVisible = true;
                 this.publishAlertType = "error";

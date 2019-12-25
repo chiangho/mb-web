@@ -6,16 +6,6 @@
       class="login-form"
       @submit="handleSubmit"
     >
-      <a-form-item :label-col="formTailLayout.labelCol" :wrapper-col="formTailLayout.wrapperCol">
-        <a-alert
-          v-if="alertVisible"
-          type="error"
-          :message="alertMessage"
-          closable
-          :afterClose="handleCloseAlert"
-        />
-      </a-form-item>
-
       <a-form-item
         :label-col="formItemLayout.labelCol"
         :wrapper-col="formItemLayout.wrapperCol"
@@ -116,7 +106,7 @@ export default {
           //调用登录接口
           Http.fetchPost("login", values)
             .then(response => {
-              if (response.status == 200) {
+              
                 this.$store.commit("setUserToken", response.data.token);
                 this.$store.commit("setUserInfo", response.data.member);
                 let catchUri = this.$store.getters.getCatchUri;
@@ -128,14 +118,12 @@ export default {
                 } else {
                   this.$router.push("/home");
                 }
-              } else {
-                this.alertVisible = true;
-                this.alertMessage = response.error.message;
-              }
+              
             })
             .catch(err => {
-              this.alertVisible = true;
-              this.alertMessage = err.message;
+              //this.alertVisible = true;
+              //this.alertMessage = err.message;
+              this.$message.error(err.message)
             });
         }
       });
