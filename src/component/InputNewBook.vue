@@ -37,40 +37,43 @@
         </a-upload>
       </a-form-item>
 
-      <a-form-item  :wrapper-col="{span:8,offset:8}">
+      <a-form-item :wrapper-col="{span:8,offset:8}">
         <a-button type="primary" block>提交</a-button>
       </a-form-item>
     </a-form>
   </div>
 </template>
 <script>
+import Common from "./../Common";
+
 export default {
   data() {
     return {
+      host: Common.Config.host,
       updateData: {},
-      inputBookCode:null,
+      inputBookCode: null,
       updateHeaders: {
         Authorization: this.$store.state.userToken
       }
     };
   },
-  beforeCreate(){
-      this.form = this.$form.createForm(this, { name: "member-input-book" });
+  beforeCreate() {
+    this.form = this.$form.createForm(this, { name: "member-input-book" });
   },
   mounted() {
     this.form.setFieldsValue({
-        isbn: this.isbn,
+      isbn: this.isbn
     });
   },
   props: ["type", "isbn"],
   methods: {
     beforeUpdateFile() {
       let isbn_temp = this.form.getFieldValue("isbn");
-      if(isbn_temp){
-          return true;
-      }else{
-          this.$message.error("图书编号不能为空");
-          return false;
+      if (isbn_temp) {
+        return true;
+      } else {
+        this.$message.error("图书编号不能为空");
+        return false;
       }
     },
     handleUpdateIcon(info) {
