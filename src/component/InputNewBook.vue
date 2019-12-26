@@ -32,13 +32,13 @@
           @change="handleUpdateIcon"
         >
           <a-button>
-            <a-icon type="upload" />上传图书封面
+            <a-icon type="upload"/>上传图书封面
           </a-button>
         </a-upload>
       </a-form-item>
 
       <a-form-item :wrapper-col="{span:8,offset:8}">
-        <a-button type="primary" block>提交</a-button>
+        <a-button type="primary" block  @click="inputBook">登记</a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -52,6 +52,7 @@ export default {
       host: Common.Config.host,
       updateData: {},
       inputBookCode: null,
+      imagePath:"",
       updateHeaders: {
         Authorization: this.$store.state.userToken
       }
@@ -67,8 +68,12 @@ export default {
   },
   props: ["type", "isbn"],
   methods: {
+    inputBook(){
+
+    },
     beforeUpdateFile() {
       let isbn_temp = this.form.getFieldValue("isbn");
+      this.imagePath="";
       if (isbn_temp) {
         return true;
       } else {
@@ -81,7 +86,8 @@ export default {
         window.console.log(info.file, info.fileList);
       }
       if (info.file.status === "done") {
-        alert(JSON.stringify(info.file.response));
+        this.imagePath = info.file.response
+        alert(this.imagePath);
       } else if (info.file.status === "error") {
         this.$message.error(`${info.file.name} file upload failed.`);
       }
