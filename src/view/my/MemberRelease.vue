@@ -12,8 +12,8 @@
       <template slot="status" slot-scope="status">{{status | formatStatus}}</template>
       <span slot="action" slot-scope="text, record">
         <a @click="deleteRow(record.code)">删除</a>
-        <a-divider type="vertical" />
-        <a @click="selectTagBook(record.code)">选择想要交换的图书</a>
+        <a-divider type="vertical"  v-if="record.status==1"/>
+        <a v-if="record.status==1" @click="selectTagBook(record.code)">选择想要交换的图书</a>
       </span>
     </a-table>
 

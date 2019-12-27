@@ -89,21 +89,14 @@
       <p>图书已经发布成功，请等待审核！</p>
     </a-modal>
 
-
-    <a-modal
-      title="登记图书"
-      v-model="isOpenInputBookWindow"
-      :footer="null"
-    >
-      <InputNewBook :isbn="tagIsbn" type="0" ></InputNewBook>
+    <a-modal title="登记图书" v-model="isOpenInputBookWindow" :destroyOnClose="true" :footer="null">
+      <InputNewBook :isbn="tagIsbn" type="0" :callBack="callBack"></InputNewBook>
     </a-modal>
-
-
   </div>
 </template>
 <script>
 import Http from "../Https.js";
-import Common from "./../Common";
+
 import AddMemberAddress from "./../component/AddMemberAddress";
 import AddMemberLink from "./../component/AddMemberLink";
 import InputNewBook from "./../component/InputNewBook";
@@ -111,7 +104,6 @@ import InputNewBook from "./../component/InputNewBook";
 export default {
   data() {
     return {
-      host:Common.Config.host,
       addressData: null, //地址信息
       linkData: null, //连接信息
       modelvisible: false,
@@ -127,7 +119,8 @@ export default {
       modelPublishSuccess: false,
 
       isOpenInputBookWindow: false,
-      tagIsbn:null
+      tagIsbn: null,
+      registerBookCode: null
     };
   },
   components: {
@@ -143,7 +136,14 @@ export default {
     this.loadAddressData();
   },
   methods: {
-    
+    callBack(code, isbn, bookName) {
+      this.isOpenInputBookWindow = false;
+      this.registerBookCode = code;
+      window.console.log(bookName);
+      this.form.setFieldsValue({
+        isbn: isbn
+      });
+    },
     handleOkPublishSuccess() {
       this.$router.push("/home");
     },
@@ -193,6 +193,7 @@ export default {
       this.form.validateFields(err => {
         if (!err) {
           Http.ajax("post", "release", null, {
+            registerBookCode: this.registerBookCode,
             isbn: this.form.getFieldValue("isbn"),
             memberLinkCode: this.form.getFieldValue("persion"),
             memberAddressCode: this.form.getFieldValue("address"),
@@ -204,7 +205,7 @@ export default {
             .catch(err => {
               if (err && err.code && err.code == 1) {
                 this.$message.success(err.message);
-                this.isOpenInputBookWindow=true;
+                this.isOpenInputBookWindow = true;
                 this.tagIsbn = this.form.getFieldValue("isbn");
               } else {
                 this.publishAlertVisible = true;

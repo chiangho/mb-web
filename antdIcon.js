@@ -6,7 +6,11 @@ export {
     BookOutline,
     BellOutline,
     LockOutline,
-    QuestionOutline
+    QuestionOutline,
+    FilterFill,
+    CaretUpFill,
+    CaretDownFill
+
 }
 from '@ant-design/icons'
 

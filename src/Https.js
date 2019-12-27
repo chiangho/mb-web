@@ -12,11 +12,11 @@ axios.defaults.baseURL = Common.Config.host; //配置接口地址
 axios.interceptors.request.use((config) => {
     //在发送请求之前做某件事
     if (config.method === 'post') {
-        if(config.params){
-            let queryString  = qs.stringify(config.params);
-            if(!config.data){
-                config.data=queryString;
-                
+        if (config.params) {
+            let queryString = qs.stringify(config.params);
+            if (!config.data) {
+                config.data = queryString;
+
             }
             // if(config.url.indexOf("?")>0){
             //     let lastChar = config.url.substr(config.url.length-1,1);
@@ -49,7 +49,7 @@ axios.interceptors.request.use((config) => {
 //返回状态判断(添加响应拦截器)
 axios.interceptors.response.use((res) => {
     //对响应数据做些事
-    
+
     if (res.status === 200) {
         let status = res.data.status;
         if (status === 200) {
@@ -57,10 +57,10 @@ axios.interceptors.response.use((res) => {
         } else {
             let error = res.data.error.code;
             if (error == Common.Config.unauthorization || error == Common.Config.unauthorized) {
-                window.console.log("未认证，请先登录！"+Common.router.history.current.path);
-                
+                window.console.log("未认证，请先登录！" + Common.router.history.current.path);
+
                 wsConnection.logout();
-                
+
                 Common.store.commit("setCatchUti", Common.router.history.current.path);
                 //清楚登录信息
                 Common.store.commit("setUserToken", "");
@@ -82,23 +82,23 @@ axios.interceptors.response.use((res) => {
 //返回一个Promise(发送post请求)
 export function fetchPost(url, params) {
     return new Promise((resolve, reject) => {
-        ajax("post",url,params,null).then(
-            (response) => {
-                resolve(response);
-            },
-            (err) => {
-                reject(err);
-            }
-        )
-        .catch((error) => {
-            reject(error)
-        })      
+        ajax("post", url, params, null).then(
+                (response) => {
+                    resolve(response);
+                },
+                (err) => {
+                    reject(err);
+                }
+            )
+            .catch((error) => {
+                reject(error)
+            })
     })
 }
 ////返回一个Promise(发送get请求)
 export function fetchGet(url, params) {
     let config = {
-        params:params
+        params: params
     }
     return new Promise((resolve, reject) => {
         axios.get(url, config)
@@ -112,6 +112,37 @@ export function fetchGet(url, params) {
             })
     })
 }
+
+
+export function update(e, url, fileName, args) { // 上传照片
+    let file = e.target.files[0]
+    /* eslint-disable no-undef */
+    let param = new FormData() // 创建form对象
+    param.append(fileName, file) // 通过append向form对象添加数据
+    if (args) {
+        for (var item in args) {
+            param.append(item, args[item]) // 添加form表单中其他数据
+        }
+    }
+    let config = {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }
+    // 添加请求头
+    return new Promise((resolve, reject) => {
+        axios.post(url, param, config)
+            .then(response => {
+                resolve(response)
+            }, err => {
+                reject(err)
+            })
+            .catch((error) => {
+                reject(error)
+            })
+    });
+}
+
 
 export function ajax(method, url, params, data) {
     // method = method.tolocaleUpperCase();
@@ -136,5 +167,6 @@ export function ajax(method, url, params, data) {
 export default {
     fetchPost,
     fetchGet,
-    ajax
+    ajax,
+    update
 }
