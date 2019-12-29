@@ -6,7 +6,7 @@
           <a-col :span="3">
             <div class="item logo">遇见书</div>
           </a-col>
-          <a-col :span="13">
+          <a-col :span="11">
             <a-menu mode="horizontal">
               <a-menu-item key="app">
                 <a-icon type="appstore" />
@@ -22,8 +22,8 @@
               </a-menu-item>
             </a-menu>
           </a-col>
-          <a-col :span="8" class="header-right">
-            <div class="item  noUnLink">
+          <a-col :span="10" class="header-right">
+            <div class="item noUnLink right">
               <div v-if="$store.getters.isLogin">
                 {{$store.state.userInfo.name}}
                 <a-popover
@@ -52,14 +52,15 @@
                 </a-popover>
 
                 <a-icon type="bell" v-else />
-                <a style="margin-left:20px" @click="log_out()" >退出</a>
+                <a style="margin-left:20px" @click="log_out()">退出</a>
               </div>
               <div v-else>
-                <a @click="to_login_page()"  >登录</a>
+                <a @click="to_login_page()">登录</a>
                 <a-divider type="vertical" />
-                <router-link to="/register" >注册</router-link>
+                <router-link to="/register">注册</router-link>
               </div>
             </div>
+            <div class="right" style="cursor:pointer" @click="openLinkInfoWindow">联系我们</div>
           </a-col>
         </a-row>
       </a-layout-header>
@@ -82,9 +83,25 @@
       @cancel="handleCancel"
       :destroyOnClose="true"
       :footer="null"
+
     >
       <MyChat :tagMemberCode="targeMemberCode"></MyChat>
       <div slot="title">聊天</div>
+    </a-modal>
+
+    <a-modal
+      :visible="isShowLinkInfo"
+      @ok="handleOkShowLinkInfo"
+      @cancel="handleCancelShowLinkInfo"
+      :destroyOnClose="true"
+      :footer="null"
+      title="联系我们"
+    >
+      <div>
+        <div>QQ:524119442</div>
+        <div>邮箱：meetingbook@163.com</div>
+        <div>遇见书由磐石软件开发</div>
+      </div>
     </a-modal>
   </div>
 </template>
@@ -102,7 +119,8 @@ export default {
       unReadMemberInfoData: [],
       targeMemberCode: null,
       dialogueVisible: false,
-      confirmLoading: false
+      confirmLoading: false,
+      isShowLinkInfo: false
     };
   },
   computed: {
@@ -116,6 +134,15 @@ export default {
     }
   },
   methods: {
+    openLinkInfoWindow() {
+      this.isShowLinkInfo = true;
+    },
+    handleOkShowLinkInfo() {
+      this.isShowLinkInfo = false;
+    },
+    handleCancelShowLinkInfo() {
+      this.isShowLinkInfo = false;
+    },
     handleOk() {
       this.dialogueVisible = false;
     },
@@ -189,6 +216,10 @@ export default {
   text-align: right !important;
 }
 
+.right {
+  float: right;
+  margin-left: 10px;
+}
 .ant-layout-header .ant-menu {
   height: 65px;
   line-height: 65px;
@@ -210,19 +241,19 @@ export default {
 }
 .noUnLink a {
   color: white !important;
-  text-decoration: none  !important;
+  text-decoration: none !important;
 }
 .noUnLink a:hover {
   color: #1890ff !important;
-  text-decoration: none  !important;
+  text-decoration: none !important;
 }
 .noUnLink a:link {
   color: #1890ff !important;
-  text-decoration: none  !important;
+  text-decoration: none !important;
 }
 .noUnLink a:active {
   color: #1890ff !important;
-  text-decoration: none  !important;
+  text-decoration: none !important;
 }
 </style>
 

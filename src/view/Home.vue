@@ -4,12 +4,18 @@
       <a-col span="14" offset="5">
         <a-list itemLayout="vertical" size="large" :dataSource="publishBookList">
           <div slot="footer">
-            <a-pagination v-model="pageNo" :total="pageTotal" :pageSize.sync="pageSize" showSizeChanger
-      @showSizeChange="onShowSizeChange" @change="onChangePage" :pageSizeOptions="pageSizeOptions"> 
-            <template slot="buildOptionText" slot-scope="props">
-              <span >{{props.value}}条/页</span>
-              
-            </template>
+            <a-pagination
+              v-model="pageNo"
+              :total="pageTotal"
+              :pageSize.sync="pageSize"
+              showSizeChanger
+              @showSizeChange="onShowSizeChange"
+              @change="onChangePage"
+              :pageSizeOptions="pageSizeOptions"
+            >
+              <template slot="buildOptionText" slot-scope="props">
+                <span>{{props.value}}条/页</span>
+              </template>
             </a-pagination>
           </div>
           <a-list-item slot="renderItem" slot-scope="item" key="item.bookName">
@@ -32,19 +38,18 @@
             </a-list-item-meta>
             <div>{{item.bookTitle}}</div>
             <div slot="actions">
-              <a-button @click="transactionApplication(item.code)">请求读它</a-button>
+              <a-button type="primary" @click="transactionApplication(item.code)">请求读它</a-button>
             </div>
           </a-list-item>
         </a-list>
       </a-col>
     </a-row>
 
-    <a-modal title="登记交换图书" v-model="registerModelvisible" :destroyOnClose="destroyOnClose"  footer>
+    <a-modal title="登记交换图书" v-model="registerModelvisible" :destroyOnClose="destroyOnClose" footer>
       <div>
         <RegisteredBook :code="releaseBookCode" @registerBookSuccess="registerBookSuccess"></RegisteredBook>
       </div>
     </a-modal>
-
 
     <div class="amap-page-container">
       <el-amap vid="amap" :plugin="plugin" class="amap-demo" :center="center"></el-amap>
@@ -54,7 +59,7 @@
 <script>
 import Http from "./../Https";
 import Common from "./../Common.js";
-import RegisteredBook from "./../component/RegisteredBook"
+import RegisteredBook from "./../component/RegisteredBook";
 
 export default {
   components: {
@@ -63,14 +68,14 @@ export default {
   data() {
     let self = this;
     return {
-      pageSizeOptions:['10','25','50'],
-      releaseBookCode:null,
-      destroyOnClose:true,
-      registerModelvisible:false,
+      pageSizeOptions: ["10", "25", "50"],
+      releaseBookCode: null,
+      destroyOnClose: true,
+      registerModelvisible: false,
       host: Common.Config.host,
       publishBookList: [],
       center: [121.59996, 31.197646],
-      pageSize: 25,
+      pageSize: 10,
       pageNo: 1,
       pageTotal: 0,
       lng: 0,
@@ -98,7 +103,7 @@ export default {
     };
   },
   created() {
-     this.loadPublishBookList();
+    this.loadPublishBookList();
   },
   watch: {
     lng: function(newLng) {
@@ -111,24 +116,25 @@ export default {
     }
   },
   methods: {
-    registerBookSuccess(){
+    registerBookSuccess() {
       this.registerModelvisible = false;
     },
     onChangePage(pageNumber) {
       this.pageNo = pageNumber;
       this.loadPublishBookList();
     },
-    onShowSizeChange(current, pageSize){
-      this.pageNo  = current;
+    onShowSizeChange(current, pageSize) {
+      this.pageNo = current;
       this.pageSize = pageSize;
+      this.loadPublishBookList();
     },
     transactionApplication(code) {
       let isLoginState = this.$store.getters.isLogin;
-      if(isLoginState){
+      if (isLoginState) {
         this.releaseBookCode = code;
         this.registerModelvisible = true;
-      }else{
-        this.$store.commit("setCatchUti",this.$route.path);
+      } else {
+        this.$store.commit("setCatchUti", this.$route.path);
         this.$router.push("/login");
       }
     },

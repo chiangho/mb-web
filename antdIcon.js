@@ -9,7 +9,9 @@ export {
     QuestionOutline,
     FilterFill,
     CaretUpFill,
-    CaretDownFill
+    CaretDownFill,
+    LeftOutline,
+    RightOutline
 
 }
 from '@ant-design/icons'

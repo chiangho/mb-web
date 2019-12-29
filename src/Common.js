@@ -303,7 +303,7 @@ const router = new VueRouter({
             component: MyMemberLink,
             meta: {
                 "auth": true,
-                title: "联系人信息编辑"
+                "title": "联系人信息编辑"
             }
         },
         {
@@ -311,31 +311,31 @@ const router = new VueRouter({
             component: MyMemberRelease,
             meta: {
                 "auth": true,
-                title: "我发布的图书"
+                "title": "我发布的图书"
             }
         },
         {
             path: "member-application",
             component: MyMemberApplication,
             meta: {
-                auth: true,
-                title: "我申请的图书"
+                "auth": true,
+                "title": "我申请的图书"
             }
         },
         {
             path: "member-trancation",
             component: MyMemberTrancation,
             meta: {
-                auth: true,
-                title: "我的换书记录"
+                "auth": true,
+                "title": "我的换书记录"
             }
         },
         {
             path: "member-setting",
             component: MyMemberSetting,
             meta: {
-                auth: true,
-                title: "个人信息设置"
+                "auth": true,
+                "title": "个人信息设置"
             }
         }
         ]

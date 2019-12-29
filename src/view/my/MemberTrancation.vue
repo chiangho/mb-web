@@ -49,6 +49,11 @@ import MyChat from "./../../component/MyChat";
 
 const columns = [
   {
+    title:"换书单号",
+    dataIndex: "code",
+    key: "code"
+  },
+  {
     title: "对方书名",
     dataIndex: "tagerBookName",
     key: "tagerBookName"

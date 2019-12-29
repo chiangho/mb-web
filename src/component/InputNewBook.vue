@@ -1,29 +1,30 @@
 <template>
   <div>
-    <a-form :form="form">
-      <a-form-item label="图书ISBN" :label-col="{span:8}" :wrapper-col="{span:8}">
-        <a-input
-          v-decorator="[
+    <a-spin :spinning="spinning" tip="正在上传图片....">
+      <a-form :form="form">
+        <a-form-item label="图书ISBN" :label-col="{span:8}" :wrapper-col="{span:8}">
+          <a-input
+            v-decorator="[
           'isbn',
           { rules: [{ required: true, message: '请输入图书ISBN编号!' }] },
         ]"
-          placeholder="图书ISBN编号"
-        ></a-input>
-      </a-form-item>
+            placeholder="图书ISBN编号"
+          ></a-input>
+        </a-form-item>
 
-      <a-form-item label="书名" :label-col="{span:8}" :wrapper-col="{span:8}">
-        <a-input
-          v-decorator="[
+        <a-form-item label="书名" :label-col="{span:8}" :wrapper-col="{span:8}">
+          <a-input
+            v-decorator="[
           'bookName',
           { rules: [{ required: false, message: '书名' }] },
         ]"
-          placeholder="请填写书名"
-        ></a-input>
-      </a-form-item>
+            placeholder="请填写书名"
+          ></a-input>
+        </a-form-item>
 
-      <a-form-item label="封面图片" :label-col="{span:8}" :wrapper-col="{span:8}">
-        <input type="file" id="people-export" ref="inputer" @change="handleUpdateIcon" />
-        <!--         
+        <a-form-item label="封面图片" :label-col="{span:8}" :wrapper-col="{span:8}">
+          <input type="file" id="people-export" ref="inputer" @change="handleUpdateIcon" />
+          <!--         
         <a-upload
           name="image"
           :multiple="false"
@@ -37,13 +38,14 @@
           <a-button>
             <a-icon type="upload" />上传图书封面
           </a-button>
-        </a-upload>-->
-      </a-form-item>
+          </a-upload>-->
+        </a-form-item>
 
-      <a-form-item :wrapper-col="{span:8,offset:8}">
-        <a-button type="primary" block @click="inputBook">登记</a-button>
-      </a-form-item>
-    </a-form>
+        <a-form-item :wrapper-col="{span:8,offset:8}">
+          <a-button type="primary" block @click="inputBook">登记</a-button>
+        </a-form-item>
+      </a-form>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -60,7 +62,8 @@ export default {
       fileList: [],
       updateHeaders: {
         Authorization: this.$store.state.userToken
-      }
+      },
+      spinning: false
     };
   },
   beforeCreate() {
@@ -72,15 +75,15 @@ export default {
     });
   },
   props: {
-    type:{
-      type: String,
-      required: true
-    }, 
-    isbn:{
+    type: {
       type: String,
       required: true
     },
-    callBack:{
+    isbn: {
+      type: String,
+      required: true
+    },
+    callBack: {
       type: Function,
       required: true
     }
@@ -117,7 +120,11 @@ export default {
         })
         .then(resp => {
           this.inputBookCode = resp.data;
-          this.callBack(this.inputBookCode,this.form.getFieldValue("isbn"),this.form.getFieldValue("bookName"))
+          this.callBack(
+            this.inputBookCode,
+            this.form.getFieldValue("isbn"),
+            this.form.getFieldValue("bookName")
+          );
         })
         .catch(err => {
           if (err && err.message) {
@@ -140,25 +147,35 @@ export default {
     handleUpdateIcon(event) {
       let isbn_temp = this.form.getFieldValue("isbn");
       this.imagePath = "";
-      if (!isbn_temp|| isbn_temp=='') {
+      if (!isbn_temp || isbn_temp == "") {
         this.$message.error("图书编号不能为空");
         return;
-      } 
+      }
+      this.spinning = true;
       // 文件上传
-      http.update(event,"upload-image","image",{isbn:isbn_temp})
+      http
+        .update(event, "upload-image", "image", { isbn: isbn_temp })
         .then(res => {
           this.$message.success("上传成功");
-          this.imagePath=res.data;
-          alert(this.imagePath);
+          this.imagePath = res.data;
+          this.spinning = false;
         })
         .catch(e => {
-          if(e&&e.message){
-            this.$.message.error(e.message);
-          }else{
+          if (e && e.message) {
+            this.$message.error(e.message);
+          } else {
             this.$message.error("异常");
           }
+          this.spinning = false;
         });
     }
   }
 };
 </script>
+<style scoped>
+.spin-content {
+  border: 1px solid #91d5ff;
+  background-color: #e6f7ff;
+  padding: 30px;
+}
+</style>

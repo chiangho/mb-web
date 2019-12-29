@@ -1,71 +1,72 @@
 <template>
   <div>
-    <a-form :form="form">
-      <a-form-item :wrapper-col="{span:8,offset:8}">
-        <a-alert
-          v-if="publishAlertVisible"
-          :type="publishAlertType"
-          :message="publishAlertMessage"
-          closable
-        />
-      </a-form-item>
-      <a-form-item label="换书区域" :label-col="{span:8}" :wrapper-col="{span:8}">
-        <a-select
-          placeholder="请选择图书交换的地点"
-          v-decorator="[
+    <a-spin :spinning="spinning" tip="系统正在发布中....">
+      <a-form :form="form">
+        <a-form-item :wrapper-col="{span:8,offset:8}">
+          <a-alert
+            v-if="publishAlertVisible"
+            :type="publishAlertType"
+            :message="publishAlertMessage"
+            closable
+          />
+        </a-form-item>
+        <a-form-item label="换书区域" :label-col="{span:8}" :wrapper-col="{span:8}">
+          <a-select
+            placeholder="请选择图书交换的地点"
+            v-decorator="[
           'address',
           { rules: [{ required: true, message: '请输入区域地址!' }] },
         ]"
-        >
-          <a-select-option
-            v-for="address in addressData"
-            :key="address.code"
-          >{{address.areaName+'，'+address.address}}</a-select-option>
-        </a-select>
-        <span style="cursor: pointer" @click="addNewMemberAddress">添加区域</span>
-      </a-form-item>
+          >
+            <a-select-option
+              v-for="address in addressData"
+              :key="address.code"
+            >{{address.areaName+'，'+address.address}}</a-select-option>
+          </a-select>
+          <span style="cursor: pointer" @click="addNewMemberAddress">添加区域</span>
+        </a-form-item>
 
-      <a-form-item label="换书联系人" :label-col="{span:8}" :wrapper-col="{span:8}">
-        <a-select
-          placeholder="请选择图书交换的联系人"
-          v-decorator="[
+        <a-form-item label="换书联系人" :label-col="{span:8}" :wrapper-col="{span:8}">
+          <a-select
+            placeholder="请选择图书交换的联系人"
+            v-decorator="[
           'persion',
           { rules: [{ required: true, message: '请输入联系人!' }] },
         ]"
-        >
-          <a-select-option
-            v-for="link in linkData"
-            :key="link.code"
-          >{{link.linkmanName+'，'+link.mobile+' '+(link.wechat==null?'':('，'+link.wechat))}}</a-select-option>
-        </a-select>
-        <span style="cursor: pointer" @click="addNewMemberLink">添加联系人</span>
-      </a-form-item>
+          >
+            <a-select-option
+              v-for="link in linkData"
+              :key="link.code"
+            >{{link.linkmanName+'，'+link.mobile+' '+(link.wechat==null?'':('，'+link.wechat))}}</a-select-option>
+          </a-select>
+          <span style="cursor: pointer" @click="addNewMemberLink">添加联系人</span>
+        </a-form-item>
 
-      <a-form-item label="图书ISBN" :label-col="{span:8}" :wrapper-col="{span:8}">
-        <a-input
-          v-decorator="[
+        <a-form-item label="图书ISBN" :label-col="{span:8}" :wrapper-col="{span:8}">
+          <a-input
+            v-decorator="[
           'isbn',
           { rules: [{ required: true, message: '请输入图书ISBN编号!' }] },
         ]"
-          placeholder="图书ISBN编号"
-        ></a-input>
-      </a-form-item>
+            placeholder="图书ISBN编号"
+          ></a-input>
+        </a-form-item>
 
-      <a-form-item label="留言" :label-col="{span:8}" :wrapper-col="{span:8}">
-        <a-input
-          v-decorator="[
+        <a-form-item label="留言" :label-col="{span:8}" :wrapper-col="{span:8}">
+          <a-input
+            v-decorator="[
           'remark',
           { rules: [{ required: true, message: '留言' }] },
         ]"
-          placeholder="留言"
-        ></a-input>
-      </a-form-item>
+            placeholder="留言"
+          ></a-input>
+        </a-form-item>
 
-      <a-form-item :wrapper-col="{span:8,offset:8}">
-        <a-button block type="primary" @click="publishbook">发布</a-button>
-      </a-form-item>
-    </a-form>
-
+        <a-form-item :wrapper-col="{span:8,offset:8}">
+          <a-button block type="primary" @click="publishbook">发布</a-button>
+        </a-form-item>
+      </a-form>
+    </a-spin>
     <a-modal title="添加区域信息" v-model="modelvisible" footer>
       <div>
         <AddMemberAddress @addMemberAddressSuccess="addMemberAddressSuccess"></AddMemberAddress>
@@ -120,7 +121,9 @@ export default {
 
       isOpenInputBookWindow: false,
       tagIsbn: null,
-      registerBookCode: null
+      registerBookCode: null,
+
+      spinning: false
     };
   },
   components: {
@@ -143,6 +146,7 @@ export default {
       this.form.setFieldsValue({
         isbn: isbn
       });
+      this.publishbook();
     },
     handleOkPublishSuccess() {
       this.$router.push("/home");
@@ -192,6 +196,7 @@ export default {
 
       this.form.validateFields(err => {
         if (!err) {
+          this.spinning = true;
           Http.ajax("post", "release", null, {
             registerBookCode: this.registerBookCode,
             isbn: this.form.getFieldValue("isbn"),
@@ -201,10 +206,11 @@ export default {
           })
             .then(() => {
               this.modelPublishSuccess = true;
+              this.spinning = false;
             })
             .catch(err => {
               if (err && err.code && err.code == 1) {
-                this.$message.success(err.message);
+                this.$message.error(err.message);
                 this.isOpenInputBookWindow = true;
                 this.tagIsbn = this.form.getFieldValue("isbn");
               } else {
@@ -216,6 +222,7 @@ export default {
                 }
                 this.publishAlertMessage = messge;
               }
+              this.spinning = false;
             });
         }
       });
@@ -232,5 +239,10 @@ export default {
   text-align: left;
   width: 120px;
   cursor: pointer;
+}
+.spin-content {
+  border: 1px solid #91d5ff;
+  background-color: #e6f7ff;
+  padding: 30px;
 }
 </style>

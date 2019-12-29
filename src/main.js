@@ -10,7 +10,7 @@ import audio from './assets/newmsg.mp3'
 
 import { Base,
      Layout, Col, Row, Modal, Icon, Menu, List, Form, Input, Divider, Button, Checkbox, Tooltip, Pagination, Select,
-     Table, Message, Alert, message,Card ,Upload,Drawer } from 'ant-design-vue';
+     Table, Message, Alert, message,Card ,Upload,Drawer,Spin} from 'ant-design-vue';
 
 
 Vue.config.productionTip = false;
@@ -21,7 +21,7 @@ Vue.use(AMap);
 // Vue.use(Antd);
 Vue.use(Base).use(Layout).use(Col).use(Row).use(Modal).use(Icon).use(Menu).use(List).
     use(Form).use(Input).use(Divider).use(Button).use(Checkbox).use(Tooltip).use(Pagination).use(Select).use(Table).use(Message)
-    .use(Alert).use(Card).use(Upload).use(Drawer);
+    .use(Alert).use(Card).use(Upload).use(Drawer).use(Spin);
 
 
 AMap.initAMapApiLoader({

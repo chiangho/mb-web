@@ -3,7 +3,7 @@ import qs from 'qs'
 import Common from "./Common.js"
 import wsConnection from "./Socket.js"
 
-axios.defaults.timeout = 10000; //响应时间
+axios.defaults.timeout = 30000; //响应时间
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'; //配置请求头
 //axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'; //配置请求头
 axios.defaults.baseURL = Common.Config.host; //配置接口地址
@@ -142,6 +142,7 @@ export function update(e, url, fileName, args) { // 上传照片
             })
     });
 }
+
 
 
 export function ajax(method, url, params, data) {
