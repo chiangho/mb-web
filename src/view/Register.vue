@@ -112,7 +112,7 @@
         <a @click="showModal">《用户注册协议》</a>
       </a-form-item>
       <a-form-item v-bind="tailFormItemLayout">
-        <a-button type="primary" html-type="submit">注册账户</a-button>
+        <a-button :disabled="submitDisabled" type="primary" html-type="submit">注册账户</a-button>
       </a-form-item>
     </a-form>
 
@@ -149,6 +149,7 @@ export default {
       alertVisible: false,
       alertMessage: "",
       alertType: "error",
+      submitDisabled: true,
       formItemLayout: {
         labelCol: {
           xs: { span: 16 },
@@ -209,6 +210,7 @@ export default {
       e.preventDefault();
       this.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
+          this.submitDisabled = false;
           Http.fetchPost("register", values)
             .then(response => {
               if (response.status === 200) {
@@ -226,10 +228,12 @@ export default {
                 this.alertVisible = true;
                 this.alertMessage = response.error.message;
               }
+              this.submitDisabled = true;
             })
             .catch(err => {
               this.alertVisible = true;
               this.alertMessage = JSON.stringify(err);
+              this.submitDisabled = true;
             });
         }
       });
