@@ -149,7 +149,7 @@ export default {
       alertVisible: false,
       alertMessage: "",
       alertType: "error",
-      submitDisabled: true,
+      submitDisabled: false,
       formItemLayout: {
         labelCol: {
           xs: { span: 16 },
@@ -210,7 +210,7 @@ export default {
       e.preventDefault();
       this.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
-          this.submitDisabled = false;
+          this.submitDisabled = true;
           Http.fetchPost("register", values)
             .then(response => {
               if (response.status === 200) {
@@ -228,12 +228,12 @@ export default {
                 this.alertVisible = true;
                 this.alertMessage = response.error.message;
               }
-              this.submitDisabled = true;
+              this.submitDisabled = false;
             })
             .catch(err => {
               this.alertVisible = true;
               this.alertMessage = JSON.stringify(err);
-              this.submitDisabled = true;
+              this.submitDisabled = false;
             });
         }
       });
