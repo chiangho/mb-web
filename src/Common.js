@@ -41,6 +41,7 @@ import http from "./Https"
 //配置信息
 var Config = {
     userInfoCacheKey: "UserInfo",
+    topMenuCurrentKey:"topMenuCurrent",
     userTokenCacheKey: "UserToken",
     host: "http://49.234.70.238:9001",
     webSocketHost: "ws://49.234.70.238:9001/websocket",
@@ -70,9 +71,14 @@ const storeInfo = {
            }  
          }
         */
-        dialogueData: {}
+        dialogueData: {},
+        topMenuCurrent:JSON.parse(localStorage.getItem(Config.topMenuCurrentKey))
     },
     mutations: {
+        setTopMenuCurrent(state,menu){
+            let temp_=[menu];
+            localStorage.setItem(Config.topMenuCurrentKey, JSON.stringify(temp_));
+        },
         setUserInfo(state, userInfo) {
             state.userInfo = userInfo;
             localStorage.setItem(Config.userInfoCacheKey, JSON.stringify(userInfo));
@@ -194,6 +200,12 @@ const storeInfo = {
         }
     },
     getters: {
+        getTopMenuCurrent:state=>{
+            if (state && state.topMenuCurrent) {
+                return state.topMenuCurrent;
+            }
+            return [];
+        },
         isLogin: state => {
             if (state && state.userToken && state.userToken != "") {
                 return true;

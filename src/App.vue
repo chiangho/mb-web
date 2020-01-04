@@ -7,18 +7,18 @@
             <div class="item logo">遇见书</div>
           </a-col>
           <a-col :span="11">
-            <a-menu mode="horizontal">
-              <a-menu-item key="app">
+            <a-menu mode="horizontal" v-model="topMenuCurrent">
+              <a-menu-item key="app" @click="go_home_page">
                 <a-icon type="appstore" />
-                <span @click="go_home_page">首页</span>
+                <span>首页</span>
               </a-menu-item>
-              <a-menu-item key="homan">
+              <a-menu-item key="homan" @click="go_my_page">
                 <a-icon type="smile" />
-                <span @click="go_my_page">个人中心</span>
+                <span>个人中心</span>
               </a-menu-item>
-              <a-menu-item key="publicBook">
+              <a-menu-item key="publicBook" @click="go_publish_page">
                 <a-icon type="book" />
-                <span @click="go_publish_page">发布图书</span>
+                <span>发布图书</span>
               </a-menu-item>
             </a-menu>
           </a-col>
@@ -83,7 +83,6 @@
       @cancel="handleCancel"
       :destroyOnClose="true"
       :footer="null"
-
     >
       <MyChat :tagMemberCode="targeMemberCode"></MyChat>
       <div slot="title">聊天</div>
@@ -120,13 +119,17 @@ export default {
       targeMemberCode: null,
       dialogueVisible: false,
       confirmLoading: false,
-      isShowLinkInfo: false
+      isShowLinkInfo: false,
+      topMenuCurrent:[]
     };
   },
   computed: {
     isLogin: function() {
       return this.$store.getters.isLogin;
     }
+  },
+  created(){
+    this.topMenuCurrent = this.$store.getters.getTopMenuCurrent;
   },
   watch: {
     isLogin: loginState => {
@@ -181,12 +184,19 @@ export default {
         });
     },
     go_home_page() {
+      this.$store.commit("setTopMenuCurrent", "app");
       this.$router.push("/home");
     },
     go_my_page() {
-      this.$router.push("/my");
+      this.$store.commit("setTopMenuCurrent", "homan");
+      if(this.$store.getters.isLogin){
+        this.$router.push("/my");
+      }else{
+        this.$router.push("/login");
+      }
     },
     go_publish_page() {
+      this.$store.commit("setTopMenuCurrent", "publicBook");
       this.$router.push("/publish-book").catch(err => {
         window.console.log(err);
       });
