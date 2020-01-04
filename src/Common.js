@@ -42,6 +42,7 @@ import http from "./Https"
 var Config = {
     userInfoCacheKey: "UserInfo",
     topMenuCurrentKey:"topMenuCurrent",
+    leftMenuCurrentKey:"leftMenuCurrent",
     userTokenCacheKey: "UserToken",
     host: "http://49.234.70.238:9001",
     webSocketHost: "ws://49.234.70.238:9001/websocket",
@@ -72,11 +73,18 @@ const storeInfo = {
          }
         */
         dialogueData: {},
-        topMenuCurrent:JSON.parse(localStorage.getItem(Config.topMenuCurrentKey))
+        topMenuCurrent:JSON.parse(localStorage.getItem(Config.topMenuCurrentKey)),
+        leftMenuCurrent:JSON.parse(localStorage.getItem(Config.leftMenuCurrentKey))
     },
     mutations: {
+        setLeftMenuCurrent(state,menu){
+            let temp_=[menu];
+            state.leftMenuCurrent = temp_;
+            localStorage.setItem(Config.leftMenuCurrentKey, JSON.stringify(temp_));
+        },
         setTopMenuCurrent(state,menu){
             let temp_=[menu];
+            state.topMenuCurrent = temp_;
             localStorage.setItem(Config.topMenuCurrentKey, JSON.stringify(temp_));
         },
         setUserInfo(state, userInfo) {
@@ -203,6 +211,12 @@ const storeInfo = {
         getTopMenuCurrent:state=>{
             if (state && state.topMenuCurrent) {
                 return state.topMenuCurrent;
+            }
+            return [];
+        },
+        getLeftMenuCurrent:state=>{
+            if (state && state.leftMenuCurrent) {
+                return state.leftMenuCurrent;
             }
             return [];
         },

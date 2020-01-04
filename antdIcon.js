@@ -11,7 +11,14 @@ export {
     CaretUpFill,
     CaretDownFill,
     LeftOutline,
-    RightOutline
+    RightOutline,
+    MenuFoldOutline,
+    MenuUnfoldOutline,
+    UserOutline,
+    SettingOutline,
+    PushpinOutline,
+    UploadOutline,
+    PaperClipOutline
 
 }
 from '@ant-design/icons'

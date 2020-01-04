@@ -1,27 +1,43 @@
 <template>
-  <div>
+  <dvi>
     <a-layout>
-      <a-layout-sider>
-        <a-menu style="width: 200px" mode="inline">
-          <a-menu-item key="my_menu_memberaddress">
-            <span @click="go_member_address_page">换书区域</span>
-          </a-menu-item>
-          <a-menu-item key="my_menu_memberlink">
-            <span @click="go_member_link_page">换书联系人</span>
-          </a-menu-item>
-          <a-menu-item key="member_publish_age">
-            <span @click="go_member_publish_page">你发布的换书</span>
-          </a-menu-item>
-          <a-menu-item key="member_application">
-            <span @click="go_member_application">申请读他人书的记录</span>
-          </a-menu-item>
-          <a-menu-item key="member_trancation">
-            <span @click="go_member_member_trancation">双方确认换书的记录</span>
-          </a-menu-item>
-          <a-menu-item key="member_setting">
-            <span @click="go_member_setting">个人设置</span>
-          </a-menu-item>
-        </a-menu>
+      <a-layout-sider
+        collapsible
+        v-model="collapsed"
+        collapsedWidth="80"
+        @breakpoint="toggleCollapsed"
+      >
+        <div style="width: 200px">
+          <!-- <a-button type="primary" @click="toggleCollapsed" style="margin-bottom: 16px">
+            <a-icon :type="collapsed ? 'menu-unfold' : 'menu-fold'" />
+          </a-button>-->
+          <a-menu mode="inline" :inlineCollapsed="collapsed" v-model="leftMenuCurrent">
+            <a-menu-item key="my_menu_memberaddress" @click="go_member_address_page">
+              <a-icon type="pushpin" />
+              <span>换书区域</span>
+            </a-menu-item>
+            <a-menu-item key="my_menu_memberlink" @click="go_member_link_page">
+              <a-icon type="user" />
+              <span>换书联系人</span>
+            </a-menu-item>
+            <a-menu-item key="member_publish_age" @click="go_member_publish_page">
+              <a-icon type="upload" />
+              <span>你发布的换书</span>
+            </a-menu-item>
+            <a-menu-item key="member_application" @click="go_member_application">
+              <a-icon type="paper-clip" />
+              <span>申请书的记录</span>
+            </a-menu-item>
+            <a-menu-item key="member_trancation" @click="go_member_member_trancation">
+              <a-icon type="book" />
+              <span>确认换书的记录</span>
+            </a-menu-item>
+            <a-menu-item key="member_setting" @click="go_member_setting">
+              <a-icon type="setting" />
+              <span>个人设置</span>
+            </a-menu-item>
+          </a-menu>
+        </div>
       </a-layout-sider>
       <a-layout class="content_border">
         <a-layout-content>
@@ -29,40 +45,70 @@
         </a-layout-content>
       </a-layout>
     </a-layout>
-  </div>
+  </dvi>
 </template>
 <script>
 export default {
   data() {
     return {
-      current: ["mail"],
-      openKeys: ["sub1"]
+      collapsed: false,
+      leftMenuCurrent: [],
+      screenWidth: null
     };
   },
+  created() {
+    this.leftMenuCurrent = this.$store.getters.getLeftMenuCurrent;
+  },
+  mounted() {
+    this.screenWidth = document.body.clientWidth;
+    window.onresize = () => {
+      return (() => {
+        this.screenWidth = document.body.clientWidth;
+      })();
+    };
+  },
+ 
   methods: {
-    go_member_setting(){
+    toggleCollapsed() {
+      alert(1);
+      this.collapsed = !this.collapsed;
+    },
+    go_member_setting() {
+      this.$store.commit("setLeftMenuCurrent", "member_setting");
       this.$router.push("/my/member-setting");
     },
     go_member_member_trancation() {
+      this.$store.commit("setLeftMenuCurrent", "member_trancation");
       this.$router.push("/my/member-trancation");
     },
     go_member_address_page() {
+      this.$store.commit("setLeftMenuCurrent", "my_menu_memberaddress");
       this.$router.push("/my/member-address");
     },
     go_member_application() {
+      this.$store.commit("setLeftMenuCurrent", "member_application");
       this.$router.push("/my/member-application");
     },
     go_member_link_page() {
+      this.$store.commit("setLeftMenuCurrent", "my_menu_memberlink");
       this.$router.push("/my/member-link");
     },
     go_member_publish_page() {
+      this.$store.commit("setLeftMenuCurrent", "member_publish_age");
       this.$router.push("/my/member-release");
     }
   },
   watch: {
     openKeys(val) {
       window.console.log("openKeys", val);
-    }
+    },
+    screenWidth(val){//普通的watch监听
+      if(val<600){
+        this.collapsed = true;
+      }else{
+        this.collapsed = false;
+      }
+    },
   }
 };
 </script>
