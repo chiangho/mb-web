@@ -46,19 +46,31 @@
         ></a-input>
       </a-form-item>
 
-      <a-form-item :wrapper-col="{span:16,offset:4}">
-        <a-button type="primary" block html-type="submit">提交</a-button>
+      <a-form-item :wrapper-col="tailFormItemLayout.wrapperCol">
+        <a-button type="primary"  html-type="submit">提交</a-button>
       </a-form-item>
     </a-form>
   </div>
 </template>
 <script>
 import Http from "./../Https.js";
-
+const tailFormItemLayout = {
+  wrapperCol: {
+    xs: {
+      span: 24,
+      offset: 0
+    },
+    sm: {
+      span: 16,
+      offset: 4
+    }
+  }
+};
 export default {
   name: "add-member-address",
   data() {
     return {
+      tailFormItemLayout,
       provinceData: [],
       cityData: [],
       countyData: [],

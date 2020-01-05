@@ -62,7 +62,7 @@
           ></a-input>
         </a-form-item>
 
-        <a-form-item :wrapper-col="{span:8,offset:8}">
+        <a-form-item :wrapper-col="tailFormItemLayout.wrapperCol">
           <a-button block type="primary" @click="publishbook">发布</a-button>
         </a-form-item>
       </a-form>
@@ -102,9 +102,23 @@ import AddMemberAddress from "./../component/AddMemberAddress";
 import AddMemberLink from "./../component/AddMemberLink";
 import InputNewBook from "./../component/InputNewBook";
 
+const tailFormItemLayout = {
+  wrapperCol: {
+    xs: {
+      span: 8,
+      offset: 0
+    },
+    sm: {
+      span: 8,
+      offset: 8
+    }
+  }
+};
+
 export default {
   data() {
     return {
+      tailFormItemLayout,
       addressData: null, //地址信息
       linkData: null, //连接信息
       modelvisible: false,
