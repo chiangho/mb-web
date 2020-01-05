@@ -7,6 +7,7 @@
       :rowKey="record=>record.code"
       :pagination="pagination"
       @change="handleTableChange"
+       :scroll="{ x: 1500 }"
     >
       <template slot="createTime" slot-scope="createTime">{{createTime | formatDate}}</template>
       <template slot="status" slot-scope="status">{{status | formatStatus}}</template>
@@ -81,6 +82,8 @@ const columns = [
     title: "操作",
     dataIndex: "action",
     key: "action",
+    fixed: "right",
+    width: 100,
     scopedSlots: { customRender: "action" }
   }
 ];

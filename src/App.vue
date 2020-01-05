@@ -113,6 +113,9 @@
                     <a-menu-item @click="go_publish_page">
                       <span>发布图书</span>
                     </a-menu-item>
+                    <a-menu-item @click="openLinkInfoWindow">
+                      <span>联系我们</span>
+                    </a-menu-item>
                   </a-menu>
                 </a-dropdown>
               </div>
@@ -122,7 +125,6 @@
                 <router-link to="/register">注册</router-link>
               </div>
             </div>
-            <div class="right" style="cursor:pointer" @click="openLinkInfoWindow">联系我们</div>
           </a-col>
         </a-row>
       </a-layout-header>

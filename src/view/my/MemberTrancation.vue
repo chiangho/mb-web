@@ -7,6 +7,7 @@
       :rowKey="record=>record.code"
       :pagination="pagination"
       @change="handleTableChange"
+      :scroll="{ x: 1500 }"
     >
       <template slot="createTime" slot-scope="createTime">{{createTime | formatDate}}</template>
       <template slot="status" slot-scope="status">{{status | formatStatus}}</template>
@@ -15,7 +16,7 @@
         <a-divider type="vertical" />
         <a @click="openDialogue(record.tagerMemberCode)">对话</a>
         <!-- <a-divider type="vertical" />
-        <a @click="complaint(record.tagerMemberCode)">投诉对方</a> -->
+        <a @click="complaint(record.tagerMemberCode)">投诉对方</a>-->
       </span>
     </a-table>
 
@@ -49,7 +50,7 @@ import MyChat from "./../../component/MyChat";
 
 const columns = [
   {
-    title:"换书单号",
+    title: "换书单号",
     dataIndex: "code",
     key: "code"
   },
@@ -84,6 +85,8 @@ const columns = [
     title: "操作",
     dataIndex: "action",
     key: "action",
+    fixed: "right",
+    width: 100,
     scopedSlots: { customRender: "action" }
   }
 ];
@@ -112,7 +115,7 @@ export default {
       columns
     };
   },
-   components:{
+  components: {
     MyChat
   },
   filters: {
@@ -125,7 +128,7 @@ export default {
     this.fetch();
   },
   methods: {
-    complaint(memberCode){
+    complaint(memberCode) {
       alert(memberCode);
     },
     handleOk() {
@@ -154,7 +157,7 @@ export default {
       this.memberLinkVisible = false;
     },
     openDialogue(targeMemberCode) {
-      this.targeMemberCode=targeMemberCode;
+      this.targeMemberCode = targeMemberCode;
       this.dialogueVisible = true;
     },
     handleTableChange(pagination, filters, sorter) {
