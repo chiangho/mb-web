@@ -1,12 +1,12 @@
 <template>
   <div id="app">
     <a-layout>
-      <a-layout-header>
+      <a-layout-header v-if="!collapsed">
         <a-row>
-          <a-col :span="3">
+          <!-- <a-col :span="3">
             <div class="item logo">遇见书</div>
-          </a-col>
-          <a-col :span="11">
+          </a-col>-->
+          <a-col :span="10">
             <a-menu mode="horizontal" v-model="topMenuCurrent">
               <a-menu-item key="app" @click="go_home_page">
                 <a-icon type="appstore" />
@@ -22,7 +22,7 @@
               </a-menu-item>
             </a-menu>
           </a-col>
-          <a-col :span="10" class="header-right">
+          <a-col :span="14" class="header-right">
             <div class="item noUnLink right">
               <div v-if="$store.getters.isLogin">
                 {{$store.state.userInfo.name}}
@@ -53,6 +53,68 @@
 
                 <a-icon type="bell" v-else />
                 <a style="margin-left:20px" @click="log_out()">退出</a>
+              </div>
+              <div v-else>
+                <a @click="to_login_page()">登录</a>
+                <a-divider type="vertical" />
+                <router-link to="/register">注册</router-link>
+              </div>
+            </div>
+            <div class="right" style="cursor:pointer" @click="openLinkInfoWindow">联系我们</div>
+          </a-col>
+        </a-row>
+      </a-layout-header>
+      <a-layout-header v-else class="smallWindow">
+        <a-row>
+          <a-col :span="8" @click="go_home_page">
+            遇见书
+            <span>首页</span>
+          </a-col>
+          <a-col :span="16" class="header-right smallWindow">
+            <div class="item noUnLink right smallWindow">
+              <div v-if="$store.getters.isLogin">
+                {{$store.state.userInfo.name}}
+                <a-popover
+                  placement="bottom"
+                  trigger="hover"
+                  @visibleChange="handleHoverChange"
+                  :visible="hovered"
+                  v-if="$store.state.unDialogueCount>0"
+                >
+                  <template slot="content">
+                    <a-list size="small" bordered :dataSource="unReadMemberInfoData">
+                      <a-list-item
+                        slot="renderItem"
+                        slot-scope="item"
+                        @click="openDialogue(item.memberCode)"
+                      >{{item.memberName+'的消息['+item.count+']条未读'}}</a-list-item>
+                    </a-list>
+                  </template>
+
+                  <a-badge
+                    :numberStyle="{backgroundColor: 'red', color: '#FFF', boxShadow: '0 0 0 1px #d9d9d9 inset',borderRadius:'8px',width:'18px',height:'18px',lineHeight:'18px', textAlign:'center'}"
+                  >
+                    <span slot="count">{{$store.state.unDialogueCount}}</span>
+                    <a-icon type="bell" />
+                  </a-badge>
+                </a-popover>
+
+                <a-icon type="bell" v-else />
+                <a style="margin-left:20px" @click="log_out()">退出</a>
+
+                <a-dropdown style="margin-left:20px">
+                  <a href="#">
+                    <a-icon type="appstore" />
+                  </a>
+                  <a-menu slot="overlay">
+                    <a-menu-item @click="go_my_page">
+                      <span>个人中心</span>
+                    </a-menu-item>
+                    <a-menu-item @click="go_publish_page">
+                      <span>发布图书</span>
+                    </a-menu-item>
+                  </a-menu>
+                </a-dropdown>
               </div>
               <div v-else>
                 <a @click="to_login_page()">登录</a>
@@ -107,6 +169,7 @@
 <script>
 import Http from "./Https.js";
 import MyChat from "./component/MyChat";
+import Common from "./Common";
 
 export default {
   components: {
@@ -120,7 +183,17 @@ export default {
       dialogueVisible: false,
       confirmLoading: false,
       isShowLinkInfo: false,
-      topMenuCurrent:[]
+      topMenuCurrent: [],
+      screenWidth: null,
+      collapsed: false
+    };
+  },
+  mounted() {
+    this.screenWidth = document.body.clientWidth;
+    window.onresize = () => {
+      return (() => {
+        this.screenWidth = document.body.clientWidth;
+      })();
     };
   },
   computed: {
@@ -128,12 +201,18 @@ export default {
       return this.$store.getters.isLogin;
     }
   },
-  created(){
+  created() {
     this.topMenuCurrent = this.$store.getters.getTopMenuCurrent;
   },
   watch: {
-    isLogin: loginState => {
-      window.console.log(loginState);
+    isLogin: () => {},
+    screenWidth(val) {
+      //普通的watch监听
+      if (val < Common.Config.simailWindowWidthSize) {
+        this.collapsed = true;
+      } else {
+        this.collapsed = false;
+      }
     }
   },
   methods: {
@@ -189,9 +268,9 @@ export default {
     },
     go_my_page() {
       this.$store.commit("setTopMenuCurrent", "homan");
-      if(this.$store.getters.isLogin){
+      if (this.$store.getters.isLogin) {
         this.$router.push("/my");
-      }else{
+      } else {
         this.$router.push("/login");
       }
     },
@@ -206,6 +285,10 @@ export default {
 </script>
 
 <style>
+.smallWindow {
+  height: 40px !important;
+  line-height: 40px !important;
+}
 #app {
   font-size: 14px;
 }

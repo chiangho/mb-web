@@ -8,9 +8,35 @@ import Common from "./Common.js"
 import wsConnection from './Socket.js'
 import audio from './assets/newmsg.mp3'
 
-import { Base,
-     Layout, Col, Row, Modal, Icon, Menu, List, Form, Input, Divider, Button, Checkbox, Tooltip, Pagination, Select,
-     Table, Message, Alert, message,Card ,Upload,Drawer,Spin,Badge,Popover} from 'ant-design-vue';
+import {
+    Base,
+    Layout,
+    Col,
+    Row,
+    Modal,
+    Icon,
+    Menu,
+    List,
+    Form,
+    Input,
+    Divider,
+    Button,
+    Checkbox,
+    Tooltip,
+    Pagination,
+    Select,
+    Table,
+    Message,
+    Alert,
+    message,
+    Card,
+    Upload,
+    Drawer,
+    Spin,
+    Badge,
+    Popover,
+    Dropdown
+} from 'ant-design-vue';
 
 
 Vue.config.productionTip = false;
@@ -20,12 +46,12 @@ Vue.use(VueRouter)
 Vue.use(AMap);
 // Vue.use(Antd);
 Vue.use(Base).use(Layout).use(Col).use(Row).use(Modal).use(Icon).use(Menu).use(List).
-    use(Form).use(Input).use(Divider).use(Button).use(Checkbox).use(Tooltip).use(Pagination).use(Select).use(Table).use(Message)
-    .use(Alert).use(Card).use(Upload).use(Drawer).use(Spin).use(Badge).use(Popover);
+use(Form).use(Input).use(Divider).use(Button).use(Checkbox).use(Tooltip).use(Pagination).use(Select).use(Table).use(Message)
+    .use(Alert).use(Card).use(Upload).use(Drawer).use(Spin).use(Badge).use(Popover).use(Dropdown);
 
 
 AMap.initAMapApiLoader({
-    key: 'f9645b34f7a07297a3c90fff903a736b',//刚刚开发者申请哪里的key
+    key: 'f9645b34f7a07297a3c90fff903a736b', //刚刚开发者申请哪里的key
     plugin: ['AMap.Autocomplete', 'AMap.Geolocation', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor'],
     v: '1.4.4'
 });
@@ -59,7 +85,7 @@ function toEmotion(text, isNoGif) {
         return text;
     }
 
-    text = text.replace(/\[[\u4E00-\u9FA5]{1,3}\]/gi, function (word) {
+    text = text.replace(/\[[\u4E00-\u9FA5]{1,3}\]/gi, function(word) {
         var newWord = word.replace(/\[|\]/gi, '');
         var index = list.indexOf(newWord);
         var backgroundPositionX = -index * 24
@@ -84,7 +110,7 @@ function toEmotion(text, isNoGif) {
 
 
 Vue.directive('emotion', {
-    bind: function (el, binding) {
+    bind: function(el, binding) {
         el.innerHTML = toEmotion(binding.value)
     }
 });

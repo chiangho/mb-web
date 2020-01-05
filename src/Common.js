@@ -19,18 +19,30 @@ import VueRouter from 'vue-router'
 
 
 
-const Home = () => import('./view/Home.vue');
-const Login = () => import('./view/Login.vue');
-const Register = () => import('./view/Register.vue');
-const ForgetPassword = () => import('./view/ForgetPassword.vue');
-const My = () => import('./view/My.vue');
-const PublishBook = () => import('./view/PublishBook.vue');
-const MyMemberAddress = () => import('./view/my/MemberAddress.vue');
-const MyMemberLink = () => import('./view/my/MemberLink.vue');
-const MyMemberRelease = () => import('./view/my/MemberRelease.vue');
-const MyMemberApplication = () => import('./view/my/MemberApplication.vue');
-const MyMemberTrancation = () => import('./view/my/MemberTrancation.vue');
-const MyMemberSetting = () => import('./view/my/MemberSetting.vue');
+const Home = () =>
+    import ('./view/Home.vue');
+const Login = () =>
+    import ('./view/Login.vue');
+const Register = () =>
+    import ('./view/Register.vue');
+const ForgetPassword = () =>
+    import ('./view/ForgetPassword.vue');
+const My = () =>
+    import ('./view/My.vue');
+const PublishBook = () =>
+    import ('./view/PublishBook.vue');
+const MyMemberAddress = () =>
+    import ('./view/my/MemberAddress.vue');
+const MyMemberLink = () =>
+    import ('./view/my/MemberLink.vue');
+const MyMemberRelease = () =>
+    import ('./view/my/MemberRelease.vue');
+const MyMemberApplication = () =>
+    import ('./view/my/MemberApplication.vue');
+const MyMemberTrancation = () =>
+    import ('./view/my/MemberTrancation.vue');
+const MyMemberSetting = () =>
+    import ('./view/my/MemberSetting.vue');
 
 
 
@@ -41,13 +53,14 @@ import http from "./Https"
 //配置信息
 var Config = {
     userInfoCacheKey: "UserInfo",
-    topMenuCurrentKey:"topMenuCurrent",
-    leftMenuCurrentKey:"leftMenuCurrent",
+    topMenuCurrentKey: "topMenuCurrent",
+    leftMenuCurrentKey: "leftMenuCurrent",
     userTokenCacheKey: "UserToken",
     host: "http://49.234.70.238:9001",
     webSocketHost: "ws://49.234.70.238:9001/websocket",
     unauthorized: "unauthorized",
-    unauthorization: "unauthorization"
+    unauthorization: "unauthorization",
+    simailWindowWidthSize: 600
 }
 
 //全局状态信息
@@ -73,17 +86,17 @@ const storeInfo = {
          }
         */
         dialogueData: {},
-        topMenuCurrent:JSON.parse(localStorage.getItem(Config.topMenuCurrentKey)),
-        leftMenuCurrent:JSON.parse(localStorage.getItem(Config.leftMenuCurrentKey))
+        topMenuCurrent: JSON.parse(localStorage.getItem(Config.topMenuCurrentKey)),
+        leftMenuCurrent: JSON.parse(localStorage.getItem(Config.leftMenuCurrentKey))
     },
     mutations: {
-        setLeftMenuCurrent(state,menu){
-            let temp_=[menu];
+        setLeftMenuCurrent(state, menu) {
+            let temp_ = [menu];
             state.leftMenuCurrent = temp_;
             localStorage.setItem(Config.leftMenuCurrentKey, JSON.stringify(temp_));
         },
-        setTopMenuCurrent(state,menu){
-            let temp_=[menu];
+        setTopMenuCurrent(state, menu) {
+            let temp_ = [menu];
             state.topMenuCurrent = temp_;
             localStorage.setItem(Config.topMenuCurrentKey, JSON.stringify(temp_));
         },
@@ -119,8 +132,8 @@ const storeInfo = {
             }
             state.unDialogueCount = count;
         },
-        cleanUserDialogue(state){
-            state.dialogueData={};
+        cleanUserDialogue(state) {
+            state.dialogueData = {};
         },
         addDialogue(state, dialogue) {
             //设置对话数据
@@ -131,7 +144,7 @@ const storeInfo = {
                 md = state.dialogueData[userCode];
                 md.data.push(dialogue);
                 if (!dialogue.isSelf) {
-                    if(md.windowCount<=0){
+                    if (md.windowCount <= 0) {
                         md.unReadCount = md.unReadCount + 1;
                         md.memberName = memberName;
                     }
@@ -139,18 +152,17 @@ const storeInfo = {
                 }
                 state.dialogueData[userCode] = md;
                 this.commit('sumDialogueUnreadCount');
-            }else{
+            } else {
                 md = {
                     data: [],
                     windowCount: 0,
                     unReadCount: 0,
-                    memberName:memberName
+                    memberName: memberName
                 };
                 http
                     .ajax(
                         "get",
-                        "dialogue/load-member",
-                        { targeMemberCode: userCode },
+                        "dialogue/load-member", { targeMemberCode: userCode },
                         null
                     )
                     .then(resp => {
@@ -159,7 +171,7 @@ const storeInfo = {
                         });
                         md.data.push(dialogue);
                         if (!dialogue.isSelf) {
-                            if(md.windowCount<=0){
+                            if (md.windowCount <= 0) {
                                 md.unReadCount = md.unReadCount + 1;
                                 md.memberName = memberName;
                             }
@@ -169,21 +181,21 @@ const storeInfo = {
                         this.commit('sumDialogueUnreadCount');
 
                     })
-                    .catch(() => { 
+                    .catch(() => {
                         md.data.push(dialogue);
                         if (!dialogue.isSelf) {
-                            if(md.windowCount<=0){
+                            if (md.windowCount <= 0) {
                                 md.unReadCount = md.unReadCount + 1;
                                 md.memberName = memberName;
                             }
                             play();
                         }
-                       
+
                         state.dialogueData[userCode] = md;
                         this.commit('sumDialogueUnreadCount');
-                    }); 
+                    });
             }
-            
+
         },
         openDialogueWindow(state, tagMemberCode) {
             let md = null;
@@ -192,29 +204,29 @@ const storeInfo = {
                 md.windowCount = md.windowCount + 1;
                 md.unReadCount = 0;
                 state.dialogueData[tagMemberCode] = md;
-            } 
+            }
             this.commit('sumDialogueUnreadCount');
         },
         closeDialogueWindow(state, tagMemberCode) {
             let md = null;
             if (state.dialogueData[tagMemberCode]) {
                 md = state.dialogueData[tagMemberCode];
-                if( md.windowCount>0){
+                if (md.windowCount > 0) {
                     md.windowCount = md.windowCount - 1;
                     state.dialogueData[tagMemberCode] = md;
                 }
-            } 
+            }
             this.commit('sumDialogueUnreadCount');
         }
     },
     getters: {
-        getTopMenuCurrent:state=>{
+        getTopMenuCurrent: state => {
             if (state && state.topMenuCurrent) {
                 return state.topMenuCurrent;
             }
             return [];
         },
-        getLeftMenuCurrent:state=>{
+        getLeftMenuCurrent: state => {
             if (state && state.leftMenuCurrent) {
                 return state.leftMenuCurrent;
             }
@@ -229,7 +241,7 @@ const storeInfo = {
         getCatchUri: state => {
             return state.catchUri;
         },
-        getUserDialogueData: (state) => (userCode,memberName) => {
+        getUserDialogueData: (state) => (userCode, memberName) => {
             if (!state.dialogueData[userCode]) {
                 let md = {
                     data: [],
@@ -241,8 +253,7 @@ const storeInfo = {
                 http
                     .ajax(
                         "get",
-                        "dialogue/load-member",
-                        { targeMemberCode: userCode },
+                        "dialogue/load-member", { targeMemberCode: userCode },
                         null
                     )
                     .then(resp => {
@@ -251,17 +262,17 @@ const storeInfo = {
                         });
                         state.dialogueData[userCode] = md;
                     })
-                    .catch(() => { });
+                    .catch(() => {});
             }
             return state.dialogueData[userCode].data;
         },
-        getUnReadMemberInfo: (state) =>  {
+        getUnReadMemberInfo: (state) => {
             let data = new Array();
             for (let key in state.dialogueData) {
                 data.push({
-                    memberCode:key,
-                    memberName:state.dialogueData[key].memberName,
-                    count:state.dialogueData[key].unReadCount
+                    memberCode: key,
+                    memberName: state.dialogueData[key].memberName,
+                    count: state.dialogueData[key].unReadCount
                 });
             }
             return data;
@@ -275,109 +286,109 @@ const store = new Vuex.Store(storeInfo)
 //路由
 const router = new VueRouter({
     routes: [{
-        path: '/',
-        component: Home,
-        meta: {
-            "title": "遇见书"
-        }
-    },
-    {
-        path: '/home',
-        component: Home,
-        meta: {
-            "title": "遇见书"
-        }
-    },
-    {
-        path: '/login',
-        component: Login,
-        meta: {
-            "title": "登录"
-        }
-    },
-    {
-        path: '/register',
-        component: Register,
-        meta: {
-            "title": "注册"
-        }
-    },
-    {
-        path: '/forget-password',
-        component: ForgetPassword,
-        meta: {
-            "title": "忘记密码"
-        }
-    },
-    {
-        path: '/my',
-        component: My,
-        meta: {
-            "auth": true,
-            "title": "个人中心"
-        },
-        children: [{
-            path: "member-address",
-            component: MyMemberAddress,
+            path: '/',
+            component: Home,
             meta: {
-                "auth": true,
-                "title": "区域信息"
+                "title": "遇见书"
             }
         },
         {
-            path: "member-link",
-            component: MyMemberLink,
+            path: '/home',
+            component: Home,
             meta: {
-                "auth": true,
-                "title": "联系人信息编辑"
+                "title": "遇见书"
             }
         },
         {
-            path: "member-release",
-            component: MyMemberRelease,
+            path: '/login',
+            component: Login,
             meta: {
-                "auth": true,
-                "title": "我发布的图书"
+                "title": "登录"
             }
         },
         {
-            path: "member-application",
-            component: MyMemberApplication,
+            path: '/register',
+            component: Register,
             meta: {
-                "auth": true,
-                "title": "我申请的图书"
+                "title": "注册"
             }
         },
         {
-            path: "member-trancation",
-            component: MyMemberTrancation,
+            path: '/forget-password',
+            component: ForgetPassword,
             meta: {
-                "auth": true,
-                "title": "我的换书记录"
+                "title": "忘记密码"
             }
         },
         {
-            path: "member-setting",
-            component: MyMemberSetting,
+            path: '/my',
+            component: My,
             meta: {
                 "auth": true,
-                "title": "个人信息设置"
+                "title": "个人中心"
+            },
+            children: [{
+                    path: "member-address",
+                    component: MyMemberAddress,
+                    meta: {
+                        "auth": true,
+                        "title": "区域信息"
+                    }
+                },
+                {
+                    path: "member-link",
+                    component: MyMemberLink,
+                    meta: {
+                        "auth": true,
+                        "title": "联系人信息编辑"
+                    }
+                },
+                {
+                    path: "member-release",
+                    component: MyMemberRelease,
+                    meta: {
+                        "auth": true,
+                        "title": "我发布的图书"
+                    }
+                },
+                {
+                    path: "member-application",
+                    component: MyMemberApplication,
+                    meta: {
+                        "auth": true,
+                        "title": "我申请的图书"
+                    }
+                },
+                {
+                    path: "member-trancation",
+                    component: MyMemberTrancation,
+                    meta: {
+                        "auth": true,
+                        "title": "我的换书记录"
+                    }
+                },
+                {
+                    path: "member-setting",
+                    component: MyMemberSetting,
+                    meta: {
+                        "auth": true,
+                        "title": "个人信息设置"
+                    }
+                }
+            ]
+        },
+        {
+            path: '/publish-book',
+            component: PublishBook,
+            meta: {
+                "auth": true,
+                "title": "发布图书"
             }
         }
-        ]
-    },
-    {
-        path: '/publish-book',
-        component: PublishBook,
-        meta: {
-            "auth": true,
-            "title": "发布图书"
-        }
-    }
     ],
 })
 
-const formatDate = function (date, fmt) {
+const formatDate = function(date, fmt) {
     if (/(y+)/.test(fmt)) {
         fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
     }
@@ -402,22 +413,22 @@ function padLeftZero(str) {
 }
 
 const defalutWebSocketParam = {
-    open: function () { },
-    message: function (msg) {
+    open: function() {},
+    message: function(msg) {
         window.console.log(msg);
     },
-    close: function () { },
-    error: function () { }
+    close: function() {},
+    error: function() {}
 }
 
-const webSocket = function (param = defalutWebSocketParam) {
-    if (typeof (WebSocket) == "undefined") {
+const webSocket = function(param = defalutWebSocketParam) {
+    if (typeof(WebSocket) == "undefined") {
         window.console.log("您的浏览器不支持WebSocket");
     } else if (!store.state.userToken) {
         window.console.log("token不能为空");
     } else {
         let socket = new WebSocket(Config.webSocketHost);
-        socket.onopen = function () {
+        socket.onopen = function() {
             window.console.log("Socket 已打开");
             param.open();
             let WebSocketOutVo = {
@@ -427,18 +438,18 @@ const webSocket = function (param = defalutWebSocketParam) {
             socket.send(JSON.stringify(WebSocketOutVo));
         };
         //获得消息事件  
-        socket.onmessage = function (msg) {
+        socket.onmessage = function(msg) {
             window.console.log(msg.data);
             //发现消息进入    开始处理前端触发逻辑
             param.message(msg);
         };
         //关闭事件  
-        socket.onclose = function () {
+        socket.onclose = function() {
             window.console.log("Socket已关闭");
             param.close();
         };
         //发生了错误事件  
-        socket.onerror = function () {
+        socket.onerror = function() {
             window.console.log("Socket发生了错误");
             //此时可以尝试刷新页面
             param.error();
@@ -448,15 +459,15 @@ const webSocket = function (param = defalutWebSocketParam) {
 }
 
 
-var play = function () {
+var play = function() {
     //let audio = document.querySelector('#audio_newmsg');
-    try{
+    try {
         Vue.prototype.playAudio();
         //audio.play();
-    }catch(e){
+    } catch (e) {
         window.console.log(e);
     }
-    
+
 }
 
 export default {

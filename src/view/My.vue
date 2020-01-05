@@ -48,6 +48,9 @@
   </dvi>
 </template>
 <script>
+
+import Common from "./../Common";
+
 export default {
   data() {
     return {
@@ -103,7 +106,7 @@ export default {
       window.console.log("openKeys", val);
     },
     screenWidth(val){//普通的watch监听
-      if(val<600){
+      if(val<Common.Config.simailWindowWidthSize){
         this.collapsed = true;
       }else{
         this.collapsed = false;
