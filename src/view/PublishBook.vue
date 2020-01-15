@@ -1,6 +1,7 @@
 <template>
   <div>
-    <a-spin :spinning="spinning" tip="系统正在发布中....">
+    <RegisteredBook></RegisteredBook>
+    <!-- <a-spin :spinning="spinning" tip="系统正在发布中....">
       <a-form :form="form">
         <a-form-item :wrapper-col="{span:8,offset:8}">
           <a-alert
@@ -92,156 +93,160 @@
 
     <a-modal title="登记图书" v-model="isOpenInputBookWindow" :destroyOnClose="true" :footer="null">
       <InputNewBook :isbn="tagIsbn" type="0" :callBack="callBack"></InputNewBook>
-    </a-modal>
+    </a-modal> -->
   </div>
 </template>
 <script>
-import Http from "../Https.js";
+// import Http from "../Https.js";
+import RegisteredBook from "./../component/RegisteredBook";
 
-import AddMemberAddress from "./../component/AddMemberAddress";
-import AddMemberLink from "./../component/AddMemberLink";
-import InputNewBook from "./../component/InputNewBook";
 
-const tailFormItemLayout = {
-  wrapperCol: {
-    xs: {
-      span: 8,
-      offset: 0
-    },
-    sm: {
-      span: 8,
-      offset: 8
-    }
-  }
-};
+
+// import AddMemberAddress from "./../component/AddMemberAddress";
+// import AddMemberLink from "./../component/AddMemberLink";
+// import InputNewBook from "./../component/InputNewBook";
+
+// const tailFormItemLayout = {
+//   wrapperCol: {
+//     xs: {
+//       span: 8,
+//       offset: 0
+//     },
+//     sm: {
+//       span: 8,
+//       offset: 8
+//     }
+//   }
+// };
 
 export default {
   data() {
     return {
-      tailFormItemLayout,
-      addressData: null, //地址信息
-      linkData: null, //连接信息
-      modelvisible: false,
-      modelLinkVisible: false,
+      // tailFormItemLayout,
+      // addressData: null, //地址信息
+      // linkData: null, //连接信息
+      // modelvisible: false,
+      // modelLinkVisible: false,
 
-      alertVisible: false,
-      alertType: "error",
-      alertMessage: "",
+      // alertVisible: false,
+      // alertType: "error",
+      // alertMessage: "",
 
-      publishAlertVisible: false,
-      publishAlertType: "error",
-      publishAlertMessage: "",
-      modelPublishSuccess: false,
+      // publishAlertVisible: false,
+      // publishAlertType: "error",
+      // publishAlertMessage: "",
+      // modelPublishSuccess: false,
 
-      isOpenInputBookWindow: false,
-      tagIsbn: null,
-      registerBookCode: null,
+      // isOpenInputBookWindow: false,
+      // tagIsbn: null,
+      // registerBookCode: null,
 
-      spinning: false
+      // spinning: false
     };
   },
   components: {
-    AddMemberAddress,
-    AddMemberLink,
-    InputNewBook
+    // AddMemberAddress,
+    // AddMemberLink,
+    // InputNewBook,
+    RegisteredBook
   },
-  beforeCreate() {
-    this.form = this.$form.createForm(this, { name: "publish-book" });
-  },
-  created() {
-    this.loadLinkData();
-    this.loadAddressData();
-  },
-  methods: {
-    callBack(code, isbn, bookName) {
-      this.isOpenInputBookWindow = false;
-      this.registerBookCode = code;
-      window.console.log(bookName);
-      this.form.setFieldsValue({
-        isbn: isbn
-      });
-      this.publishbook();
-    },
-    handleOkPublishSuccess() {
-      this.$router.push("/home");
-    },
-    handleCancelPublishSuccess() {
-      this.$router.go(0);
-      //this.$router.push("/publish-book");
-    },
+  // beforeCreate() {
+  //   this.form = this.$form.createForm(this, { name: "publish-book" });
+  // },
+  // created() {
+  //   this.loadLinkData();
+  //   this.loadAddressData();
+  // },
+  // methods: {
+  //   callBack(code, isbn, bookName) {
+  //     this.isOpenInputBookWindow = false;
+  //     this.registerBookCode = code;
+  //     window.console.log(bookName);
+  //     this.form.setFieldsValue({
+  //       isbn: isbn
+  //     });
+  //     this.publishbook();
+  //   },
+  //   handleOkPublishSuccess() {
+  //     this.$router.push("/home");
+  //   },
+  //   handleCancelPublishSuccess() {
+  //     this.$router.go(0);
+  //     //this.$router.push("/publish-book");
+  //   },
 
-    loadAddressData() {
-      Http.fetchPost("member/address/query", null)
-        .then(res => {
-          this.addressData = res.data;
-        })
-        .catch(err => {
-          window.console.log(err);
-        });
-    },
-    loadLinkData() {
-      Http.fetchGet("member/link/query", null)
-        .then(res => {
-          this.linkData = res.data;
-        })
-        .catch(err => {
-          window.console.log(err);
-        });
-    },
-    addNewMemberAddress() {
-      this.modelvisible = true;
-    },
-    addMemberAddressSuccess() {
-      this.modelvisible = false;
-      this.loadAddressData();
-    },
-    addMemberLinkSuccess() {
-      this.modelvisible = false;
-      this.loadLinkData();
-    },
-    addNewMemberLink() {
-      this.modelLinkVisible = true;
-    },
+  //   loadAddressData() {
+  //     Http.fetchPost("member/address/query", null)
+  //       .then(res => {
+  //         this.addressData = res.data;
+  //       })
+  //       .catch(err => {
+  //         window.console.log(err);
+  //       });
+  //   },
+  //   loadLinkData() {
+  //     Http.fetchGet("member/link/query", null)
+  //       .then(res => {
+  //         this.linkData = res.data;
+  //       })
+  //       .catch(err => {
+  //         window.console.log(err);
+  //       });
+  //   },
+  //   addNewMemberAddress() {
+  //     this.modelvisible = true;
+  //   },
+  //   addMemberAddressSuccess() {
+  //     this.modelvisible = false;
+  //     this.loadAddressData();
+  //   },
+  //   addMemberLinkSuccess() {
+  //     this.modelvisible = false;
+  //     this.loadLinkData();
+  //   },
+  //   addNewMemberLink() {
+  //     this.modelLinkVisible = true;
+  //   },
 
-    publishbook() {
-      this.publishAlertVisible = false;
-      this.publishAlertType = "error";
-      this.publishAlertMessage = "";
+  //   publishbook() {
+  //     this.publishAlertVisible = false;
+  //     this.publishAlertType = "error";
+  //     this.publishAlertMessage = "";
 
-      this.form.validateFields(err => {
-        if (!err) {
-          this.spinning = true;
-          Http.ajax("post", "release", null, {
-            registerBookCode: this.registerBookCode,
-            isbn: this.form.getFieldValue("isbn"),
-            memberLinkCode: this.form.getFieldValue("persion"),
-            memberAddressCode: this.form.getFieldValue("address"),
-            remark: this.form.getFieldValue("remark")
-          })
-            .then(() => {
-              this.modelPublishSuccess = true;
-              this.spinning = false;
-            })
-            .catch(err => {
-              if (err && err.code && err.code == 1) {
-                this.$message.error(err.message);
-                this.isOpenInputBookWindow = true;
-                this.tagIsbn = this.form.getFieldValue("isbn");
-              } else {
-                this.publishAlertVisible = true;
-                this.publishAlertType = "error";
-                let messge = "发布失败";
-                if (err && err.message) {
-                  messge = err.message;
-                }
-                this.publishAlertMessage = messge;
-              }
-              this.spinning = false;
-            });
-        }
-      });
-    }
-  }
+  //     this.form.validateFields(err => {
+  //       if (!err) {
+  //         this.spinning = true;
+  //         Http.ajax("post", "release", null, {
+  //           registerBookCode: this.registerBookCode,
+  //           isbn: this.form.getFieldValue("isbn"),
+  //           memberLinkCode: this.form.getFieldValue("persion"),
+  //           memberAddressCode: this.form.getFieldValue("address"),
+  //           remark: this.form.getFieldValue("remark")
+  //         })
+  //           .then(() => {
+  //             this.modelPublishSuccess = true;
+  //             this.spinning = false;
+  //           })
+  //           .catch(err => {
+  //             if (err && err.code && err.code == 1) {
+  //               this.$message.error(err.message);
+  //               this.isOpenInputBookWindow = true;
+  //               this.tagIsbn = this.form.getFieldValue("isbn");
+  //             } else {
+  //               this.publishAlertVisible = true;
+  //               this.publishAlertType = "error";
+  //               let messge = "发布失败";
+  //               if (err && err.message) {
+  //                 messge = err.message;
+  //               }
+  //               this.publishAlertMessage = messge;
+  //             }
+  //             this.spinning = false;
+  //           });
+  //       }
+  //     });
+  //   }
+  // }
 };
 </script>
 <style>

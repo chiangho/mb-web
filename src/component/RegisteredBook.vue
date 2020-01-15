@@ -1,21 +1,67 @@
 <template>
-  <div>
-    <a-spin :spinning="spinning" tip="系统正在发布中....">
+  <div class="header">
+    
+    <a-spin :spinning="spinning" :tip="spinningTip">
       <a-form :form="form">
-        <a-form-item :wrapper-col="{span:18,offset:4}">
-          <a-alert
-            v-if="publishAlertVisible"
-            :type="publishAlertType"
-            :message="publishAlertMessage"
-            closable
-          />
+        
+        <a-form-item :wrapper-col="tailFormItemLayout.wrapperCol">
+          <span class="title">输入图书条码后会自动配置图书信息，如匹配错误或者匹配不到，请修改或者填写图书名称、简介等信息!</span>
         </a-form-item>
-        <a-form-item label="区域" :label-col="{span:4}" :wrapper-col="{span:18}">
+        
+        <a-form-item label="图书条码" :label-col="{span:4}" :wrapper-col="{span:18}">
+          <a-input
+            v-decorator="[
+          'bookisbn',
+          { rules: [{ required: false, message: '请填写图书条码!' }] },
+        ]"
+            placeholder="请填写图书条码"
+            @blur="finishIsbn"
+          ></a-input>
+        </a-form-item>
+
+        <a-form-item label="图书名称" :label-col="{span:4}" :wrapper-col="{span:18}">
+          <a-input
+            v-decorator="[
+          'bookName',
+          { rules: [{ required: true, message: '请填写图书名称!' }] },
+        ]"
+            placeholder="请填写图书名称"
+          ></a-input>
+        </a-form-item>
+
+        <a-form-item label="图书图片" :label-col="{span:4}" :wrapper-col="{span:18}">
+          <input
+            type="file"
+            id="people-export"
+            ref="inputer"
+            @change="handleUpdateIcon"
+            placeholder="请上传图片"
+             v-decorator="[
+              'bookImage',
+              { rules: [{ required: true, message: '请上传图片!' }] },
+            ]"
+          />
+          <img v-if="isShowImage" :src="imagePath" />
+        </a-form-item>
+
+        <a-form-item label="图书简介" :label-col="{span:4}" :wrapper-col="{span:18}">
+          <a-textarea
+            :rows="4"
+            v-decorator="[
+          'bookName',
+          { rules: [{ required: false, message: '请输入图书简介!' }] },
+        ]"
+            placeholder="请填写图书简介"
+          ></a-textarea>
+        </a-form-item>
+
+        <a-form-item label="图书地址" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-select
             v-decorator="[
           'address',
           { rules: [{ required: true, message: '请输入区域地址!' }] },
         ]"
+            placeholder="请选择图书地址"
           >
             <a-select-option
               v-for="address in addressData"
@@ -24,12 +70,13 @@
           </a-select>
           <span style="cursor: pointer" @click="addNewMemberAddress">添加区域</span>
         </a-form-item>
-        <a-form-item label="联系人" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-form-item label="图书联系人" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-select
             v-decorator="[
           'persion',
           { rules: [{ required: true, message: '请输入联系人!' }] },
         ]"
+            placeholder="请选择图书联系人"
           >
             <a-select-option
               v-for="link in linkData"
@@ -39,24 +86,16 @@
 
           <span style="cursor: pointer" @click="addNewMemberLink">添加联系人</span>
         </a-form-item>
-        <a-form-item label="图书ISBN" :label-col="{span:4}" :wrapper-col="{span:18}">
-          <a-input
-            v-decorator="[
-          'bookisbn',
-          { rules: [{ required: true, message: '请输入图书ISBN编号!' }] },
-        ]"
-            placeholder="图书ISBN编号"
-          ></a-input>
-        </a-form-item>
 
         <a-form-item label="留言" :label-col="{span:4}" :wrapper-col="{span:18}">
-          <a-input
+          <a-textarea
+            :rows="4"
             v-decorator="[
           'remark',
-          { rules: [{ required: true, message: '留言' }] },
+          { rules: [{ required: false, message: '留言' }] },
         ]"
             placeholder="留言"
-          ></a-input>
+          ></a-textarea>
         </a-form-item>
 
         <a-form-item :wrapper-col="tailFormItemLayout.wrapperCol">
@@ -76,16 +115,17 @@
       </div>
     </a-modal>
 
-    <a-modal title="登记图书" v-model="isOpenInputBookWindow" :destroyOnClose="true" :footer="null">
+    <!-- <a-modal title="提交" v-model="isOpenInputBookWindow" :destroyOnClose="true" :footer="null">
       <InputNewBook :isbn="tagIsbn" type="1" :callBack="callBack"></InputNewBook>
-    </a-modal>
+    </a-modal>-->
   </div>
 </template>
 <script>
 import Http from "./../Https.js";
 import AddMemberAddress from "./AddMemberAddress";
 import AddMemberLink from "./AddMemberLink";
-import InputNewBook from "./InputNewBook";
+import Common from "./../Common";
+
 const tailFormItemLayout = {
   wrapperCol: {
     xs: {
@@ -108,23 +148,16 @@ export default {
       modelvisible: false,
       modelLinkVisible: false,
       modelAddModelVisibal: false,
-      alertVisible: false,
-      alertType: "error",
-      alertMessage: "",
-      publishAlertVisible: false,
-      publishAlertType: "error",
-      publishAlertMessage: "",
+      spinningTip: "系统在识别条码中....",
 
-      isOpenInputBookWindow: false,
-      tagIsbn: null,
-      registerBookCode: null,
-      spinning:false
+      spinning: false,
+      imagePath: null,
+      isShowImage: false
     };
   },
   components: {
     AddMemberAddress,
-    AddMemberLink,
-    InputNewBook
+    AddMemberLink
   },
   props: ["code"],
   beforeCreate() {
@@ -135,15 +168,6 @@ export default {
     this.loadAddressData();
   },
   methods: {
-    callBack(code, isbn, bookName) {
-      this.isOpenInputBookWindow = false;
-      this.registerBookCode = code;
-      window.console.log(bookName);
-      this.form.setFieldsValue({
-        bookisbn: isbn
-      });
-      this.publishbook();
-    },
     loadAddressData() {
       Http.fetchPost("member/address/query", null)
         .then(res => {
@@ -178,14 +202,37 @@ export default {
       this.modelLinkVisible = true;
     },
 
+    handleUpdateIcon(event) {
+      this.imagePath = "";
+      this.spinning = true;
+      this.spinningTip = "图片上传中....";
+      // 文件上传
+      Http.update(event, "upload-image", "image", null)
+        .then(res => {
+          this.spinning = false;
+          this.$message.success("上传成功");
+          this.imagePath = Common.Config.host + "" + res.data;
+          this.isShowImage = true;
+        })
+        .catch(e => {
+          this.spinning = false;
+          if (e && e.message) {
+            this.$message.error(e.message);
+          } else {
+            this.$message.error("异常");
+          }
+        });
+    },
+    finishIsbn() {
+      //isbn输入完成匹配isbn的信息，自动填写图书信息
+      alert(1);
+    },
+
     publishbook() {
-      this.publishAlertVisible = false;
-      this.publishAlertType = "error";
-      this.publishAlertMessage = "";
       this.form.validateFields((err, vlaues) => {
         if (!err) {
           vlaues["bookReleaseCode"] = this.code;
-          vlaues["registerBookCode"]=this.registerBookCode;
+          vlaues["registerBookCode"] = this.registerBookCode;
           this.spinning = true;
           Http.ajax("get", "apply/register-book", vlaues, null)
             .then(() => {
@@ -199,13 +246,9 @@ export default {
                 this.tagIsbn = this.form.getFieldValue("bookisbn");
               } else {
                 if (err && err.message) {
-                  this.publishAlertVisible = true;
-                  this.publishAlertType = "error";
-                  this.publishAlertMessage = err.message;
+                  this.$message.error(err.message);
                 } else {
-                  this.publishAlertVisible = true;
-                  this.publishAlertType = "error";
-                  this.publishAlertMessage = "未知异常";
+                  this.$message.error("未知异常");
                 }
               }
               this.spinning = false;
@@ -217,4 +260,15 @@ export default {
 };
 </script>
 <style>
+.header {
+  margin-top: 20px;
+}
+.title{
+  text-align: left;
+  color:red
+}
+img{
+  width: 150px;
+  height: 150px;
+}
 </style>

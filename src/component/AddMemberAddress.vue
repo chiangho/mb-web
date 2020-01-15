@@ -4,11 +4,11 @@
       <a-form-item label="省" :label-col="{span:4}" :wrapper-col="{span:16}">
         <a-select
           @change="handleProvinceChange"
-          placeholder="请选择省份"
           v-decorator="[
           'province',
            { rules: [{ required: true, message: '请选择省份' }],initialValue:provinceDefaultValue },
         ]"
+          placeholder="请选择省份"
         >
           <a-select-option v-for="province in provinceData" :key="province.id">{{province.name}}</a-select-option>
         </a-select>
@@ -16,22 +16,23 @@
       <a-form-item label="市" :label-col="{span:4}" :wrapper-col="{span:16}">
         <a-select
           @change="handleCityChange"
-          placeholder="请选择地市"
           v-decorator="[
           'city',
           { rules: [{ required: true, message: '请选择地市' }],initialValue:cityDefaultValue },
         ]"
+          placeholder="请选择地市"
         >
           <a-select-option v-for="city in cityData" :key="city.id">{{city.name}}</a-select-option>
         </a-select>
       </a-form-item>
       <a-form-item label="区/县" :label-col="{span:4}" :wrapper-col="{span:16}">
         <a-select
-          placeholder="请选择区县"
+          
           v-decorator="[
           'county',
           { rules: [{ required: true, message: '请选择区县' }],initialValue:countyDefaultValue },
         ]"
+        placeholder="请选择区县"
         >
           <a-select-option v-for="county in countyData" :key="county.id">{{county.name}}</a-select-option>
         </a-select>
@@ -47,7 +48,7 @@
       </a-form-item>
 
       <a-form-item :wrapper-col="tailFormItemLayout.wrapperCol">
-        <a-button type="primary"  html-type="submit">提交</a-button>
+        <a-button type="primary" html-type="submit">提交</a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -74,10 +75,10 @@ export default {
       provinceData: [],
       cityData: [],
       countyData: [],
-      provinceDefaultValue:null,
-      cityDefaultValue:null,
-      countyDefaultValue:null,
-      addressDefaultValue:null
+      provinceDefaultValue: null,
+      cityDefaultValue: null,
+      countyDefaultValue: null,
+      addressDefaultValue: null
     };
   },
   beforeCreate() {
@@ -87,9 +88,7 @@ export default {
     this.loadProvinceData(); //加载省份信息
     this.loadMemberAddressInfo();
   },
-  props:[
-    "code"
-  ],
+  props: ["code"],
   methods: {
     loadProvinceData() {
       Http.fetchGet("area/province", null)
@@ -135,16 +134,16 @@ export default {
       this.form.validateFields((err, values) => {
         if (!err) {
           let url = "member/address/add";
-          if(this.code){
-            url="member/address/update";
-            values["code"]=this.code;
+          if (this.code) {
+            url = "member/address/update";
+            values["code"] = this.code;
           }
           Http.fetchPost(url, values)
             .then(res => {
-              if(res.status===200){
+              if (res.status === 200) {
                 //alert("success");
-                this.$emit('addMemberAddressSuccess');
-              }else{
+                this.$emit("addMemberAddressSuccess");
+              } else {
                 this.$message.error(res.error.message);
               }
             })
@@ -154,18 +153,20 @@ export default {
         }
       });
     },
-    loadMemberAddressInfo(){
-      if(this.code){
-        Http.ajax("post","member/address/detail",{"code":this.code},null).then(res=>{
-          this.provinceDefaultValue = res.data.provinceId;
-          this.handleProvinceChange(this.provinceDefaultValue);
-          this.cityDefaultValue = res.data.cityId;
-          this.handleCityChange(this.cityDefaultValue);
-          this.countyDefaultValue = res.data.countyId;
-          this.addressDefaultValue = res.data.address
-        }).catch(err=>{
-          this.$message.error(err.message);
-        });
+    loadMemberAddressInfo() {
+      if (this.code) {
+        Http.ajax("post", "member/address/detail", { code: this.code }, null)
+          .then(res => {
+            this.provinceDefaultValue = res.data.provinceId;
+            this.handleProvinceChange(this.provinceDefaultValue);
+            this.cityDefaultValue = res.data.cityId;
+            this.handleCityChange(this.cityDefaultValue);
+            this.countyDefaultValue = res.data.countyId;
+            this.addressDefaultValue = res.data.address;
+          })
+          .catch(err => {
+            this.$message.error(err.message);
+          });
       }
     }
   }
