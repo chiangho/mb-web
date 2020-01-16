@@ -35,7 +35,8 @@ import {
     Spin,
     Badge,
     Popover,
-    Dropdown
+    Dropdown,
+    Radio
 } from 'ant-design-vue';
 
 
@@ -47,7 +48,7 @@ Vue.use(AMap);
 // Vue.use(Antd);
 Vue.use(Base).use(Layout).use(Col).use(Row).use(Modal).use(Icon).use(Menu).use(List).
 use(Form).use(Input).use(Divider).use(Button).use(Checkbox).use(Tooltip).use(Pagination).use(Select).use(Table).use(Message)
-    .use(Alert).use(Card).use(Upload).use(Drawer).use(Spin).use(Badge).use(Popover).use(Dropdown);
+    .use(Alert).use(Card).use(Upload).use(Drawer).use(Spin).use(Badge).use(Popover).use(Dropdown).use(Radio);
 
 
 AMap.initAMapApiLoader({
@@ -67,7 +68,9 @@ Common.router.beforeEach((to, from, next) => {
         } else {
             window.console.log("未认证，请先登录！" + to.path);
             Common.store.commit("setCatchUti", to.path);
-            next({ path: '/login' });
+            next({
+                path: '/login'
+            });
         }
     } else {
         next();
@@ -85,7 +88,7 @@ function toEmotion(text, isNoGif) {
         return text;
     }
 
-    text = text.replace(/\[[\u4E00-\u9FA5]{1,3}\]/gi, function(word) {
+    text = text.replace(/\[[\u4E00-\u9FA5]{1,3}\]/gi, function (word) {
         var newWord = word.replace(/\[|\]/gi, '');
         var index = list.indexOf(newWord);
         var backgroundPositionX = -index * 24
@@ -110,7 +113,7 @@ function toEmotion(text, isNoGif) {
 
 
 Vue.directive('emotion', {
-    bind: function(el, binding) {
+    bind: function (el, binding) {
         el.innerHTML = toEmotion(binding.value)
     }
 });

@@ -1,17 +1,33 @@
 <template>
   <div class="header">
-    
     <a-spin :spinning="spinning" :tip="spinningTip">
       <a-form :form="form">
-        
         <a-form-item :wrapper-col="tailFormItemLayout.wrapperCol">
           <span class="title">输入图书条码后会自动配置图书信息，如匹配错误或者匹配不到，请修改或者填写图书名称、简介等信息!</span>
         </a-form-item>
-        
-        <a-form-item label="图书条码" :label-col="{span:4}" :wrapper-col="{span:18}">
+
+        <a-form-item label="选择图书方式" :label-col="{span:4}" :wrapper-col="{span:18}">
+          <a-radio-group
+            @change="onChangeBookChoodeType"
+            defaultValue="1"
+            buttonStyle="solid"
+            v-decorator="[
+            'bookChooseType',
+             { rules: [{ required: true, message: '请选择图书选择形式!' }] },
+            ]"
+          >
+            <a-radio-button value="0">新建</a-radio-button>
+            <a-radio-button value="1">从库中选择</a-radio-button>
+          </a-radio-group>
+        </a-form-item>
+
+
+
+
+        <a-form-item v-if="bookChooseType===1" label="图书条码" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-input
             v-decorator="[
-          'bookisbn',
+          'isbn',
           { rules: [{ required: false, message: '请填写图书条码!' }] },
         ]"
             placeholder="请填写图书条码"
@@ -22,9 +38,9 @@
         <a-form-item label="图书名称" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-input
             v-decorator="[
-          'bookName',
-          { rules: [{ required: true, message: '请填写图书名称!' }] },
-        ]"
+              'bookName',
+              { rules: [{ required: true, message: '请填写图书名称!' }] },
+            ]"
             placeholder="请填写图书名称"
           ></a-input>
         </a-form-item>
@@ -36,8 +52,8 @@
             ref="inputer"
             @change="handleUpdateIcon"
             placeholder="请上传图片"
-             v-decorator="[
-              'bookImage',
+            v-decorator="[
+              'icon',
               { rules: [{ required: true, message: '请上传图片!' }] },
             ]"
           />
@@ -48,17 +64,32 @@
           <a-textarea
             :rows="4"
             v-decorator="[
-          'bookName',
+          'introduction',
           { rules: [{ required: false, message: '请输入图书简介!' }] },
         ]"
             placeholder="请填写图书简介"
           ></a-textarea>
         </a-form-item>
 
+       
+        
+
+        <a-form-item label="发布方式" :label-col="{span:4}" :wrapper-col="{span:18}">
+          <a-radio-group
+            buttonStyle="solid"
+            v-decorator="[
+            'type',
+             { rules: [{ required: true, message: '请选择发布方式!' }] },
+            ]"
+          >
+            <a-radio-button value="10">换读</a-radio-button>
+            <a-radio-button value="01">借阅</a-radio-button>
+          </a-radio-group>
+        </a-form-item>
         <a-form-item label="图书地址" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-select
             v-decorator="[
-          'address',
+          'memberAddressCode',
           { rules: [{ required: true, message: '请输入区域地址!' }] },
         ]"
             placeholder="请选择图书地址"
@@ -73,7 +104,7 @@
         <a-form-item label="图书联系人" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-select
             v-decorator="[
-          'persion',
+          'memberLinkCode',
           { rules: [{ required: true, message: '请输入联系人!' }] },
         ]"
             placeholder="请选择图书联系人"
@@ -152,7 +183,8 @@ export default {
 
       spinning: false,
       imagePath: null,
-      isShowImage: false
+      isShowImage: false,
+      bookChooseType: 1
     };
   },
   components: {
@@ -227,7 +259,11 @@ export default {
       //isbn输入完成匹配isbn的信息，自动填写图书信息
       alert(1);
     },
-
+    onChangeBookChoodeType(e) {
+      let value = e.target.value;
+      alert(value);
+      this.bookChooseType = value;
+    },
     publishbook() {
       this.form.validateFields((err, vlaues) => {
         if (!err) {
@@ -263,11 +299,11 @@ export default {
 .header {
   margin-top: 20px;
 }
-.title{
+.title {
   text-align: left;
-  color:red
+  color: red;
 }
-img{
+img {
   width: 150px;
   height: 150px;
 }
