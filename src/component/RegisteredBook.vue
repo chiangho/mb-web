@@ -9,10 +9,10 @@
         <a-form-item label="选择图书方式" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-radio-group
             @change="onChangeBookChoodeType"
-            defaultValue="1"
+            defaultValue="0"
             buttonStyle="solid"
             v-decorator="[
-            'bookChooseType',
+            'bookChooseTypeValue',
              { rules: [{ required: true, message: '请选择图书选择形式!' }] },
             ]"
           >
@@ -21,10 +21,12 @@
           </a-radio-group>
         </a-form-item>
 
-
-
-
-        <a-form-item v-if="bookChooseType===1" label="图书条码" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-form-item
+          v-if="bookChooseType==0"
+          label="图书条码"
+          :label-col="{span:4}"
+          :wrapper-col="{span:18}"
+        >
           <a-input
             v-decorator="[
           'isbn',
@@ -34,45 +36,6 @@
             @blur="finishIsbn"
           ></a-input>
         </a-form-item>
-
-        <a-form-item label="图书名称" :label-col="{span:4}" :wrapper-col="{span:18}">
-          <a-input
-            v-decorator="[
-              'bookName',
-              { rules: [{ required: true, message: '请填写图书名称!' }] },
-            ]"
-            placeholder="请填写图书名称"
-          ></a-input>
-        </a-form-item>
-
-        <a-form-item label="图书图片" :label-col="{span:4}" :wrapper-col="{span:18}">
-          <input
-            type="file"
-            id="people-export"
-            ref="inputer"
-            @change="handleUpdateIcon"
-            placeholder="请上传图片"
-            v-decorator="[
-              'icon',
-              { rules: [{ required: true, message: '请上传图片!' }] },
-            ]"
-          />
-          <img v-if="isShowImage" :src="imagePath" />
-        </a-form-item>
-
-        <a-form-item label="图书简介" :label-col="{span:4}" :wrapper-col="{span:18}">
-          <a-textarea
-            :rows="4"
-            v-decorator="[
-          'introduction',
-          { rules: [{ required: false, message: '请输入图书简介!' }] },
-        ]"
-            placeholder="请填写图书简介"
-          ></a-textarea>
-        </a-form-item>
-
-       
-        
 
         <a-form-item label="发布方式" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-radio-group
@@ -184,7 +147,7 @@ export default {
       spinning: false,
       imagePath: null,
       isShowImage: false,
-      bookChooseType: 1
+      bookChooseType: 0
     };
   },
   components: {
