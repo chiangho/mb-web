@@ -1,6 +1,6 @@
 <template>
   <div>
-    <RegisteredBook></RegisteredBook>
+    <RegisteredBook registerType="0"></RegisteredBook>
     <!-- <a-spin :spinning="spinning" tip="系统正在发布中....">
       <a-form :form="form">
         <a-form-item :wrapper-col="{span:8,offset:8}">

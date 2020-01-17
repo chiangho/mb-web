@@ -2,12 +2,10 @@
   <div class="header">
     <a-spin :spinning="spinning" :tip="spinningTip">
       <a-form :form="form">
-        
-
         <a-form-item label="图书来源" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-radio-group
             @change="onChangeBookChoodeType"
-            defaultValue=0
+            defaultValue="0"
             buttonStyle="solid"
             v-decorator="[
             'bookChooseTypeValue',
@@ -19,28 +17,32 @@
           </a-radio-group>
         </a-form-item>
 
-<a-form-item
+        <a-form-item
           v-if="bookChooseType==1"
           label="选择图书"
           :label-col="{span:4}"
           :wrapper-col="{span:18}"
         >
-        <a-select 
-        v-decorator="[
+          <a-select
+            v-decorator="[
           'selectBookList',
           { rules: [{ required: false, message: '请选择图书!' }] },
         ]"
-          :loading="isLoadBookList"
-          placeholder="请选择图书"
+            :loading="isLoadBookList"
+            @search="handleSearchBookSearch"
+            @change="handleSearchBookChange"
+            showSearch
+            notFoundContent="没有找到相应的图书"
+            placeholder="请选择图书"
           >
-      <a-select-option value="lucy">Lucy</a-select-option>
-    </a-select>
-</a-form-item>
+            <a-select-option value="lucy">Lucy</a-select-option>
+          </a-select>
+        </a-form-item>
 
         <a-form-item v-if="bookChooseType==0" :wrapper-col="tailFormItemLayout.wrapperCol">
           <span class="title">输入图书条码后会自动配置图书信息，如匹配错误或者匹配不到，请修改或者填写图书名称、简介等信息!</span>
         </a-form-item>
-        
+
         <a-form-item
           v-if="bookChooseType==0"
           label="图书条码"
@@ -57,8 +59,12 @@
           ></a-input>
         </a-form-item>
 
-
-        <a-form-item v-if="bookChooseType==0" label="图书名称" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-form-item
+          v-if="bookChooseType==0"
+          label="图书名称"
+          :label-col="{span:4}"
+          :wrapper-col="{span:18}"
+        >
           <a-input
             v-decorator="[
               'bookName',
@@ -68,7 +74,12 @@
           ></a-input>
         </a-form-item>
 
-        <a-form-item v-if="bookChooseType==0" label="图书图片" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-form-item
+          v-if="bookChooseType==0"
+          label="图书图片"
+          :label-col="{span:4}"
+          :wrapper-col="{span:18}"
+        >
           <input
             type="file"
             id="people-export"
@@ -83,7 +94,12 @@
           <img v-if="isShowImage" :src="imagePath" />
         </a-form-item>
 
-        <a-form-item v-if="bookChooseType==0" label="图书简介" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-form-item
+          v-if="bookChooseType==0"
+          label="图书简介"
+          :label-col="{span:4}"
+          :wrapper-col="{span:18}"
+        >
           <a-textarea
             :rows="4"
             v-decorator="[
@@ -93,9 +109,6 @@
             placeholder="请填写图书简介"
           ></a-textarea>
         </a-form-item>
-
-
-       
 
         <a-form-item label="发布方式" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-radio-group
@@ -192,6 +205,34 @@ const tailFormItemLayout = {
     }
   }
 };
+
+let timeout;
+let currentValue;
+
+function fetch(value, callback) {
+  if (timeout) {
+    clearTimeout(timeout);
+    timeout = null;
+  }
+  currentValue = value;
+
+  function fake() {
+    Http.fetchGet("", { search: currentValue })
+      .then(resp => {
+        callback(resp.data);
+      })
+      .catch(err => {
+        if (err && err.message) {
+          window.console.log(err.message);
+        } else {
+          window.console.log("查询图书库异常");
+        }
+      });
+  }
+
+  timeout = setTimeout(fake, 500);
+}
+
 export default {
   name: "registered-book",
   data() {
@@ -208,14 +249,28 @@ export default {
       imagePath: null,
       isShowImage: false,
       bookChooseType: 0,
-      isLoadBookList:false
+      isLoadBookList: false,
+      books: []
     };
   },
   components: {
     AddMemberAddress,
     AddMemberLink
   },
-  props: ["code"],
+  props: {
+    registerType: {
+      type: String,
+      required: true
+    },
+    publishBookCode: {
+      type: String,
+      default: null
+    },
+    callback: {
+      type: Function,
+      required: false
+    }
+  },
   beforeCreate() {
     this.form = this.$form.createForm(this, { name: "publish-book" });
   },
@@ -224,6 +279,17 @@ export default {
     this.loadAddressData();
   },
   methods: {
+    fetchBookList(value) {
+      fetch(value, books => {
+        this.books = books;
+      });
+    },
+    handleSearchBookSearch(value) {
+      this.fetchBookList(value);
+    },
+    handleSearchBookChange(value) {
+      this.fetchBookList(value);
+    },
     loadAddressData() {
       Http.fetchPost("member/address/query", null)
         .then(res => {

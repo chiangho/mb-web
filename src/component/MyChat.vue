@@ -25,7 +25,7 @@
         <a-textarea v-model="message" placeholder="填写发送内容" :rows="4" />
       </div>
       <div class="footer">
-        <a-button type="primary" @click="sendMessage()" >提交(快捷键ctrl+enter)</a-button>
+        <a-button type="primary" @click="sendMessage()">提交(快捷键ctrl+enter)</a-button>
       </div>
     </div>
   </div>
@@ -130,7 +130,7 @@
   animation: moveRight 0.7s ease;
   -webkit-animation: moveRight 0.7s ease;
 }
-.footer{
+.footer {
   text-align: right;
   margin-top: 5px;
 }
@@ -171,29 +171,30 @@ export default {
       message: ""
     };
   },
-  watch:{
-    "dataArray":function(){
+  watch: {
+    dataArray: function() {
       this.$nextTick(function() {
         let div = document.getElementById("dialogue_box");
         div.scrollTop = div.scrollHeight;
       });
-    },
+    }
   },
   created() {
+    http
+      .ajax("get", "member/query-code", { code: this.tagMemberCode }, null)
+      .then(resp => {
+        this.dataArray = this.$store.getters.getUserDialogueData(
+          this.tagMemberCode,
+          resp.data.name
+        );
+      })
+      .catch(() => {});
 
-    http.ajax("get","member/query-code",{code:this.tagMemberCode},null).then(resp=>{
-      this.dataArray = this.$store.getters.getUserDialogueData(
-        this.tagMemberCode,resp.data.name
-      );
-    }).catch(()=>{});
-
-
-    
-    this.$store.commit("openDialogueWindow",this.tagMemberCode);
+    this.$store.commit("openDialogueWindow", this.tagMemberCode);
     this.scrollBottom();
   },
-  destroyed(){
-    this.$store.commit("closeDialogueWindow",this.tagMemberCode);
+  destroyed() {
+    this.$store.commit("closeDialogueWindow", this.tagMemberCode);
   },
   filters: {
     formatDate(time) {
@@ -227,7 +228,7 @@ export default {
         })
         .catch(err => {
           if (err && err.message) {
-            this.$message.error(err.message+"_asdfasdf");
+            this.$message.error(err.message + "_asdfasdf");
           }
         });
     }
