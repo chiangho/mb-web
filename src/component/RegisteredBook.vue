@@ -2,14 +2,12 @@
   <div class="header">
     <a-spin :spinning="spinning" :tip="spinningTip">
       <a-form :form="form">
-        <a-form-item :wrapper-col="tailFormItemLayout.wrapperCol">
-          <span class="title">输入图书条码后会自动配置图书信息，如匹配错误或者匹配不到，请修改或者填写图书名称、简介等信息!</span>
-        </a-form-item>
+        
 
-        <a-form-item label="选择图书方式" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-form-item label="图书来源" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-radio-group
             @change="onChangeBookChoodeType"
-            defaultValue="0"
+            defaultValue=0
             buttonStyle="solid"
             v-decorator="[
             'bookChooseTypeValue',
@@ -21,6 +19,10 @@
           </a-radio-group>
         </a-form-item>
 
+
+        <a-form-item v-if="bookChooseType==0" :wrapper-col="tailFormItemLayout.wrapperCol">
+          <span class="title">输入图书条码后会自动配置图书信息，如匹配错误或者匹配不到，请修改或者填写图书名称、简介等信息!</span>
+        </a-form-item>
         <a-form-item
           v-if="bookChooseType==0"
           label="图书条码"
