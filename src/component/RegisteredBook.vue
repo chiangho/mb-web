@@ -5,11 +5,11 @@
         <a-form-item label="图书来源" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-radio-group
             @change="onChangeBookChoodeType"
-            defaultValue="0"
+            
             buttonStyle="solid"
             v-decorator="[
             'bookChooseTypeValue',
-             { rules: [{ required: true, message: '请选择图书选择形式!' }] },
+             { rules: [{ required: true, message: '请选择图书选择形式!' }],initialValue: '0' },
             ]"
           >
             <a-radio-button value="0">新建</a-radio-button>
@@ -25,7 +25,7 @@
         >
           <a-select
             v-decorator="[
-          'selectBookList',
+          'bookInventoryCode',
           { rules: [{ required: false, message: '请选择图书!' }] },
         ]"
             :loading="isLoadBookList"
@@ -35,7 +35,7 @@
             notFoundContent="没有找到相应的图书"
             placeholder="请选择图书"
           >
-            <a-select-option value="lucy">Lucy</a-select-option>
+            <a-select-option v-for="book in books" :key="book.code">{{book.name}}</a-select-option>
           </a-select>
         </a-form-item>
 
@@ -110,7 +110,7 @@
           ></a-textarea>
         </a-form-item>
 
-        <a-form-item label="发布方式" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-form-item v-if="registerType==0" label="发布方式" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-radio-group
             buttonStyle="solid"
             v-decorator="[
@@ -217,7 +217,7 @@ function fetch(value, callback) {
   currentValue = value;
 
   function fake() {
-    Http.fetchGet("", { search: currentValue })
+    Http.fetchGet("inventory/query", { name: currentValue })
       .then(resp => {
         callback(resp.data);
       })
@@ -247,6 +247,7 @@ export default {
 
       spinning: false,
       imagePath: null,
+      imgSrc:null,
       isShowImage: false,
       bookChooseType: 0,
       isLoadBookList: false,
@@ -259,7 +260,7 @@ export default {
   },
   props: {
     registerType: {
-      type: String,
+      type: String, //0 发布图书  1 申请换读
       required: true
     },
     publishBookCode: {
@@ -326,6 +327,7 @@ export default {
 
     handleUpdateIcon(event) {
       this.imagePath = "";
+      this.imgSrc="";
       this.spinning = true;
       this.spinningTip = "图片上传中....";
       // 文件上传
@@ -333,7 +335,8 @@ export default {
         .then(res => {
           this.spinning = false;
           this.$message.success("上传成功");
-          this.imagePath = Common.Config.host + "" + res.data;
+          this.imagePath = Common.Config.host + "/common/down-image?path=" + res.data;
+          this.imgSrc=res.data;
           this.isShowImage = true;
         })
         .catch(e => {
@@ -347,34 +350,41 @@ export default {
     },
     finishIsbn() {
       //isbn输入完成匹配isbn的信息，自动填写图书信息
-      alert(1);
+      //alert(1);
     },
     onChangeBookChoodeType(e) {
       let value = e.target.value;
       this.bookChooseType = value;
+      if (value == 1) {
+        this.fetchBookList(null);
+      }
     },
     publishbook() {
       this.form.validateFields((err, vlaues) => {
         if (!err) {
-          vlaues["bookReleaseCode"] = this.code;
-          vlaues["registerBookCode"] = this.registerBookCode;
           this.spinning = true;
-          Http.ajax("get", "apply/register-book", vlaues, null)
-            .then(() => {
-              this.spinning = true;
-              this.$emit("registerBookSuccess");
+
+          let url = "release";
+
+          if (this.registerType === '0') {
+            url = url+"/add";
+          }
+          if (this.registerType === '1') {
+            url = url+"/application-change-reading";
+          }
+         
+          vlaues.publishBookCode=this.publishBookCode;
+          vlaues.icon=this.imgSrc;
+          Http.ajax("post", url, null, vlaues)
+            .then(()=> {
+              alert("success");
+              this.spinning = false;
             })
             .catch(err => {
-              if (err && err.code && err.code == 1) {
+              if (err && err.message) {
                 this.$message.error(err.message);
-                this.isOpenInputBookWindow = true;
-                this.tagIsbn = this.form.getFieldValue("bookisbn");
               } else {
-                if (err && err.message) {
-                  this.$message.error(err.message);
-                } else {
-                  this.$message.error("未知异常");
-                }
+                this.$message.error("发布异常");
               }
               this.spinning = false;
             });
