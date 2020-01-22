@@ -12,7 +12,7 @@
       <template slot="createTime" slot-scope="createTime">{{createTime | formatDate}}</template>
       <template slot="status" slot-scope="status">{{status | formatStatus}}</template>
       <span slot="action" slot-scope="text, record">
-        <a @click="getLinkInfo(record.code)">获取对方联系方式</a>
+        <a @click="getLinkInfo(record.code)">对方联系方式</a>
         <a-divider type="vertical" />
         <a @click="openDialogue(record.tagerMemberCode)">对话</a>
         <!-- <a-divider type="vertical" />
@@ -178,7 +178,7 @@ export default {
       }
 
       http
-        .ajax("get", "transaction/query", param, null)
+        .ajax("get", "my/transaction/query", param, null)
         .then(res => {
           let tempTotal = Number(res.data.total);
           this.pagination.total = tempTotal;

@@ -21,10 +21,10 @@
           <a-list-item slot="renderItem" slot-scope="item" key="item.bookName">
             <img
               slot="extra"
-              width="180"
-              height="180"
+              width="200"
+              height="200"
               alt="logo"
-              :src="host+'/book/down/image?isbn='+item.isbn"
+              :src="host+'/common/down-image?path='+item.icon"
             />
             <a-list-item-meta>
               <span slot="title">{{item.bookName}}</span>
@@ -38,7 +38,16 @@
             </a-list-item-meta>
             <div>{{item.bookTitle}}</div>
             <div slot="actions">
-              <a-button type="primary" @click="transactionApplication(item.code)">请求读它</a-button>
+              <a-button
+                type="primary"
+                v-if="item.type==='10'||item.type==='11'"
+                @click="transactionApplication(item.code,'10')"
+              >申请换读</a-button>
+              <a-button
+                type="primary"
+                v-if="item.type==='01'||item.type==='11'"
+                @click="transactionApplication(item.code,'01')"
+              >申请借阅</a-button>
             </div>
           </a-list-item>
         </a-list>
@@ -47,7 +56,7 @@
 
     <a-modal title="登记交换图书" v-model="registerModelvisible" :destroyOnClose="destroyOnClose" footer>
       <div>
-        <RegisteredBook :code="releaseBookCode" @registerBookSuccess="registerBookSuccess"></RegisteredBook>
+        <RegisteredBook registerType="1" :publishBookCode="releaseBookCode"></RegisteredBook>
       </div>
     </a-modal>
 
@@ -128,21 +137,23 @@ export default {
       this.pageSize = pageSize;
       this.loadPublishBookList();
     },
-    transactionApplication(code) {
-      let isLoginState = this.$store.getters.isLogin;
-      if (isLoginState) {
-        this.releaseBookCode = code;
-        this.registerModelvisible = true;
-      } else {
-        this.$store.commit("setCatchUti", this.$route.path);
-        this.$router.push("/login");
+    transactionApplication(code, type) {
+      if (type == "10") {
+        let isLoginState = this.$store.getters.isLogin;
+        if (isLoginState) {
+          this.releaseBookCode = code;
+          this.registerModelvisible = true;
+        } else {
+          this.$store.commit("setCatchUti", this.$route.path);
+          this.$router.push("/login");
+        }
       }
     },
     //加载发布的图书
     loadPublishBookList() {
       Http.ajax(
         "get",
-        "book/publish-book/query",
+        "home/book/query",
         {
           name: this.bookInfo,
           addressCode: this.addressCode,

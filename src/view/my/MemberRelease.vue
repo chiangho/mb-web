@@ -14,7 +14,8 @@
       <span slot="action" slot-scope="text, record">
         <a @click="deleteRow(record.code)">删除</a>
         <a-divider type="vertical"  v-if="record.status==1"/>
-        <a v-if="record.status==1" @click="selectTagBook(record.code)">选择想要交换的图书</a>
+        <a v-if="record.status==1 && (record.type=='10' || record.type=='11')" @click="selectTagBook(record.code)">选择换本</a>
+        <a v-if="record.status==1 && (record.type=='01' || record.type=='11')" @click="selectTagBook(record.code)">确定借阅</a>
       </span>
     </a-table>
 
@@ -26,7 +27,7 @@
             width="180"
             height="180"
             alt="logo"
-            :src="host+'/book/down/image?isbn='+item.isbn"
+            :src="host+'/common/down-image?path='+item.icon"
           />
           <a-list-item-meta>
             <span slot="title">{{item.bookName}}</span>
@@ -192,23 +193,21 @@ export default {
     },
     openDialogue(targeMemberCode) {
       this.dialogueVisible = true;
-      this.targeMemberCode = targeMemberCode,
-      //拉去用户信息
-      http
-        .ajax("get", "member/query-code", { code: targeMemberCode }, null)
-        .then(resp => {
-          this.targeMemberName = resp.data.name;
-        })
-        .catch(err => {
-          if (err && err.message) {
-            this.$message.error(err.message);
-          }
-        });
-      //判断是否含有
+      this.targeMemberCode = targeMemberCode;
+      // http
+      //   .ajax("get", "member/query-code", { code: targeMemberCode }, null)
+      //   .then(resp => {
+      //     this.targeMemberName = resp.data.name;
+      //   })
+      //   .catch(err => {
+      //     if (err && err.message) {
+      //       this.$message.error(err.message);
+      //     }
+      //   });
     },
     transactionApplication(tagCode) {
       http
-        .ajax("get", "trancaction/add", { applayCode: tagCode }, null)
+        .ajax("get", "my/trancaction/add", { applayCode: tagCode }, null)
         .then(() => {
           this.$message.info("确定换书成功，请到换书记录中查看详情！");
           this.onClose();
@@ -232,7 +231,7 @@ export default {
       http
         .ajax(
           "get",
-          "apply/query-release-application-record",
+          "my/release/query-application",
           { code: code, pageNo: 1, pageSize: 9999 },
           null
         )
@@ -248,7 +247,7 @@ export default {
     deleteRow(code) {
       //删除换书记录
       http
-        .ajax("get", "my/publish-book/del", { code: code }, null)
+        .ajax("get", "my/release/del", { code: code }, null)
         .then(() => {
           let param = {
             pageSize: this.pagination.pageSize,
@@ -296,7 +295,7 @@ export default {
       }
 
       http
-        .ajax("get", "my/publish-book/query", param, null)
+        .ajax("get", "my/release/query", param, null)
         .then(res => {
           let tempTotal = Number(res.data.total);
           this.pagination.total = tempTotal;

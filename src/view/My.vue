@@ -1,5 +1,5 @@
 <template>
-  <dvi>
+  <div>
     <a-layout>
       <a-layout-sider
         collapsible
@@ -45,7 +45,7 @@
         </a-layout-content>
       </a-layout>
     </a-layout>
-  </dvi>
+  </div>
 </template>
 <script>
 

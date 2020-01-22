@@ -137,7 +137,7 @@
           </a-select>
           <span style="cursor: pointer" @click="addNewMemberAddress">添加区域</span>
         </a-form-item>
-        <a-form-item label="图书联系人" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-form-item label="联系人" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-select
             v-decorator="[
           'memberLinkCode',
@@ -364,13 +364,15 @@ export default {
         if (!err) {
           this.spinning = true;
 
-          let url = "release";
+          let url = "";
 
           if (this.registerType === '0') {
-            url = url+"/add";
+            url = url+"my/release/add";
+            this.spinningTip = "系统处理中....";
           }
           if (this.registerType === '1') {
-            url = url+"/application-change-reading";
+            url = url+"my/application/application-change-reading";
+            this.spinningTip = "系统处理中....";
           }
          
           vlaues.publishBookCode=this.publishBookCode;

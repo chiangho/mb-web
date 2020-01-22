@@ -45,22 +45,21 @@ const columns = [
     dataIndex: "releaseBookName",
     key: "releaseBookName"
   },
-  {
-    title: "对方ISBN",
-    dataIndex: "releaseBookIsbn",
-    key: "releaseBookIsbn"
-  },
-
+  // {
+  //   title: "对方ISBN",
+  //   dataIndex: "releaseBookIsbn",
+  //   key: "releaseBookIsbn"
+  // },
   {
     title: "你的书名",
     dataIndex: "bookName",
     key: "bookName"
   },
-  {
-    title: "你书的ISBN",
-    dataIndex: "isbn",
-    key: "isbn"
-  },
+  // {
+  //   title: "你书的ISBN",
+  //   dataIndex: "isbn",
+  //   key: "isbn"
+  // },
   {
     title: "申请时间",
     dataIndex: "createTime",
@@ -148,7 +147,7 @@ export default {
     },
     deleteRow(code) {
       http
-        .ajax("get", "apply/del", { code: code }, null)
+        .ajax("get", "my/apply/del", { code: code }, null)
         .then(resp => {
           window.console.log(resp);
           this.fetch();
@@ -190,7 +189,7 @@ export default {
       }
 
       http
-        .ajax("get", "apply/user-application-record", param, null)
+        .ajax("get", "my/apply/page-list", param, null)
         .then(res => {
           let tempTotal = Number(res.data.total);
           this.pagination.total = tempTotal;
