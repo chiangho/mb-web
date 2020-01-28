@@ -20,30 +20,30 @@ import VueRouter from 'vue-router'
 
 
 const Home = () =>
-    import ('./view/Home.vue');
+    import('./view/Home.vue');
 const Login = () =>
-    import ('./view/Login.vue');
+    import('./view/Login.vue');
 const Register = () =>
-    import ('./view/Register.vue');
+    import('./view/Register.vue');
 const ForgetPassword = () =>
-    import ('./view/ForgetPassword.vue');
+    import('./view/ForgetPassword.vue');
 const My = () =>
-    import ('./view/My.vue');
+    import('./view/My.vue');
 const PublishBook = () =>
-    import ('./view/PublishBook.vue');
+    import('./view/PublishBook.vue');
 const MyMemberAddress = () =>
-    import ('./view/my/MemberAddress.vue');
+    import('./view/my/MemberAddress.vue');
 const MyMemberLink = () =>
-    import ('./view/my/MemberLink.vue');
+    import('./view/my/MemberLink.vue');
 const MyMemberRelease = () =>
-    import ('./view/my/MemberRelease.vue');
+    import('./view/my/MemberRelease.vue');
 const MyMemberApplication = () =>
-    import ('./view/my/MemberApplication.vue');
+    import('./view/my/MemberApplication.vue');
 const MyMemberTrancation = () =>
-    import ('./view/my/MemberTrancation.vue');
+    import('./view/my/MemberTrancation.vue');
 const MyMemberSetting = () =>
-    import ('./view/my/MemberSetting.vue');
-
+    import('./view/my/MemberSetting.vue');
+const MyMemberBorrow = () => import('./view/my/MemberBorrow.vue');
 
 
 
@@ -164,7 +164,9 @@ const storeInfo = {
                 http
                     .ajax(
                         "get",
-                        "dialogue/load-member", { targeMemberCode: userCode },
+                        "dialogue/load-member", {
+                            targeMemberCode: userCode
+                        },
                         null
                     )
                     .then(resp => {
@@ -255,7 +257,9 @@ const storeInfo = {
                 http
                     .ajax(
                         "get",
-                        "dialogue/load-member", { targeMemberCode: userCode },
+                        "dialogue/load-member", {
+                            targeMemberCode: userCode
+                        },
                         null
                     )
                     .then(resp => {
@@ -350,7 +354,7 @@ const router = new VueRouter({
                     component: MyMemberRelease,
                     meta: {
                         "auth": true,
-                        "title": "我发布的图书"
+                        "title": "发布记录"
                     }
                 },
                 {
@@ -358,7 +362,7 @@ const router = new VueRouter({
                     component: MyMemberApplication,
                     meta: {
                         "auth": true,
-                        "title": "我申请的图书"
+                        "title": "申请记录"
                     }
                 },
                 {
@@ -366,7 +370,7 @@ const router = new VueRouter({
                     component: MyMemberTrancation,
                     meta: {
                         "auth": true,
-                        "title": "我的换书记录"
+                        "title": "换读记录"
                     }
                 },
                 {
@@ -375,6 +379,14 @@ const router = new VueRouter({
                     meta: {
                         "auth": true,
                         "title": "个人信息设置"
+                    }
+                },
+                {
+                    path: "member_borrow",
+                    component: MyMemberBorrow,
+                    meta: {
+                        "auth": true,
+                        "title": "借阅记录"
                     }
                 }
             ]
@@ -390,7 +402,7 @@ const router = new VueRouter({
     ],
 })
 
-const formatDate = function(date, fmt) {
+const formatDate = function (date, fmt) {
     if (/(y+)/.test(fmt)) {
         fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
     }
@@ -415,22 +427,22 @@ function padLeftZero(str) {
 }
 
 const defalutWebSocketParam = {
-    open: function() {},
-    message: function(msg) {
+    open: function () {},
+    message: function (msg) {
         window.console.log(msg);
     },
-    close: function() {},
-    error: function() {}
+    close: function () {},
+    error: function () {}
 }
 
-const webSocket = function(param = defalutWebSocketParam) {
-    if (typeof(WebSocket) == "undefined") {
+const webSocket = function (param = defalutWebSocketParam) {
+    if (typeof (WebSocket) == "undefined") {
         window.console.log("您的浏览器不支持WebSocket");
     } else if (!store.state.userToken) {
         window.console.log("token不能为空");
     } else {
         let socket = new WebSocket(Config.webSocketHost);
-        socket.onopen = function() {
+        socket.onopen = function () {
             window.console.log("Socket 已打开");
             param.open();
             let WebSocketOutVo = {
@@ -440,18 +452,18 @@ const webSocket = function(param = defalutWebSocketParam) {
             socket.send(JSON.stringify(WebSocketOutVo));
         };
         //获得消息事件  
-        socket.onmessage = function(msg) {
+        socket.onmessage = function (msg) {
             window.console.log(msg.data);
             //发现消息进入    开始处理前端触发逻辑
             param.message(msg);
         };
         //关闭事件  
-        socket.onclose = function() {
+        socket.onclose = function () {
             window.console.log("Socket已关闭");
             param.close();
         };
         //发生了错误事件  
-        socket.onerror = function() {
+        socket.onerror = function () {
             window.console.log("Socket发生了错误");
             //此时可以尝试刷新页面
             param.error();
@@ -461,7 +473,7 @@ const webSocket = function(param = defalutWebSocketParam) {
 }
 
 
-var play = function() {
+var play = function () {
     //let audio = document.querySelector('#audio_newmsg');
     try {
         Vue.prototype.playAudio();

@@ -7,10 +7,11 @@
       :rowKey="record=>record.code"
       :pagination="pagination"
       @change="handleTableChange"
-       :scroll="{ x: 1500 }"
+       :scroll="{ x: 1000 }"
     >
       <template slot="createTime" slot-scope="createTime">{{createTime | formatDate}}</template>
-      <template slot="status" slot-scope="status">{{status | formatStatus}}</template>
+      <!-- <template slot="status" slot-scope="status">{{status | formatStatus}}</template> -->
+      <template slot="type" slot-scope="type">{{type | formatType}}</template>
       <span slot="action" slot-scope="text, record">
         <a @click="deleteRow(record.code)">删除</a>
         <a-divider type="vertical" />
@@ -41,17 +42,18 @@ import MyChat from "./../../component/MyChat";
 
 const columns = [
   {
-    title: "对方书名",
+    title: "发布书名",
     dataIndex: "releaseBookName",
     key: "releaseBookName"
   },
-  // {
-  //   title: "对方ISBN",
-  //   dataIndex: "releaseBookIsbn",
-  //   key: "releaseBookIsbn"
-  // },
   {
-    title: "你的书名",
+    title: "申请类型",
+    dataIndex: "type",
+    key: "type",
+    scopedSlots: { customRender: "type" }
+  },
+  {
+    title: "换读书名",
     dataIndex: "bookName",
     key: "bookName"
   },
@@ -67,22 +69,28 @@ const columns = [
     scopedSlots: { customRender: "createTime" }
   },
   {
-    title: "状态",
-    dataIndex: "status",
-    key: "status",
-    scopedSlots: { customRender: "status" },
-    filters: [
-      { text: "成功", value: "1" },
-      { text: "失败", value: "0" },
-      { text: "待审核", value: "-1" }
-    ]
+    title:"备注",
+    dataIndex:"remark",
+    key:"remark",
+    width:100
   },
+  // {
+  //   title: "状态",
+  //   dataIndex: "status",
+  //   key: "status",
+  //   scopedSlots: { customRender: "status" },
+  //   filters: [
+  //     { text: "成功", value: "1" },
+  //     { text: "失败", value: "0" },
+  //     { text: "待审核", value: "-1" }
+  //   ]
+  // },
   {
     title: "操作",
     dataIndex: "action",
     key: "action",
     fixed: "right",
-    width: 100,
+    width: 150,
     scopedSlots: { customRender: "action" }
   }
 ];
@@ -125,6 +133,16 @@ export default {
         return "申请失败";
       } else {
         return "系统审核中..";
+      }
+    },
+    formatType(type){
+
+      if (type == '10') {
+        return "换读";
+      } else if (type == '01') {
+        return "借阅";
+      }else{
+        return type;
       }
     }
   },

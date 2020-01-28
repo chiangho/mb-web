@@ -22,15 +22,19 @@
             </a-menu-item>
             <a-menu-item key="member_publish_age" @click="go_member_publish_page">
               <a-icon type="upload" />
-              <span>你发布的换书</span>
+              <span>发布记录</span>
             </a-menu-item>
             <a-menu-item key="member_application" @click="go_member_application">
               <a-icon type="paper-clip" />
-              <span>申请书的记录</span>
+              <span>申请记录</span>
             </a-menu-item>
             <a-menu-item key="member_trancation" @click="go_member_member_trancation">
               <a-icon type="book" />
-              <span>确认换书的记录</span>
+              <span>换读记录</span>
+            </a-menu-item>
+            <a-menu-item key="member_borrow" @click="go_member_borrow">
+              <a-icon type="gold" />
+              <span>借阅记录</span>
             </a-menu-item>
             <a-menu-item key="member_setting" @click="go_member_setting">
               <a-icon type="setting" />
@@ -99,7 +103,12 @@ export default {
     go_member_publish_page() {
       this.$store.commit("setLeftMenuCurrent", "member_publish_age");
       this.$router.push("/my/member-release");
+    },
+    go_member_borrow(){
+      this.$store.commit("setLeftMenuCurrent", "member_borrow");
+      this.$router.push("/my/member_borrow");
     }
+
   },
   watch: {
     openKeys(val) {

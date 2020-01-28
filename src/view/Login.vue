@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="_content">
     <a-form
       id="components-form-demo-normal-login"
       :form="form"
@@ -149,5 +149,8 @@ export default {
 }
 #components-form-demo-normal-login .login-form-button {
   width: 100%;
+}
+._content{
+  margin-top: 20px;
 }
 </style>

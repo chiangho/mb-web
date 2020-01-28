@@ -29,14 +29,16 @@
             <a-list-item-meta>
               <span slot="title">{{item.bookName}}</span>
               <div slot="description">
-                作者：{{item.bookAuthor}}
-                <br />
-                ISBN：{{item.isbn}}
-                <br />
-                {{item.address}}
+                <span v-if="item.bookAuthor!=null&&item.bookAuthor!=''">作者：{{item.bookAuthor}}<a-divider type="vertical" /></span>
+                <span v-if="item.isbn!=null&&item.isbn!=''">ISBN：{{item.isbn}}<a-divider type="vertical" /></span>
+                地址：{{item.address}}
+                <br/>
+                <span style="font-weight: bold;font-size: 16px" v-if="item.remark!=null&&item.remark!=''">备注：{{item.remark}}</span>
               </div>
             </a-list-item-meta>
-            <div>{{item.bookTitle}}</div>
+            <div>
+              {{item.bookTitle}}
+            </div>
             <div slot="actions">
               <a-button
                 type="primary"
@@ -54,11 +56,28 @@
       </a-col>
     </a-row>
 
-    <a-modal title="登记交换图书" v-model="registerModelvisible" :destroyOnClose="destroyOnClose" footer>
+    <a-modal title="申请换读" v-model="registerModelvisible" :destroyOnClose="destroyOnClose" footer>
       <div>
         <RegisteredBook registerType="1" :publishBookCode="releaseBookCode"></RegisteredBook>
       </div>
     </a-modal>
+
+    <a-modal
+      title="申请借阅"
+      v-model="borrowWindowModel"
+      :destroyOnClose="destroyOnClose"
+      :footer="null"
+    >
+      <div>
+        <RegisterBorrow :publishBookCode="releaseBookCode" :callback="registerBorrowCallBack"></RegisterBorrow>
+      </div>
+    </a-modal>
+
+    <!-- <a-modal title="登记交换图书" v-model="borrowWindowModel" :destroyOnClose="destroyOnClose" footer>
+      <div>
+        <RegisteredBook registerType="1" :publishBookCode="releaseBookCode"></RegisteredBook>
+      </div>
+    </a-modal>-->
 
     <div class="amap-page-container">
       <el-amap vid="amap" :plugin="plugin" class="amap-demo" :center="center"></el-amap>
@@ -69,14 +88,18 @@
 import Http from "./../Https";
 import Common from "./../Common.js";
 import RegisteredBook from "./../component/RegisteredBook";
+import RegisterBorrow from "./../component/RegisterBorrow";
 
 export default {
   components: {
-    RegisteredBook
+    RegisteredBook,
+    RegisterBorrow
   },
   data() {
     let self = this;
     return {
+      borrowWindowModel: false,
+
       pageSizeOptions: ["10", "25", "50"],
       releaseBookCode: null,
       destroyOnClose: true,
@@ -125,6 +148,9 @@ export default {
     }
   },
   methods: {
+    registerBorrowCallBack(){
+      this.borrowWindowModel=false;
+    },
     registerBookSuccess() {
       this.registerModelvisible = false;
     },
@@ -143,6 +169,15 @@ export default {
         if (isLoginState) {
           this.releaseBookCode = code;
           this.registerModelvisible = true;
+        } else {
+          this.$store.commit("setCatchUti", this.$route.path);
+          this.$router.push("/login");
+        }
+      } else {
+        let isLoginState = this.$store.getters.isLogin;
+        if (isLoginState) {
+          this.releaseBookCode = code;
+          this.borrowWindowModel = true;
         } else {
           this.$store.commit("setCatchUti", this.$route.path);
           this.$router.push("/login");

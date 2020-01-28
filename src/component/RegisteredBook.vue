@@ -342,7 +342,7 @@ export default {
         .catch(e => {
           this.spinning = false;
           if (e && e.message) {
-            this.$message.error(e.message);
+            this.$message.error(e.message); 
           } else {
             this.$message.error("异常");
           }

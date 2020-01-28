@@ -7,15 +7,21 @@
       :rowKey="record=>record.code"
       :pagination="pagination"
       @change="handleTableChange"
-       :scroll="{ x: 1500 }"
+      :scroll="{ x: 1000 }"
     >
       <template slot="createTime" slot-scope="createTime">{{createTime | formatDate}}</template>
-      <template slot="status" slot-scope="status">{{status | formatStatus}}</template>
+      <!-- <template slot="status" slot-scope="status">{{status | formatStatus}}</template> -->
       <span slot="action" slot-scope="text, record">
         <a @click="deleteRow(record.code)">删除</a>
-        <a-divider type="vertical"  v-if="record.status==1"/>
-        <a v-if="record.status==1 && (record.type=='10' || record.type=='11')" @click="selectTagBook(record.code)">选择换本</a>
-        <a v-if="record.status==1 && (record.type=='01' || record.type=='11')" @click="selectTagBook(record.code)">确定借阅</a>
+        <a-divider type="vertical" v-if="record.status==1" />
+        <a
+          v-if="record.status==1 && (record.type=='10' || record.type=='11')"
+          @click="selectTagBook(record.code)"
+        >选择换本</a>
+        <a
+          v-if="record.status==1 && (record.type=='01' || record.type=='11')"
+          @click="selectBorrowTagBook(record.code)"
+        >确定借阅</a>
       </span>
     </a-table>
 
@@ -47,6 +53,33 @@
       </a-list>
     </a-drawer>
 
+    <a-drawer
+      width="50%"
+      placement="right"
+      :closable="false"
+      @close="onClose"
+      :visible="borrowDrawerVisible"
+    >
+      <a-list itemLayout="vertical" :dataSource="loadApplicationList">
+        <a-list-item slot="renderItem" slot-scope="item">
+          <a-list-item-meta>
+            <span slot="title">{{item.bookName}}</span>
+            <div slot="description">
+              <span>ISBN：{{item.isbn}}</span>
+              <br />
+              <span>来自：{{item.address}}</span>
+            </div>
+          </a-list-item-meta>
+          <div>{{item.remark}}</div>
+          <div slot="actions">
+            <a @click="transactionApplication(item.code)">确定换这本书</a>
+            <a-divider type="vertical" />
+            <a @click="openDialogue(item.memberCode)">和申请者对话</a>
+          </div>
+        </a-list-item>
+      </a-list>
+    </a-drawer>
+
     <a-modal
       :visible="dialogueVisible"
       @ok="handleOk"
@@ -55,11 +88,8 @@
       :destroyOnClose="true"
       :footer="null"
     >
-      
-      <MyChat :tagMemberCode="targeMemberCode" ></MyChat>
-      <div slot="title">
-        聊天
-      </div>
+      <MyChat :tagMemberCode="targeMemberCode"></MyChat>
+      <div slot="title">聊天</div>
     </a-modal>
   </div>
 </template>
@@ -68,7 +98,6 @@ import http from "./../../Https";
 import Common from "./../../Common";
 import MyChat from "./../../component/MyChat";
 
-
 const columns = [
   {
     title: "书名",
@@ -76,11 +105,11 @@ const columns = [
     key: "bookName",
     width: 200
   },
-  {
-    title: "ISBN",
-    dataIndex: "isbn",
-    key: "isbn"
-  },
+  // {
+  //   title: "ISBN",
+  //   dataIndex: "isbn",
+  //   key: "isbn"
+  // },
   {
     title: "创建时间",
     dataIndex: "createTime",
@@ -98,23 +127,23 @@ const columns = [
     dataIndex: "address",
     key: "address"
   },
-  {
-    title: "状态",
-    dataIndex: "status",
-    key: "status",
-    scopedSlots: { customRender: "status" },
-    filters: [
-      { text: "成功", value: "1" },
-      { text: "失败", value: "0" },
-      { text: "待审核", value: "-1" }
-    ]
-  },
+  // {
+  //   title: "状态",
+  //   dataIndex: "status",
+  //   key: "status",
+  //   scopedSlots: { customRender: "status" },
+  //   filters: [
+  //     { text: "成功", value: "1" },
+  //     { text: "失败", value: "0" },
+  //     { text: "待审核", value: "-1" }
+  //   ]
+  // },
   {
     title: "操作",
     dataIndex: "action",
     key: "action",
     fixed: "right",
-    width: 100,
+    width: 150,
     scopedSlots: { customRender: "action" }
   }
 ];
@@ -123,17 +152,19 @@ export default {
   mounted() {
     this.fetch();
   },
-  components:{
+  components: {
     MyChat
   },
   data() {
     return {
+      borrowDrawerVisible: false,
+      borrowApplicationData: [],
+
       targeMemberName: "",
       dialogueVisible: false,
-      confirmLoading:false,
-      sendMessage:"",
-      targeMemberCode:null,
-
+      confirmLoading: false,
+      sendMessage: "",
+      targeMemberCode: null,
 
       editCode: null,
       host: Common.Config.host,
@@ -171,24 +202,35 @@ export default {
     }
   },
   methods: {
-    getUpperData(){alert(1)},
-    getUnderData(){alert(2)},
+    getUpperData() {
+      alert(1);
+    },
+    getUnderData() {
+      alert(2);
+    },
     handleOk() {},
     handleCancel() {
       this.dialogueVisible = false;
     },
     sendMessageAction() {
-      if(this.targeMemberCode&&this.sendMessage){
-
+      if (this.targeMemberCode && this.sendMessage) {
         //添加自己发送的内容。
-        http.ajax("post","dialogue/send",{tagMemberCode:this.targeMemberCode,content:this.sendMessage},null).then(resp=>{
-          this.sendMessage = "";
-          window.console.log(resp);
-        }).catch(err=>{
-          if(err&&err.message){
-            this.$message.error(err.message);
-          }
-        });
+        http
+          .ajax(
+            "post",
+            "dialogue/send",
+            { tagMemberCode: this.targeMemberCode, content: this.sendMessage },
+            null
+          )
+          .then(resp => {
+            this.sendMessage = "";
+            window.console.log(resp);
+          })
+          .catch(err => {
+            if (err && err.message) {
+              this.$message.error(err.message);
+            }
+          });
       }
     },
     openDialogue(targeMemberCode) {
@@ -225,9 +267,30 @@ export default {
       this.visible = true;
       this.loadApplicationList(code);
     },
+    selectBorrowTagBook(code) {
+      this.borrowDrawerVisible = true;
+      this.loadBorrowApplicationList(code);
+    },
+    loadBorrowApplicationList(code) {
+      this.editCode = code;
+      http
+        .ajax(
+          "get",
+          "my/release/query-application",
+          { code: code, pageNo: 1, pageSize: 9999 },
+          null
+        )
+        .then(resp => {
+          this.borrowApplicationData = resp.data.items;
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          }
+        });
+    },
     loadApplicationList(code) {
       this.editCode = code;
-      window.console.log(code);
       http
         .ajax(
           "get",

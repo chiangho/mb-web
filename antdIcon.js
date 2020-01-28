@@ -20,7 +20,8 @@ export {
     PushpinOutline,
     UploadOutline,
     PaperClipOutline,
-    BarsOutline
+    BarsOutline,
+    GoldOutline
 
 }
 from '@ant-design/icons'
