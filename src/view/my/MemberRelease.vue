@@ -38,16 +38,22 @@
           <a-list-item-meta>
             <span slot="title">{{item.bookName}}</span>
             <div slot="description">
-              <span>ISBN：{{item.isbn}}</span>
-              <br />
-              <span>来自：{{item.address}}</span>
+              <span v-if="item.isbn!=null && item.isbn!=''">
+                ISBN：{{item.isbn}}
+                <br />>
+              </span>
+              <span v-if="item.remark!=null && item.remark!=''">
+                留言：{{item.remark}}
+                <br />
+              </span>
+              <span>地址：{{item.address}}</span>
             </div>
           </a-list-item-meta>
           <div>{{item.remark}}</div>
           <div slot="actions">
-            <a @click="transactionApplication(item.code)">确定换这本书</a>
+            <a @click="transactionApplication(item.code,'0')">确定换读</a>
             <a-divider type="vertical" />
-            <a @click="openDialogue(item.memberCode)">和申请者对话</a>
+            <a @click="openDialogue(item.memberCode)">在线聊天</a>
           </div>
         </a-list-item>
       </a-list>
@@ -57,24 +63,26 @@
       width="50%"
       placement="right"
       :closable="false"
-      @close="onClose"
+      @close="onBorrowClose"
       :visible="borrowDrawerVisible"
     >
-      <a-list itemLayout="vertical" :dataSource="loadApplicationList">
+      <a-list itemLayout="vertical" :dataSource="borrowApplicationData">
         <a-list-item slot="renderItem" slot-scope="item">
           <a-list-item-meta>
-            <span slot="title">{{item.bookName}}</span>
+            <!-- <span slot="title">{{item.bookName}}</span> -->
             <div slot="description">
-              <span>ISBN：{{item.isbn}}</span>
-              <br />
-              <span>来自：{{item.address}}</span>
+              <span>
+                联系人：{{item.linkInfo}}
+                <br />
+              </span>
+              <span>地址：{{item.address}}</span>
             </div>
           </a-list-item-meta>
           <div>{{item.remark}}</div>
           <div slot="actions">
-            <a @click="transactionApplication(item.code)">确定换这本书</a>
+            <a @click="openWindowWriteBorrowRemark(item.code)">确定借阅</a>
             <a-divider type="vertical" />
-            <a @click="openDialogue(item.memberCode)">和申请者对话</a>
+            <a @click="openDialogue(item.memberCode)">在线聊天</a>
           </div>
         </a-list-item>
       </a-list>
@@ -90,6 +98,17 @@
     >
       <MyChat :tagMemberCode="targeMemberCode"></MyChat>
       <div slot="title">聊天</div>
+    </a-modal>
+
+    <a-modal
+      :visible="openWindowWriteBorrowRemarkVaild"
+      title="确认借阅"
+      @ok="handleOkBorrowBook"
+      @cancel="handleCancelBorrowBook"
+      cancelText="取消"
+      okText="确定"
+    >
+      <a-input placeholder="填写备注" v-model="borrowBookRemark" />
     </a-modal>
   </div>
 </template>
@@ -183,7 +202,11 @@ export default {
       sorterOrder: "",
       filters: null,
       loading: false,
-      columns
+      columns,
+
+      activeApplicationCode: null,
+      openWindowWriteBorrowRemarkVaild: false,
+      borrowBookRemark: null
     };
   },
   filters: {
@@ -202,6 +225,21 @@ export default {
     }
   },
   methods: {
+    handleOkBorrowBook() {
+      this.transactionApplication(this.activeApplicationCode, 1);
+    },
+    cleanBorrowBookInfo() {
+      this.activeApplicationCode = null;
+      this.openWindowWriteBorrowRemarkVaild = false;
+      this.borrowBookRemark = null;
+    },
+    handleCancelBorrowBook() {
+      this.cleanBorrowBookInfo();
+    },
+    openWindowWriteBorrowRemark(code) {
+      this.activeApplicationCode = code;
+      this.openWindowWriteBorrowRemarkVaild = true;
+    },
     getUpperData() {
       alert(1);
     },
@@ -247,11 +285,22 @@ export default {
       //     }
       //   });
     },
-    transactionApplication(tagCode) {
+    transactionApplication(tagCode, type) {
       http
-        .ajax("get", "my/trancaction/add", { applayCode: tagCode }, null)
+        .ajax(
+          "get",
+          "my/trancaction/add",
+          {
+            applayCode: tagCode,
+            type: type,
+            bookBorrowRemark: this.borrowBookRemark
+          },
+          null
+        )
         .then(() => {
-          this.$message.info("确定换书成功，请到换书记录中查看详情！");
+          this.$message.info("操作成功！");
+          this.cleanBorrowBookInfo();
+          this.fetch();
           this.onClose();
         })
         .catch(err => {
@@ -262,6 +311,9 @@ export default {
     },
     onClose() {
       this.visible = false;
+    },
+    onBorrowClose() {
+      this.borrowDrawerVisible = false;
     },
     selectTagBook(code) {
       this.visible = true;
@@ -277,7 +329,7 @@ export default {
         .ajax(
           "get",
           "my/release/query-application",
-          { code: code, pageNo: 1, pageSize: 9999 },
+          { code: code, pageNo: 1, pageSize: 9999, type: 1 },
           null
         )
         .then(resp => {
@@ -295,7 +347,7 @@ export default {
         .ajax(
           "get",
           "my/release/query-application",
-          { code: code, pageNo: 1, pageSize: 9999 },
+          { code: code, pageNo: 1, pageSize: 9999, type: 0 },
           null
         )
         .then(resp => {

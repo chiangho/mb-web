@@ -29,16 +29,23 @@
             <a-list-item-meta>
               <span slot="title">{{item.bookName}}</span>
               <div slot="description">
-                <span v-if="item.bookAuthor!=null&&item.bookAuthor!=''">作者：{{item.bookAuthor}}<a-divider type="vertical" /></span>
-                <span v-if="item.isbn!=null&&item.isbn!=''">ISBN：{{item.isbn}}<a-divider type="vertical" /></span>
+                <span v-if="item.bookAuthor!=null&&item.bookAuthor!=''">
+                  作者：{{item.bookAuthor}}
+                  <a-divider type="vertical" />
+                </span>
+                <span v-if="item.isbn!=null&&item.isbn!=''">
+                  ISBN：{{item.isbn}}
+                  <a-divider type="vertical" />
+                </span>
                 地址：{{item.address}}
-                <br/>
-                <span style="font-weight: bold;font-size: 16px" v-if="item.remark!=null&&item.remark!=''">备注：{{item.remark}}</span>
+                <br />
+                <span
+                  style="font-weight: bold;font-size: 16px"
+                  v-if="item.remark!=null&&item.remark!=''"
+                >备注：{{item.remark}}</span>
               </div>
             </a-list-item-meta>
-            <div>
-              {{item.bookTitle}}
-            </div>
+            <div>{{item.bookTitle}}</div>
             <div slot="actions">
               <a-button
                 type="primary"
@@ -58,7 +65,7 @@
 
     <a-modal title="申请换读" v-model="registerModelvisible" :destroyOnClose="destroyOnClose" footer>
       <div>
-        <RegisteredBook registerType="1" :publishBookCode="releaseBookCode"></RegisteredBook>
+        <RegisteredBook registerType="1" :publishBookCode="releaseBookCode" :callback="registerBookCallBack"></RegisteredBook>
       </div>
     </a-modal>
 
@@ -148,8 +155,11 @@ export default {
     }
   },
   methods: {
-    registerBorrowCallBack(){
-      this.borrowWindowModel=false;
+    registerBookCallBack() {
+      this.registerModelvisible=false;
+    },
+    registerBorrowCallBack() {
+      this.borrowWindowModel = false;
     },
     registerBookSuccess() {
       this.registerModelvisible = false;

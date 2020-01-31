@@ -5,7 +5,6 @@
         <a-form-item label="图书来源" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-radio-group
             @change="onChangeBookChoodeType"
-            
             buttonStyle="solid"
             v-decorator="[
             'bookChooseTypeValue',
@@ -110,7 +109,12 @@
           ></a-textarea>
         </a-form-item>
 
-        <a-form-item v-if="registerType==0" label="发布方式" :label-col="{span:4}" :wrapper-col="{span:18}">
+        <a-form-item
+          v-if="registerType==0"
+          label="发布方式"
+          :label-col="{span:4}"
+          :wrapper-col="{span:18}"
+        >
           <a-radio-group
             buttonStyle="solid"
             v-decorator="[
@@ -247,7 +251,7 @@ export default {
 
       spinning: false,
       imagePath: null,
-      imgSrc:null,
+      imgSrc: null,
       isShowImage: false,
       bookChooseType: 0,
       isLoadBookList: false,
@@ -269,7 +273,8 @@ export default {
     },
     callback: {
       type: Function,
-      required: false
+      required: false,
+      default: null
     }
   },
   beforeCreate() {
@@ -327,7 +332,7 @@ export default {
 
     handleUpdateIcon(event) {
       this.imagePath = "";
-      this.imgSrc="";
+      this.imgSrc = "";
       this.spinning = true;
       this.spinningTip = "图片上传中....";
       // 文件上传
@@ -335,14 +340,15 @@ export default {
         .then(res => {
           this.spinning = false;
           this.$message.success("上传成功");
-          this.imagePath = Common.Config.host + "/common/down-image?path=" + res.data;
-          this.imgSrc=res.data;
+          this.imagePath =
+            Common.Config.host + "/common/down-image?path=" + res.data;
+          this.imgSrc = res.data;
           this.isShowImage = true;
         })
         .catch(e => {
           this.spinning = false;
           if (e && e.message) {
-            this.$message.error(e.message); 
+            this.$message.error(e.message);
           } else {
             this.$message.error("异常");
           }
@@ -366,20 +372,29 @@ export default {
 
           let url = "";
 
-          if (this.registerType === '0') {
-            url = url+"my/release/add";
+          if (this.registerType === "0") {
+            url = url + "my/release/add";
             this.spinningTip = "系统处理中....";
           }
-          if (this.registerType === '1') {
-            url = url+"my/application/application-change-reading";
+          if (this.registerType === "1") {
+            url = url + "my/application/application-change-reading";
             this.spinningTip = "系统处理中....";
           }
-         
-          vlaues.publishBookCode=this.publishBookCode;
-          vlaues.icon=this.imgSrc;
+
+          vlaues.publishBookCode = this.publishBookCode;
+          vlaues.icon = this.imgSrc;
           Http.ajax("post", url, null, vlaues)
-            .then(()=> {
-              alert("success");
+            .then(() => {
+              //alert("success");
+              this.$message.success("发布成功！");
+              if (typeof this.callback != "function") {
+                this.form.resetFields();
+                this.imagePath ="";
+                this.imgSrc = "";
+                this.isShowImage = false;
+              } else {
+                this.callback();
+              }
               this.spinning = false;
             })
             .catch(err => {
