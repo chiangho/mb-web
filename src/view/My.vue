@@ -36,6 +36,10 @@
               <a-icon type="gold" />
               <span>借阅记录</span>
             </a-menu-item>
+            <a-menu-item key="manage_book" @click="go_manage_book">
+              <a-icon type="setting" />
+              <span>图书管理</span>
+            </a-menu-item>
             <a-menu-item key="member_setting" @click="go_member_setting">
               <a-icon type="setting" />
               <span>个人设置</span>
@@ -79,6 +83,10 @@ export default {
     toggleCollapsed() {
       alert(1);
       this.collapsed = !this.collapsed;
+    },
+    go_manage_book(){
+      this.$store.commit("setLeftMenuCurrent", "manage_book");
+      this.$router.push("/my/manage_book");
     },
     go_member_setting() {
       this.$store.commit("setLeftMenuCurrent", "member_setting");

@@ -43,7 +43,10 @@ const MyMemberTrancation = () =>
     import('./view/my/MemberTrancation.vue');
 const MyMemberSetting = () =>
     import('./view/my/MemberSetting.vue');
+
 const MyMemberBorrow = () => import('./view/my/MemberBorrow.vue');
+
+const MyManageBook = () => import("./view/my/ManageBook.vue");
 
 
 
@@ -291,7 +294,7 @@ const store = new Vuex.Store(storeInfo)
 
 const routerPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
-  return routerPush.call(this, location).catch(error=> error)
+    return routerPush.call(this, location).catch(error => error)
 }
 
 //路由
@@ -393,6 +396,15 @@ const router = new VueRouter({
                         "auth": true,
                         "title": "借阅记录"
                     }
+                }, 
+                {
+                    path: "manage_book",
+                    component: MyManageBook,
+                    meta: {
+                        "auth": true,
+                        "title": "图书管理"
+                    }
+
                 }
             ]
         },
@@ -411,7 +423,7 @@ const router = new VueRouter({
 
 
 const formatDate = function (date, fmt) {
-    if(date==null){
+    if (date == null) {
         return ""
     }
     if (/(y+)/.test(fmt)) {

@@ -37,7 +37,9 @@ import {
     Popover,
     Dropdown,
     Radio,
-    Tabs
+    Tabs,
+    Tree,
+    TreeSelect
 } from 'ant-design-vue';
 
 
@@ -49,7 +51,7 @@ Vue.use(AMap);
 // Vue.use(Antd);
 Vue.use(Base).use(Layout).use(Col).use(Row).use(Modal).use(Icon).use(Menu).use(List).
 use(Form).use(Input).use(Divider).use(Button).use(Checkbox).use(Tooltip).use(Pagination).use(Select).use(Table).use(Message)
-    .use(Alert).use(Card).use(Upload).use(Drawer).use(Spin).use(Badge).use(Popover).use(Dropdown).use(Radio).use(Tabs);
+    .use(Alert).use(Card).use(Upload).use(Drawer).use(Spin).use(Badge).use(Popover).use(Dropdown).use(Radio).use(Tabs).use(Tree).use(TreeSelect);
 
 
 AMap.initAMapApiLoader({

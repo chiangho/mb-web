@@ -21,7 +21,10 @@ export {
     UploadOutline,
     PaperClipOutline,
     BarsOutline,
-    GoldOutline
+    GoldOutline,
+    MinusSquareOutline,
+    PlusSquareOutline,
+    FileOutline
 
 }
 from '@ant-design/icons'
