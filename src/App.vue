@@ -198,16 +198,10 @@ export default {
       })();
     };
   },
-  computed: {
-    isLogin: function() {
-      return this.$store.getters.isLogin;
-    }
-  },
   created() {
     this.topMenuCurrent = this.$store.getters.getTopMenuCurrent;
   },
   watch: {
-    isLogin: () => {},
     screenWidth(val) {
       //普通的watch监听
       if (val < Common.Config.simailWindowWidthSize) {
@@ -310,7 +304,9 @@ export default {
 .ant-layout-header .header-right {
   text-align: right !important;
 }
-
+.ant-layout-content{
+  margin-top: 8px;
+}
 .right {
   float: right;
   margin-left: 10px;

@@ -61,6 +61,10 @@ AMap.initAMapApiLoader({
 
 //如果token不存在则调整到登录页面
 Common.router.beforeEach((to, from, next) => {
+    // alert(to.path+"===="+from.path);
+    // if(to.path===from.path){
+    //     next(false);
+    // }
     window.document.title = to.meta.title || '遇见书'
     if (to.meta && to.meta.auth && to.meta.auth == true) {
         let isLoginState = Common.store.getters.isLogin;

@@ -58,9 +58,7 @@ axios.interceptors.response.use((res) => {
             let error = res.data.error.code;
             if (error == Common.Config.unauthorization || error == Common.Config.unauthorized) {
                 window.console.log("未认证，请先登录！" + Common.router.history.current.path);
-
                 wsConnection.logout();
-
                 Common.store.commit("setCatchUti", Common.router.history.current.path);
                 //清楚登录信息
                 Common.store.commit("setUserToken", "");

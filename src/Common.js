@@ -289,6 +289,11 @@ const storeInfo = {
 Vue.use(Vuex);
 const store = new Vuex.Store(storeInfo)
 
+const routerPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return routerPush.call(this, location).catch(error=> error)
+}
+
 //路由
 const router = new VueRouter({
     routes: [{
@@ -402,7 +407,13 @@ const router = new VueRouter({
     ],
 })
 
+
+
+
 const formatDate = function (date, fmt) {
+    if(date==null){
+        return ""
+    }
     if (/(y+)/.test(fmt)) {
         fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
     }

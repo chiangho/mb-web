@@ -209,7 +209,7 @@ export default {
         null
       )
         .then(res => {
-          this.publishBookList = res.data.items;
+          this.publishBookList = res.data.items==null?[]:res.data.items;
           let tempTotal = Number(res.data.total);
           this.pageTotal = tempTotal;
         })

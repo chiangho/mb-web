@@ -12,6 +12,8 @@
           :scroll="{ x: 800 }"
         >
           <template slot="createTime" slot-scope="createTime">{{createTime | formatDate}}</template>
+          <template slot="outTime" slot-scope="outTime">{{outTime | formatDate}}</template>
+          <template slot="finshTime" slot-scope="finshTime">{{finshTime | formatDate}}</template>
           <template slot="state" slot-scope="state">{{state | formatInStatus}}</template>
           <span slot="action" slot-scope="text, record">
             <a @click="openDialogue(record.fromMemberCode)">对话</a>
@@ -29,6 +31,8 @@
           :scroll="{ x: 800 }"
         >
           <template slot="createTime" slot-scope="createTime">{{createTime | formatDate}}</template>
+          <template slot="outTime" slot-scope="outTime">{{outTime | formatDate}}</template>
+          <template slot="finshTime" slot-scope="finshTime">{{finshTime | formatDate}}</template>
           <template slot="state" slot-scope="state">{{state | formatOutStatus}}</template>
           <span slot="action" slot-scope="text, record">
             <a v-if="record.state==0" @click="borrowOutInventory(record.code)">出书</a>
@@ -71,12 +75,24 @@ const borrowInColumns = [
     scopedSlots: { customRender: "createTime" }
   },
   {
-    title: "借书者",
+    title: "借出时间",
+    dataIndex: "outTime",
+    key: "outTime",
+    scopedSlots: { customRender: "outTime" }
+  },
+  {
+    title: "完成时间",
+    dataIndex: "finshTime",
+    key: "finshTime",
+    scopedSlots: { customRender: "finshTime" }
+  },
+  {
+    title: "借出者信息",
     dataIndex: "fromMemberName",
     key: "fromMemberName"
   },
   {
-    title: "联系地址",
+    title: "借出者地址",
     dataIndex: "fromMemberAddress",
     key: "fromMemberAddress"
   },
@@ -100,14 +116,25 @@ const borrowOutColumns = [
   {
     title: "书名",
     dataIndex: "bookName",
-    key: "bookName",
-    width: 200
+    key: "bookName"
   },
   {
     title: "创建时间",
     dataIndex: "createTime",
     key: "createTime",
     scopedSlots: { customRender: "createTime" }
+  },
+   {
+    title: "借出时间",
+    dataIndex: "outTime",
+    key: "outTime",
+    scopedSlots: { customRender: "outTime" }
+  },
+  {
+    title: "完成时间",
+    dataIndex: "finshTime",
+    key: "finshTime",
+    scopedSlots: { customRender: "finshTime" }
   },
   {
     title: "联系地址",
@@ -118,6 +145,11 @@ const borrowOutColumns = [
     title: "联系人",
     dataIndex: "borrowMemberLinkInfo",
     key: "borrowMemberLinkInfo"
+  },
+  {
+    title:"备注",
+    dataIndex: "remark",
+    key: "remark"
   },
   {
     title: "状态",
@@ -176,6 +208,9 @@ export default {
   },
   filters: {
     formatDate(time) {
+      if(time==null){
+        return "";
+      }
       var date = new Date(time);
       return Common.formatDate(date, "yyyy-MM-dd hh:mm:ss");
     },
@@ -203,6 +238,32 @@ export default {
     }
   },
   methods: {
+    borrowOutInventory(recordCode) {
+      http
+        .fetchGet("my/borrow/out-book", { recordCode: recordCode })
+        .then(() => {
+          this.$message.success("操作成功");
+          this.loadBorrowOutRecord();
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          }
+        });
+    },
+    borrowInInventory(recordCode) {
+      http
+        .fetchGet("my/borrow/back-book", { recordCode: recordCode })
+        .then(() => {
+          this.$message.success("操作成功");
+          this.loadBorrowOutRecord();
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          }
+        });
+    },
     handleOkDialog() {
       this.dialogueVisible = false;
     },
@@ -220,14 +281,17 @@ export default {
       if (!param.pageNo) {
         param.pageNo = this.borrowInPagination.current;
       }
+      this.borrowInLoading=true;
       http
         .fetchGet("my/borrow/in/page-list", param)
         .then(resp => {
+          this.borrowInLoading=false;
           this.borrowInData = resp.data.items;
           let total = parseInt(resp.data.total);
           this.borrowInPagination.total = total;
         })
         .catch(err => {
+          this.borrowInLoading=false;
           if (err && err.message) {
             this.$message.error(err.message);
           } else {
@@ -247,17 +311,20 @@ export default {
       if (!param.pageNo) {
         param.pageNo = this.borrowOutPagination.current;
       }
+      this.borrowOutLoading=true;
       http
         .fetchGet("my/borrow/out/page-list", {
           pageSize: this.borrowOutPagination.pageSize,
           pageNo: this.borrowOutPagination.current
         })
         .then(resp => {
+          this.borrowOutLoading=false;
           this.borrowOutData = resp.data.items;
           let total = parseInt(resp.data.total);
           this.borrowOutPagination.total = total;
         })
         .catch(err => {
+          this.borrowOutLoading=false;
           if (err && err.message) {
             this.$message.error(err.message);
           } else {

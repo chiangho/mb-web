@@ -17,20 +17,20 @@ let wsConnection = {
     this.$ws.onerror = this.wsError;
   },
   //打开websocket
-  wsOpen: function (e) {
+  wsOpen: function () {
     //开始websocket心跳
-    window.console.log(e);
-    window.console.log('ws success');
+    //window.console.log(e);
+    //window.console.log('ws success');
     wsConnection.login();
     wsConnection.startWsHeartbeat();
   },
-  wsClose: function (e) {
-    window.console.log(e, 'ws close')
+  wsClose: function () {
+    //window.console.log(e, 'ws close')
     wsConnection.reconnect()
   },
   wsMsg: function (msg) {
     wsConnection.resetHeartbeat();
-    window.console.log(msg);
+    //window.console.log(msg);
     try {
       if (msg.data) {
         let jsonContent = JSON.parse(msg.data);
