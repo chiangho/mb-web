@@ -24,7 +24,8 @@ export {
     GoldOutline,
     MinusSquareOutline,
     PlusSquareOutline,
-    FileOutline
+    FileOutline,
+    QuestionCircleOutline
 
 }
 from '@ant-design/icons'

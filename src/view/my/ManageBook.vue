@@ -24,29 +24,42 @@
         </a-table>
       </a-tab-pane>
       <a-tab-pane tab="图书分类" key="bookType">
-        <a-tree
-          :defaultExpandedKeys="['0-0-0']"
-          @select="onSelectTreeItem"
-          @rightClick="treeRightClick"
-        >
-          <a-tree-node key="0-0">
-            <span slot="title" style="color: #1890ff">parent 1</span>
-            <a-tree-node title="parent 1-0" key="0-0-0">
-              <a-tree-node title="leaf" key="0-0-0-0" />
-              <a-tree-node title="leaf" key="0-0-0-1" />
-              <a-tree-node title="leaf" key="0-0-0-2" />
-            </a-tree-node>
-            <a-tree-node title="parent 1-1" key="0-0-1">
-              <a-tree-node title="leaf" key="0-0-1-0" />
-            </a-tree-node>
-            <a-tree-node title="parent 1-2" key="0-0-2">
-              <a-tree-node title="leaf" key="0-0-2-0" />
-              <a-tree-node title="leaf" key="0-0-2-1" />
-            </a-tree-node>
-          </a-tree-node>
-        </a-tree>
+        <a-tree :treeData="treeData" @rightClick="treeRightClick"></a-tree>
       </a-tab-pane>
     </a-tabs>
+
+    <div
+      class="m-popover"
+      v-if="isShowTreeMenu"
+      :style="{ top: treeMenuTop + 'px', left: treeMenuLeft + 'px'} "
+    >
+      <div class="treeMenuHeader">
+        <span class="treeMenuTitle">操作</span>
+        <span class="treeMenuClose" @click="closeTreeMenu">
+          <a-icon type="close" />
+        </span>
+      </div>
+      <div>
+        <a-list bordered>
+          <a-list-item @click="delNode">删除</a-list-item>
+          <a-list-item @click="editNode">修改</a-list-item>
+          <a-list-item @click="addNode">添加</a-list-item>
+        </a-list>
+      </div>
+
+      <a-modal
+        :title="editBookTypeTitle"
+        v-model="addNewBookTypeVisible"
+        @ok="handleOkAddNewBookType"
+        okText="确认"
+        cancelText="取消"
+        :destroyOnClose="true"
+        :okButtonProps="okButtonProps"
+        :cancelButtonProps="okButtonProps"
+      >
+        <a-input placeholder="请填写分类名称" v-model="addNewBookTypeValue" />
+      </a-modal>
+    </div>
   </div>
 </template>
 <script>
@@ -99,6 +112,16 @@ const bookColumns = [
 export default {
   data() {
     return {
+      exitNodeCode: null,
+      addNewBookTypeValue: null,
+      addNewBookTypeVisible: false,
+      okButtonProps: { props: { disabled: false } },
+      editBookTypeTitle: null,
+      editOrAddBookType: "", //add / update
+
+      treeMenuTop: 0,
+      treeMenuLeft: 0,
+      isShowTreeMenu: false,
       host: Common.Config.host,
       bookColumns,
       bookData: [],
@@ -110,7 +133,9 @@ export default {
         current: 1,
         total: 0,
         showQuickJumper: false
-      }
+      },
+
+      treeData: []
     };
   },
   created() {
@@ -152,8 +177,125 @@ export default {
     }
   },
   methods: {
+    handleOkAddNewBookType() {
+      this.okButtonProps.props.disabled = true;
+      if (!this.addNewBookTypeValue) {
+        this.$message.error("请填写分类名称");
+        this.okButtonProps.props.disabled = false;
+        return null;
+      }
+      if (!this.exitNodeCode) {
+        this.$message.error("请选择分类的父节点再操作！");
+        this.okButtonProps.props.disabled = false;
+        return null;
+      }
+      let url = "";
+      let param = {};
+      if (this.editOrAddBookType == "add") {
+        url = "book-type/add";
+        param = {
+          parentCode: this.exitNodeCode,
+          name: this.addNewBookTypeValue
+        };
+      }
+      if (this.editOrAddBookType == "update") {
+        url = "book-type/update-name";
+        param = {
+          code: this.exitNodeCode,
+          name: this.addNewBookTypeValue
+        };
+      }
+      http
+        .fetchPost(url, param)
+        .then(() => {
+          this.okButtonProps.props.disabled = false;
+          this.$message.success("操作成功");
+          this.loadBookTypeTree();
+          this.closeTreeMenu();
+        })
+        .catch(err => {
+          this.okButtonProps.props.disabled = false;
+          if (err && err.message) {
+            this.$message.error(err.message);
+          } else {
+            this.$message.error("添加异常");
+          }
+        });
+    },
+    delNode() {
+      if (this.exitNodeCode == null) {
+        this.$message.error("请选择对应的图书分类再操作");
+        return;
+      }
+      let nodecode = this.exitNodeCode;
+      let _this = this;
+      this.$confirm({
+        title: "确定删除此分类?",
+        content: "删除此分类将导致分类下的所有图书变成未分类状态，是否删除",
+        okText: "确认",
+        cancelText: "取消",
+        onOk() {
+          http
+            .ajax("delete", "", { code: nodecode }, null)
+            .then(() => {
+              _this.$message.success("删除成功");
+              _this.loadBookTypeTree();
+              _this.closeTreeMenu();
+            })
+            .catch(err => {
+              if (err && err.message) {
+                _this.$message.error(err.message);
+              } else {
+                _this.message.error("删除异常");
+              }
+            });
+        },
+        onCancel() {}
+      });
+    },
+    editNode() {
+      if (this.exitNodeCode == null) {
+        this.$message.error("请选择对应的图书分类再操作");
+        return;
+      }
+      this.editBookTypeTitle = "修改图书分类";
+      this.addNewBookTypeValue = null;
+      this.addNewBookTypeVisible = true;
+      this.editOrAddBookType = "update";
+      http
+        .fetchGet("book-type/detail", { code: this.exitNodeCode })
+        .then(resp => {
+          this.addNewBookTypeValue = resp.data.name;
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          } else {
+            this.$message.error("获取节点信息异常");
+          }
+        });
+    },
+    addNode() {
+      if (this.exitNodeCode == null) {
+        this.$message.error("请选择对应的图书分类再操作");
+        return;
+      }
+      this.editOrAddBookType = "add";
+      this.editBookTypeTitle = "添加图书分类";
+      this.addNewBookTypeValue = null;
+      this.addNewBookTypeVisible = true;
+    },
+    closeTreeMenu() {
+      this.isShowTreeMenu = false;
+      this.treeMenuTop = 0;
+      this.treeMenuLeft = 0;
+      this.exitNodeCode = null;
+    },
     treeRightClick(data) {
-      window.console.log("treeRightClick====>", data.node.eventKey);
+      this.isShowTreeMenu = true;
+      this.treeMenuTop = data.event.y;
+      this.treeMenuLeft = data.event.x + data.event.offsetX + 5;
+      this.exitNodeCode = data.node.eventKey;
     },
     onSelectTreeItem(selectedKeys, info) {
       window.console.log("====>", selectedKeys, info);
@@ -196,6 +338,19 @@ export default {
     },
     loadBookTypeTree() {
       //加载树形菜单
+      http
+        .fetchGet("book-type/query-tree", null)
+        .then(resp => {
+          this.treeData = resp.data;
+        })
+        .catch(err => {
+          this.bookLoading = false;
+          if (err && err.message) {
+            this.$message.error(err.message);
+          } else {
+            this.$message.error("获取分类异常");
+          }
+        });
     },
     callback(key) {
       if (key == "book") {
@@ -209,3 +364,40 @@ export default {
   }
 };
 </script>
+<style scoped>
+.m-popover {
+  position: absolute;
+  z-index: 1000;
+  /* display: none; */
+  width: 100px;
+  height: 163px;
+  background-color: #e6f7ff;
+}
+.treeMenuHeader {
+  height: 30px !important;
+  width: 100px !important;
+  border: 1px solid #1890ff;
+  line-height: 30px;
+}
+.treeMenuTitle {
+  width: 60px !important;
+  height: 30px !important;
+  left: 3px !important;
+  top: 0px !important;
+  position: relative !important;
+}
+.treeMenuClose {
+  width: 20px !important;
+  height: 30px !important;
+  left: 50px !important;
+  top: 0px !important;
+  position: relative !important;
+}
+
+.m-popover .ant-list-bordered {
+  border: 1px solid #1890ff;
+  border-radius: 0px;
+  text-align: center;
+  cursor: pointer;
+}
+</style>

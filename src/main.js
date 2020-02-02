@@ -45,6 +45,7 @@ import {
 
 Vue.config.productionTip = false;
 Vue.prototype.$message = message
+Vue.prototype.$confirm = Modal.confirm
 
 Vue.use(VueRouter)
 Vue.use(AMap);
