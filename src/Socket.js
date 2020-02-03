@@ -108,7 +108,12 @@ let wsConnection = {
       type: 5,
       content: "退出系统"
     }
-    wsConnection.sendMessage(JSON.stringify(WebSocketOutVo));
+    try{
+      wsConnection.sendMessage(JSON.stringify(WebSocketOutVo));
+    }catch(e){
+      window.console.log(e);
+    }
+    
   }
 };
 

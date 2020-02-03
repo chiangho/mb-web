@@ -24,7 +24,19 @@
         </a-table>
       </a-tab-pane>
       <a-tab-pane tab="图书分类" key="bookType">
-        <a-tree :treeData="treeData" @rightClick="treeRightClick"></a-tree>
+        <p>
+          操作说明：
+          <br />1、对准分类，鼠标右击会有“删除”、“添加”、“修改”的操作。
+          <br />2、点击鼠标拖动能移动图书分类。
+        </p>
+        <a-tree
+          :treeData="treeData"
+          @rightClick="treeRightClick"
+          :defaultExpandedKeys="expandedKeys"
+          draggable
+          @dragenter="onDragEnter"
+          @drop="onDrop"
+        ></a-tree>
       </a-tab-pane>
     </a-tabs>
 
@@ -41,8 +53,8 @@
       </div>
       <div>
         <a-list bordered>
-          <a-list-item @click="delNode">删除</a-list-item>
-          <a-list-item @click="editNode">修改</a-list-item>
+          <a-list-item @click="delNode" v-if="isShowTreeMenuItem">删除</a-list-item>
+          <a-list-item @click="editNode" v-if="isShowTreeMenuItem">修改</a-list-item>
           <a-list-item @click="addNode">添加</a-list-item>
         </a-list>
       </div>
@@ -118,6 +130,9 @@ export default {
       okButtonProps: { props: { disabled: false } },
       editBookTypeTitle: null,
       editOrAddBookType: "", //add / update
+      isShowTreeMenuItem: true,
+
+      expandedKeys: ["-1"],
 
       treeMenuTop: 0,
       treeMenuLeft: 0,
@@ -177,6 +192,28 @@ export default {
     }
   },
   methods: {
+    onDragEnter() {
+      //window.console.log(info);
+    },
+    onDrop(info) {
+      const parentCode = info.node.eventKey;
+      const code = info.dragNode.eventKey;
+      http
+        .fetchPost("book-type/move-node", {
+          code: code,
+          parentCode: parentCode
+        })
+        .then(() => {
+          this.loadBookTypeTree();
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          } else {
+            this.$message.error("操作异常");
+          }
+        });
+    },
     handleOkAddNewBookType() {
       this.okButtonProps.props.disabled = true;
       if (!this.addNewBookTypeValue) {
@@ -236,7 +273,7 @@ export default {
         cancelText: "取消",
         onOk() {
           http
-            .ajax("delete", "", { code: nodecode }, null)
+            .ajax("delete", "book-type/del", { code: nodecode }, null)
             .then(() => {
               _this.$message.success("删除成功");
               _this.loadBookTypeTree();
@@ -292,10 +329,15 @@ export default {
       this.exitNodeCode = null;
     },
     treeRightClick(data) {
+      this.isShowTreeMenuItem = true;
       this.isShowTreeMenu = true;
+      this.addNewBookTypeVisible = false;
       this.treeMenuTop = data.event.y;
       this.treeMenuLeft = data.event.x + data.event.offsetX + 5;
       this.exitNodeCode = data.node.eventKey;
+      if (this.exitNodeCode == -1) {
+        this.isShowTreeMenuItem = false;
+      }
     },
     onSelectTreeItem(selectedKeys, info) {
       window.console.log("====>", selectedKeys, info);
@@ -370,7 +412,6 @@ export default {
   z-index: 1000;
   /* display: none; */
   width: 100px;
-  height: 163px;
   background-color: #e6f7ff;
 }
 .treeMenuHeader {

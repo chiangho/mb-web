@@ -242,20 +242,20 @@ export default {
     },
     log_out() {
       Http.fetchGet("log-out")
-        .then(response => {
+        .then(()=> {
           this.$setWs.logout();
           this.$store.commit("setUserToken", "");
           this.$store.commit("setUserInfo", null);
           this.$store.commit("cleanUserDialogue");
           this.$router.push("/home");
-          window.console.log(response.data);
+          //window.console.log(response.data);
         })
-        .catch(err => {
+        .catch(() => {
           this.$setWs.logout();
           this.$store.commit("setUserToken", "");
           this.$store.commit("setUserInfo", null);
           this.$store.commit("cleanUserDialogue");
-          window.console.log(err);
+          //window.console.log(err);
         });
     },
     go_home_page() {

@@ -110,7 +110,6 @@ export default {
                 this.$store.commit("setUserToken", response.data.token);
                 this.$store.commit("setUserInfo", response.data.member);
                 let catchUri = this.$store.getters.getCatchUri;
-                window.console.log("登录成功=======》" + catchUri);
                 this.$store.commit("setCatchUti", "");
                 this.$setWs.login();
                 if (catchUri) {
@@ -118,7 +117,6 @@ export default {
                 } else {
                   this.$router.push("/home");
                 }
-              
             })
             .catch(err => {
               //this.alertVisible = true;

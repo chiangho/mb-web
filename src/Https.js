@@ -34,7 +34,9 @@ axios.interceptors.request.use((config) => {
     }
     let token = "";
     try {
-        token = Common.store.state.userToken;
+        if (Common.store) {
+            token = Common.store.state.userToken;
+        }
     } catch (e) {
         token = ""
     }
@@ -57,14 +59,21 @@ axios.interceptors.response.use((res) => {
         } else {
             let error = res.data.error.code;
             if (error == Common.Config.unauthorization || error == Common.Config.unauthorized) {
-                window.console.log("未认证，请先登录！" + Common.router.history.current.path);
-                wsConnection.logout();
-                Common.store.commit("setCatchUti", Common.router.history.current.path);
-                //清楚登录信息
-                Common.store.commit("setUserToken", "");
-                Common.store.commit("setUserInfo", "");
-                this.$store.commit("cleanUserDialogue");
+                if (Common.store) {
+                    //websocker 退出登录
+                    wsConnection.logout();
+                    //设置缓存
+                    Common.store.commit("setCatchUti", Common.router.history.current.path);
+                    //清楚登录信息 
+                    Common.store.commit("cleanUserDialogue");
+                    //清楚token
+                    Common.store.commit("setUserToken", "");
+                    //清楚userInfo
+                    Common.store.commit("setUserInfo", "");
+                }
                 Common.router.push("/login");
+                res.data.error.message="登记超时，重新登录";
+                return Promise.reject(res.data.error);
             } else {
                 return Promise.reject(res.data.error);
             }

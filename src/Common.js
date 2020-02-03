@@ -124,7 +124,9 @@ const storeInfo = {
         },
         cleanUserDialogueData(state, userCode) {
             if (state.dialogueData[userCode]) {
-                state.dialogueData[userCode].data = [];
+                if(state.dialogueData[userCode].data){
+                    state.dialogueData[userCode].data=[]
+                }
             }
         },
         sumDialogueUnreadCount(state) {

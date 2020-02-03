@@ -59,22 +59,22 @@ const columns = [
     dataIndex: "tagerBookName",
     key: "tagerBookName"
   },
-  {
-    title: "对方ISBN",
-    dataIndex: "tagerBookIsbn",
-    key: "tagerBookIsbn"
-  },
+  // {
+  //   title: "对方ISBN",
+  //   dataIndex: "tagerBookIsbn",
+  //   key: "tagerBookIsbn"
+  // },
 
   {
     title: "你的书名",
     dataIndex: "selfBookName",
     key: "selfBookName"
   },
-  {
-    title: "你书的ISBN",
-    dataIndex: "selfBookIsbn",
-    key: "selfBookIsbn"
-  },
+  // {
+  //   title: "你书的ISBN",
+  //   dataIndex: "selfBookIsbn",
+  //   key: "selfBookIsbn"
+  // },
   {
     title: "确认交换时间",
     dataIndex: "createTime",
@@ -86,7 +86,7 @@ const columns = [
     dataIndex: "action",
     key: "action",
     fixed: "right",
-    width: 100,
+    width: 200,
     scopedSlots: { customRender: "action" }
   }
 ];
