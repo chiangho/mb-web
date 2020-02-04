@@ -19,7 +19,7 @@
           <span slot="action" slot-scope="text, record">
             <a @click="setClassification(record.code)">修改分类</a>
             <a-divider type="vertical" />
-            <a @click="editBook(record.code)">修改简介</a>
+            <a @click="editBookIntroduction(record.code,record.introduction)">修改简介</a>
           </span>
         </a-table>
       </a-tab-pane>
@@ -58,20 +58,49 @@
           <a-list-item @click="addNode">添加</a-list-item>
         </a-list>
       </div>
-
-      <a-modal
-        :title="editBookTypeTitle"
-        v-model="addNewBookTypeVisible"
-        @ok="handleOkAddNewBookType"
-        okText="确认"
-        cancelText="取消"
-        :destroyOnClose="true"
-        :okButtonProps="okButtonProps"
-        :cancelButtonProps="okButtonProps"
-      >
-        <a-input placeholder="请填写分类名称" v-model="addNewBookTypeValue" />
-      </a-modal>
     </div>
+
+    <a-modal
+      :title="editBookTypeTitle"
+      v-model="addNewBookTypeVisible"
+      @ok="handleOkAddNewBookType"
+      okText="确认"
+      cancelText="取消"
+      :destroyOnClose="true"
+      :okButtonProps="okButtonProps"
+      :cancelButtonProps="okButtonProps"
+    >
+      <a-input placeholder="请填写分类名称" v-model="addNewBookTypeValue" />
+    </a-modal>
+
+    <a-modal
+      title="选择图书分类"
+      v-model="selectBookTypeVisible"
+      @ok="handleOkSelectBookType"
+      okText="确认"
+      cancelText="取消"
+      :destroyOnClose="true"
+    >
+      <a-tree-select
+        style="width:400px"
+        :dropdownStyle="{ maxHeight: '400px', overflow: 'auto' }"
+        :treeData="inputTreeData"
+        placeholder="请选择图书分类"
+        treeDefaultExpandAll
+        v-model="inputTreeValue"
+      ></a-tree-select>
+    </a-modal>
+
+    <a-modal
+      title="修改图书简介"
+      v-model="modifyBookVisible"
+      @ok="handleOkmodifyBook"
+      okText="确认"
+      cancelText="取消"
+      :destroyOnClose="true"
+    >
+      <a-textarea placeholder="请填写图书简介" :rows="4" v-model="bookIntroductionValue" />
+    </a-modal>
   </div>
 </template>
 <script>
@@ -84,6 +113,11 @@ const bookColumns = [
     key: "name"
   },
   {
+    title: "图书分类",
+    dataIndex: "bookTypeName",
+    key: "bookTypeName"
+  },
+  {
     title: "图片",
     dataIndex: "icon",
     key: "icon",
@@ -94,6 +128,11 @@ const bookColumns = [
     dataIndex: "state",
     scopedSlots: { customRender: "state" },
     key: "state"
+  },
+  {
+    title: "简介",
+    dataIndex: "introduction",
+    key: "introduction"
   },
   {
     title: "条码",
@@ -124,6 +163,7 @@ const bookColumns = [
 export default {
   data() {
     return {
+      //node操作
       exitNodeCode: null,
       addNewBookTypeValue: null,
       addNewBookTypeVisible: false,
@@ -131,12 +171,23 @@ export default {
       editBookTypeTitle: null,
       editOrAddBookType: "", //add / update
       isShowTreeMenuItem: true,
-
+      treeData: [],
       expandedKeys: ["-1"],
-
       treeMenuTop: 0,
       treeMenuLeft: 0,
       isShowTreeMenu: false,
+
+      //Input 输入框 tree结构
+      inputTreeData: [],
+      selectBookTypeVisible: false,
+      okSelectButtonProps: { props: { disabled: false } },
+      inputTreeValue: null,
+
+      //修改图书简介
+      modifyBookVisible: false,
+      bookIntroductionValue: null,
+
+      modifyBookCode: null,
       host: Common.Config.host,
       bookColumns,
       bookData: [],
@@ -148,9 +199,7 @@ export default {
         current: 1,
         total: 0,
         showQuickJumper: false
-      },
-
-      treeData: []
+      }
     };
   },
   created() {
@@ -192,6 +241,69 @@ export default {
     }
   },
   methods: {
+    handleOkmodifyBook() {
+      if (!this.bookIntroductionValue) {
+        this.$message.error("请填写图书简介");
+        return;
+      }
+      if (!this.modifyBookCode) {
+        this.$message.error("请选择对应的图书再操作！");
+        return;
+      }
+      http
+        .fetchPost("inventory/update-introduction", {
+          code: this.modifyBookCode,
+          introduction: this.bookIntroductionValue
+        })
+        .then(() => {
+          this.modifyBookVisible = false;
+          this.bookIntroductionValue = null;
+          this.modifyBookCode = null;
+          this.$message.error("设置成功！");
+          this.loadBookList();
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          } else {
+            this.$message.error("设置异常");
+          }
+        });
+    },
+    editBookIntroduction(code, content) {
+      this.modifyBookVisible = true;
+      this.bookIntroductionValue = content;
+      this.modifyBookCode = code;
+    },
+    handleOkSelectBookType() {
+      if (!this.inputTreeValue) {
+        this.$message.error("请选择图书分类");
+        return;
+      }
+      if (!this.modifyBookCode) {
+        this.$message.error("请选择对应的图书再操作！");
+        return;
+      }
+      http
+        .fetchPost("inventory/update-booktype", {
+          code: this.modifyBookCode,
+          bookTypeCode: this.inputTreeValue
+        })
+        .then(() => {
+          this.selectBookTypeVisible = false;
+          this.inputTreeValue = null;
+          this.modifyBookCode = null;
+          this.$message.error("设置成功！");
+          this.loadBookList();
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          } else {
+            this.$message.error("设置异常");
+          }
+        });
+    },
     onDragEnter() {
       //window.console.log(info);
     },
@@ -246,6 +358,7 @@ export default {
         .fetchPost(url, param)
         .then(() => {
           this.okButtonProps.props.disabled = false;
+          this.addNewBookTypeVisible = false;
           this.$message.success("操作成功");
           this.loadBookTypeTree();
           this.closeTreeMenu();
@@ -344,7 +457,21 @@ export default {
     },
     //修改图书的所属分类
     setClassification(code) {
-      alert(code);
+      this.selectBookTypeVisible = true;
+      this.inputTreeValue = null;
+      this.modifyBookCode = code;
+      http
+        .fetchGet("book-type/query-tree", { isRoot: false })
+        .then(resp => {
+          this.inputTreeData = resp.data;
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          } else {
+            this.$message.error("获取分类异常");
+          }
+        });
     },
     //修改图书
     editBook(code) {
