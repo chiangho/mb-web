@@ -473,12 +473,13 @@ export default {
           }
         });
     },
-    //修改图书
-    editBook(code) {
-      alert(code);
-    },
-    bookHandleTableChange() {
-      this.loadBookList();
+    bookHandleTableChange(_pagination) {
+      // alert(JSON.stringify(_pagination));
+      let param={
+          pageSize:_pagination.size,
+          pageNo:_pagination.current
+      }
+      this.loadBookList(param);
     },
     loadBookList(param = {}) {
       if (!param.pageSize) {
@@ -495,6 +496,7 @@ export default {
           this.bookData = resp.data.items;
           let total = parseInt(resp.data.total);
           this.pagination.total = total;
+          this.pagination.current=param.pageNo;
         })
         .catch(err => {
           this.bookLoading = false;

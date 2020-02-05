@@ -232,6 +232,7 @@ export default {
       this.activeApplicationCode = null;
       this.openWindowWriteBorrowRemarkVaild = false;
       this.borrowBookRemark = null;
+      this.borrowDrawerVisible=false;
     },
     handleCancelBorrowBook() {
       this.cleanBorrowBookInfo();

@@ -124,7 +124,7 @@ const borrowOutColumns = [
     key: "createTime",
     scopedSlots: { customRender: "createTime" }
   },
-   {
+  {
     title: "借出时间",
     dataIndex: "outTime",
     key: "outTime",
@@ -147,7 +147,7 @@ const borrowOutColumns = [
     key: "borrowMemberLinkInfo"
   },
   {
-    title:"备注",
+    title: "备注",
     dataIndex: "remark",
     key: "remark"
   },
@@ -175,8 +175,8 @@ export default {
       borrowInLoading: false,
       borrowInPagination: {
         showSizeChanger: true,
-        pageSizeOptions: ["10", "25", "50"],
-        pageSize: 10,
+        pageSizeOptions: ["1", "10", "25", "50"],
+        pageSize: 1,
         current: 1,
         total: 0,
         showQuickJumper: false
@@ -187,8 +187,8 @@ export default {
       borrowOutLoading: false,
       borrowOutPagination: {
         showSizeChanger: true,
-        pageSizeOptions: ["10", "25", "50"],
-        pageSize: 10,
+        pageSizeOptions: ["1", "10", "25", "50"],
+        pageSize: 1,
         current: 1,
         total: 0,
         showQuickJumper: false
@@ -204,11 +204,11 @@ export default {
   },
   created() {
     this.loadBorrowInRecord();
-    this.loadBorrowInRecord();
+    this.loadBorrowOutRecord();
   },
   filters: {
     formatDate(time) {
-      if(time==null){
+      if (time == null) {
         return "";
       }
       var date = new Date(time);
@@ -281,17 +281,18 @@ export default {
       if (!param.pageNo) {
         param.pageNo = this.borrowInPagination.current;
       }
-      this.borrowInLoading=true;
+      this.borrowInLoading = true;
       http
         .fetchGet("my/borrow/in/page-list", param)
         .then(resp => {
-          this.borrowInLoading=false;
+          this.borrowInLoading = false;
           this.borrowInData = resp.data.items;
           let total = parseInt(resp.data.total);
           this.borrowInPagination.total = total;
+          this.borrowInPagination.current = param.pageNo;
         })
         .catch(err => {
-          this.borrowInLoading=false;
+          this.borrowInLoading = false;
           if (err && err.message) {
             this.$message.error(err.message);
           } else {
@@ -300,8 +301,12 @@ export default {
           }
         });
     },
-    borrowInHandleTableChange() {
-      this.loadBorrowInRecord();
+    borrowInHandleTableChange(_pagination) {
+      let param = {
+        pageSize: _pagination.size,
+        pageNo: _pagination.current
+      };
+      this.loadBorrowInRecord(param);
     },
 
     loadBorrowOutRecord(param = {}) {
@@ -311,20 +316,21 @@ export default {
       if (!param.pageNo) {
         param.pageNo = this.borrowOutPagination.current;
       }
-      this.borrowOutLoading=true;
+      this.borrowOutLoading = true;
       http
         .fetchGet("my/borrow/out/page-list", {
           pageSize: this.borrowOutPagination.pageSize,
           pageNo: this.borrowOutPagination.current
         })
         .then(resp => {
-          this.borrowOutLoading=false;
+          this.borrowOutLoading = false;
           this.borrowOutData = resp.data.items;
           let total = parseInt(resp.data.total);
           this.borrowOutPagination.total = total;
+          this.borrowOutPagination.current = param.pageNo;
         })
         .catch(err => {
-          this.borrowOutLoading=false;
+          this.borrowOutLoading = false;
           if (err && err.message) {
             this.$message.error(err.message);
           } else {
@@ -333,8 +339,12 @@ export default {
           }
         });
     },
-    borrowOutHandleTableChange() {
-      this.loadBorrowOutRecord();
+    borrowOutHandleTableChange(_pagination) {
+      let param = {
+        pageSize: _pagination.size,
+        pageNo: _pagination.current
+      };
+      this.loadBorrowOutRecord(param);
     },
     callback(key) {
       if (key == "borrow_in") {
