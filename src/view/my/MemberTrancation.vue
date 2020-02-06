@@ -1,5 +1,6 @@
 <template>
   <div>
+    <p style="color:red">换读双方确定收书后会将图书变更到对方名下</p>
     <a-table
       :columns="columns"
       :dataSource="data"
@@ -59,27 +60,26 @@ const columns = [
     dataIndex: "tagerBookName",
     key: "tagerBookName"
   },
-  // {
-  //   title: "对方ISBN",
-  //   dataIndex: "tagerBookIsbn",
-  //   key: "tagerBookIsbn"
-  // },
-
+  {
+    title:"对方物流",
+    dataIndex:"",
+    key:"11"
+  },
   {
     title: "你的书名",
     dataIndex: "selfBookName",
     key: "selfBookName"
   },
-  // {
-  //   title: "你书的ISBN",
-  //   dataIndex: "selfBookIsbn",
-  //   key: "selfBookIsbn"
-  // },
   {
-    title: "确认交换时间",
+    title: "创建时间",
     dataIndex: "createTime",
     key: "createTime",
     scopedSlots: { customRender: "createTime" }
+  },
+  {
+    title:"我的物流",
+    dataIndex:"",
+    key:"22"
   },
   {
     title: "操作",
