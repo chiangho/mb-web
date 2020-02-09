@@ -59,10 +59,10 @@ var Config = {
     topMenuCurrentKey: "topMenuCurrent",
     leftMenuCurrentKey: "leftMenuCurrent",
     userTokenCacheKey: "UserToken",
-    host: "http://127.0.0.1:9001",
-    webSocketHost: "ws://127.0.0.1:9001/websocket",
-    // host: "http://49.234.70.238:9001",
-    // webSocketHost: "ws://49.234.70.238:9001/websocket",
+    //host: "http://127.0.0.1:9001",
+    //webSocketHost: "ws://127.0.0.1:9001/websocket",
+    host: "http://49.234.70.238:9001",
+    webSocketHost: "ws://49.234.70.238:9001/websocket",
     unauthorized: "unauthorized",
     unauthorization: "unauthorization",
     simailWindowWidthSize: 600
@@ -124,8 +124,8 @@ const storeInfo = {
         },
         cleanUserDialogueData(state, userCode) {
             if (state.dialogueData[userCode]) {
-                if(state.dialogueData[userCode].data){
-                    state.dialogueData[userCode].data=[]
+                if (state.dialogueData[userCode].data) {
+                    state.dialogueData[userCode].data = []
                 }
             }
         },
@@ -398,7 +398,7 @@ const router = new VueRouter({
                         "auth": true,
                         "title": "借阅记录"
                     }
-                }, 
+                },
                 {
                     path: "manage_book",
                     component: MyManageBook,
