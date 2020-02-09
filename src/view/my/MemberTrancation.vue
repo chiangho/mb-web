@@ -12,10 +12,21 @@
     >
       <template slot="createTime" slot-scope="createTime">{{createTime | formatDate}}</template>
       <template slot="status" slot-scope="status">{{status | formatStatus}}</template>
+      <template slot="selfIsReceived" slot-scope="selfIsReceived">{{selfIsReceived | formatIsSelfReceived}}</template>
       <span slot="action" slot-scope="text, record">
-        <a @click="getLinkInfo(record.code)">对方联系方式</a>
-        <a-divider type="vertical" />
+        
         <a @click="openDialogue(record.tagerMemberCode)">对话</a>
+
+        <a-divider type="vertical" />
+        <a @click="registerLogistics(record.code)">登记物流</a>
+
+        <span v-if="record.selfIsReceived==0">
+          <a-divider type="vertical" />
+          <a @click="setSelfReceived(record.tagerMemberCode)">确认收书</a>
+        </span>
+
+
+
         <!-- <a-divider type="vertical" />
         <a @click="complaint(record.tagerMemberCode)">投诉对方</a>-->
       </span>
@@ -62,8 +73,13 @@ const columns = [
   },
   {
     title:"对方物流",
-    dataIndex:"",
-    key:"11"
+    dataIndex:"tagerLogisticsInfo",
+    key:"tagerLogisticsInfo"
+  },
+  {
+    title:"对方联系方式",
+    dataIndex:"tagerLinkInfo",
+    key:"tagerLinkInfo"
   },
   {
     title: "你的书名",
@@ -71,15 +87,21 @@ const columns = [
     key: "selfBookName"
   },
   {
+    title:"你受否收到图书",
+    dataIndex:"selfIsReceived",
+    key:"selfIsReceived",
+    scopedSlots: { customRender: "selfIsReceived" }
+  },
+  {
+    title:"我的物流",
+    dataIndex:"selfLogisticsInfo",
+    key:"selfLogisticsInfo"
+  },
+  {
     title: "创建时间",
     dataIndex: "createTime",
     key: "createTime",
     scopedSlots: { customRender: "createTime" }
-  },
-  {
-    title:"我的物流",
-    dataIndex:"",
-    key:"22"
   },
   {
     title: "操作",
@@ -122,12 +144,35 @@ export default {
     formatDate(time) {
       var date = new Date(time);
       return Common.formatDate(date, "yyyy-MM-dd hh:mm:ss");
+    },
+    formatIsSelfReceived(state){
+      if(state==1){
+        return "收到";
+      }
+      if(state==0){
+        return "未收到";
+      }
     }
   },
   mounted() {
     this.fetch();
   },
   methods: {
+    setSelfReceived(code){
+      http
+        .ajax("post", "transaction/set-member-received-state", { code: code }, null)
+        .then(() => {
+          this.$message.error("收书成功！");
+          this.fetch();
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          }else{
+            this.$message.error("操作异常");
+          }
+        });
+    },
     complaint(memberCode) {
       alert(memberCode);
     },
