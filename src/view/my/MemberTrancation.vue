@@ -8,13 +8,15 @@
       :rowKey="record=>record.code"
       :pagination="pagination"
       @change="handleTableChange"
-      :scroll="{ x: 1500 }"
+      :scroll="{ x: 2000 }"
     >
       <template slot="createTime" slot-scope="createTime">{{createTime | formatDate}}</template>
       <template slot="status" slot-scope="status">{{status | formatStatus}}</template>
-      <template slot="selfIsReceived" slot-scope="selfIsReceived">{{selfIsReceived | formatIsSelfReceived}}</template>
+      <template
+        slot="selfIsReceived"
+        slot-scope="selfIsReceived"
+      >{{selfIsReceived | formatIsSelfReceived}}</template>
       <span slot="action" slot-scope="text, record">
-        
         <a @click="openDialogue(record.tagerMemberCode)">对话</a>
 
         <a-divider type="vertical" />
@@ -22,10 +24,8 @@
 
         <span v-if="record.selfIsReceived==0">
           <a-divider type="vertical" />
-          <a @click="setSelfReceived(record.tagerMemberCode)">确认收书</a>
+          <a @click="setSelfReceived(record.code)">确认收书</a>
         </span>
-
-
 
         <!-- <a-divider type="vertical" />
         <a @click="complaint(record.tagerMemberCode)">投诉对方</a>-->
@@ -53,6 +53,29 @@
       <MyChat :tagMemberCode="targeMemberCode"></MyChat>
       <div slot="title">聊天</div>
     </a-modal>
+
+    <a-modal
+      tital="登记物流信息"
+      @ok="handleOkRegisterLogistics"
+      @cancel="handleCancelRegisterLogistics"
+      :visible="registerLogisticsVisible"
+      :destroyOnClose="true"
+      okText="确认"
+      cancelText="取消"
+    >
+      <div class="input-item">
+        <div class="lable">物流公司:</div>
+        <div class="input">
+          <a-input placeholder="请填写物流公司" v-model="logisticsCompany" />
+        </div>
+      </div>
+      <div class="input-item">
+        <div class="lable">物流单号:</div>
+        <div class="input">
+          <a-input placeholder="请填写物流单号" v-model="logisticsNumber" />
+        </div>
+      </div>
+    </a-modal>
   </div>
 </template>
 <script>
@@ -62,7 +85,7 @@ import MyChat from "./../../component/MyChat";
 
 const columns = [
   {
-    title: "换书单号",
+    title: "换读单号",
     dataIndex: "code",
     key: "code"
   },
@@ -72,14 +95,14 @@ const columns = [
     key: "tagerBookName"
   },
   {
-    title:"对方物流",
-    dataIndex:"tagerLogisticsInfo",
-    key:"tagerLogisticsInfo"
+    title: "对方物流",
+    dataIndex: "tagerLogisticsInfo",
+    key: "tagerLogisticsInfo"
   },
   {
-    title:"对方联系方式",
-    dataIndex:"tagerLinkInfo",
-    key:"tagerLinkInfo"
+    title: "对方联系方式",
+    dataIndex: "tagerLinkInfo",
+    key: "tagerLinkInfo"
   },
   {
     title: "你的书名",
@@ -87,15 +110,15 @@ const columns = [
     key: "selfBookName"
   },
   {
-    title:"你受否收到图书",
-    dataIndex:"selfIsReceived",
-    key:"selfIsReceived",
+    title: "收到图书",
+    dataIndex: "selfIsReceived",
+    key: "selfIsReceived",
     scopedSlots: { customRender: "selfIsReceived" }
   },
   {
-    title:"我的物流",
-    dataIndex:"selfLogisticsInfo",
-    key:"selfLogisticsInfo"
+    title: "我的物流",
+    dataIndex: "selfLogisticsInfo",
+    key: "selfLogisticsInfo"
   },
   {
     title: "创建时间",
@@ -108,13 +131,18 @@ const columns = [
     dataIndex: "action",
     key: "action",
     fixed: "right",
-    width: 200,
+    width: 220,
     scopedSlots: { customRender: "action" }
   }
 ];
 export default {
   data() {
     return {
+      registerLogisticsVisible: false,
+      logisticsCompany: null,
+      logisticsNumber: null,
+      editCode: null,
+
       memberInfo: "",
       memberLinkVisible: false,
 
@@ -145,11 +173,11 @@ export default {
       var date = new Date(time);
       return Common.formatDate(date, "yyyy-MM-dd hh:mm:ss");
     },
-    formatIsSelfReceived(state){
-      if(state==1){
+    formatIsSelfReceived(state) {
+      if (state == 1) {
         return "收到";
       }
-      if(state==0){
+      if (state == 0) {
         return "未收到";
       }
     }
@@ -158,9 +186,49 @@ export default {
     this.fetch();
   },
   methods: {
-    setSelfReceived(code){
+    registerLogistics(code) {
+      this.editCode = code;
+      this.registerLogisticsVisible = true;
+      this.logisticsCompany = null;
+      this.logisticsNumber = null;
+    },
+    handleOkRegisterLogistics() {
+      if(!this.logisticsCompany&&!this.logisticsNumber){
+        this.$message.error("请填写物流公司或者物流单号！")
+        return;
+      }
       http
-        .ajax("post", "transaction/set-member-received-state", { code: code }, null)
+        .fetchPost("transaction/register-logistics", {
+          company: this.logisticsCompany,
+          logisticsNumber: this.logisticsNumber,
+          code: this.editCode
+        })
+        .then(() => {
+          this.fetch();
+          this.editCode = null;
+          this.registerLogisticsVisible = false;
+          this.logisticsCompany = null;
+          this.logisticsNumber = null;
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          } else {
+            this.$message.error("异常");
+          }
+        });
+    },
+    handleCancelRegisterLogistics() {
+      this.registerLogisticsVisible = false;
+    },
+    setSelfReceived(code) {
+      http
+        .ajax(
+          "post",
+          "transaction/set-member-received-state",
+          { code: code },
+          null
+        )
         .then(() => {
           this.$message.error("收书成功！");
           this.fetch();
@@ -168,7 +236,7 @@ export default {
         .catch(err => {
           if (err && err.message) {
             this.$message.error(err.message);
-          }else{
+          } else {
             this.$message.error("操作异常");
           }
         });
@@ -240,3 +308,21 @@ export default {
   }
 };
 </script>
+<style scoped>
+.input-item {
+  margin:5px 0 0 10px;
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  padding: 10px;
+  
+}
+.input-item .lable { 
+  float: left;
+  width: 80px;
+}
+.input-item .input {
+  float: left;
+ width: 300px;
+}
+</style>
