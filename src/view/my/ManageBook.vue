@@ -2,6 +2,10 @@
   <div>
     <a-tabs defaultActiveKey="book" @change="callback">
       <a-tab-pane tab="图书管理" key="book">
+        <div class="ops">
+          <a-button type="primary" @click="addNewBook">添加</a-button>
+        </div>
+        <a-divider />
         <a-table
           :columns="bookColumns"
           :dataSource="bookData"
@@ -19,7 +23,11 @@
           <span slot="action" slot-scope="text, record">
             <a @click="setClassification(record.code)">修改分类</a>
             <a-divider type="vertical" />
-            <a @click="editBookIntroduction(record.code,record.introduction)">修改简介</a>
+            <a @click="editBookIntroduction(record.code)">修改</a>
+            <span v-if="record.state==0">
+              <a-divider type="vertical" />
+              <a @click="deleteBook(record.code)">删除</a>
+            </span>
           </span>
         </a-table>
       </a-tab-pane>
@@ -101,11 +109,17 @@
     >
       <a-textarea placeholder="请填写图书简介" :rows="4" v-model="bookIntroductionValue" />
     </a-modal>
+
+    <a-modal @cancel="closeEditBookWindow" :title="editBookTitle" v-model="editBookVisible" :footer="null" :destroyOnClose="true">
+      <EditInventory :callback="editBookCallBack" :code="modifyBookCode"></EditInventory>
+    </a-modal>
   </div>
 </template>
 <script>
 import Common from "./../../Common";
+import EditInventory from "./../../component/EditInventory";
 import http from "./../../Https";
+
 const bookColumns = [
   {
     title: "书名",
@@ -199,8 +213,15 @@ export default {
         current: 1,
         total: 0,
         showQuickJumper: false
-      }
+      },
+
+      //编辑或者修改图书
+      editBookTitle: null,
+      editBookVisible: false
     };
+  },
+  components: {
+    EditInventory
   },
   created() {
     this.loadBookList();
@@ -241,6 +262,47 @@ export default {
     }
   },
   methods: {
+    closeEditBookWindow(){
+      this.editBookTitle = "";
+      this.editBookVisible = false;
+      this.modifyBookCode = null;
+    },
+    editBookIntroduction(code) {
+      this.editBookTitle = "修改图书";
+      this.editBookVisible = true;
+      this.modifyBookCode = code;
+    },
+    addNewBook() {
+      this.editBookTitle = "添加图书";
+      this.editBookVisible = true;
+    },
+    editBookCallBack() {
+      this.editBookTitle = "";
+      this.editBookVisible = false;
+      this.loadBookList();
+    },
+    deleteBook(code) {
+      let _this = this;
+      this.$confirm({
+        title: "你确认删除吗?",
+        content: "确定删除此本图书将不可恢复。是否删除此本图书",
+        onOk() {
+          http
+            .ajax("delete", "inventory/delete", { code: code }, null)
+            .then(() => {
+              _this.loadBookList();
+            })
+            .catch(err => {
+              if (err && err.message) {
+                this.$message.error(err.message);
+              } else {
+                this.$message.error("删除异常");
+              }
+            });
+        },
+        onCancel() {}
+      });
+    },
     handleOkmodifyBook() {
       if (!this.bookIntroductionValue) {
         this.$message.error("请填写图书简介");
@@ -270,11 +332,7 @@ export default {
           }
         });
     },
-    editBookIntroduction(code, content) {
-      this.modifyBookVisible = true;
-      this.bookIntroductionValue = content;
-      this.modifyBookCode = code;
-    },
+
     handleOkSelectBookType() {
       if (!this.inputTreeValue) {
         this.$message.error("请选择图书分类");
@@ -475,10 +533,10 @@ export default {
     },
     bookHandleTableChange(_pagination) {
       // alert(JSON.stringify(_pagination));
-      let param={
-          pageSize:_pagination.size,
-          pageNo:_pagination.current
-      }
+      let param = {
+        pageSize: _pagination.size,
+        pageNo: _pagination.current
+      };
       this.loadBookList(param);
     },
     loadBookList(param = {}) {
@@ -496,7 +554,7 @@ export default {
           this.bookData = resp.data.items;
           let total = parseInt(resp.data.total);
           this.pagination.total = total;
-          this.pagination.current=param.pageNo;
+          this.pagination.current = param.pageNo;
         })
         .catch(err => {
           this.bookLoading = false;
@@ -569,5 +627,8 @@ export default {
   border-radius: 0px;
   text-align: center;
   cursor: pointer;
+}
+.ops {
+  text-align: right;
 }
 </style>
