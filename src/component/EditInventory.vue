@@ -3,14 +3,20 @@
     <a-spin :spinning="spinning" :tip="spinningTip">
       <a-form :form="form">
         <a-form-item label="图书条码" :label-col="{span:4}" :wrapper-col="{span:18}">
-          <a-input
+          <a-select
             v-decorator="[
           'isbn',
-          { rules: [{ required: false, message: '请填写图书条码!' }] },
+          { rules: [{ required: false, message: '请选择图书条码!' }] },
         ]"
-            placeholder="请填写图书条码"
-            @blur="finishIsbn"
-          ></a-input>
+            :loading="isLoadBookList"
+            @search="handleSearchBookSearch"
+            @change="handleSearchBookChange"
+            showSearch
+            notFoundContent="没有找到相应的图书"
+            placeholder="请选择条码"
+          >
+            <a-select-option v-for="book in books" :key="book">{{book}}</a-select-option>
+          </a-select>
         </a-form-item>
         <a-form-item label="图书名称" :label-col="{span:4}" :wrapper-col="{span:18}">
           <a-input
@@ -47,7 +53,7 @@
           ></a-textarea>
         </a-form-item>
         <a-form-item :wrapper-col="tailFormItemLayout.wrapperCol">
-          <a-button block type="primary">提交</a-button>
+          <a-button block type="primary" >提交</a-button>
         </a-form-item>
       </a-form>
     </a-spin>
@@ -70,6 +76,9 @@ const tailFormItemLayout = {
   }
 };
 
+let timeout;
+let currentValue;
+
 export default {
   name: "registered-book",
   data() {
@@ -80,7 +89,11 @@ export default {
       spinning: false,
       imagePath: null,
       imgSrc: null,
-      isShowImage: false
+      isShowImage: false,
+
+      //select isbn
+      isLoadBookList: false,
+      books: []
     };
   },
   props: {
@@ -127,7 +140,65 @@ export default {
     }
   },
   methods: {
-    finishIsbn() {},
+    handleSearchBookSearch(value) {
+      if (value.length >4) {
+        this.fetchIsbn(value, this.handleSearchBookChangeCallBack);
+      }
+    },
+    handleSearchBookChange(isbn) {
+      if(!isbn){
+        return;
+      }
+      //查询图书的信息
+      Http.fetchGet("book/detail", { isbn:isbn })
+        .then(resp => {
+          let data = resp.data;
+          this.form.setFieldsValue({
+            isbn: data.isbn,
+            name: data.name,
+            introduction: data.introduction
+          });
+          this.imgSrc = data.icon;
+          //设置显示图片
+          if (data.icon) {
+            this.isShowImage = true;
+            this.imagePath =
+              Common.Config.host + "/common/down-image?path=" + data.icon;
+          }
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          } else {
+            this.$message.error("异常");
+          }
+        });
+    },
+    handleSearchBookChangeCallBack(books) {
+      this.books = books;
+    },
+    fetchIsbn(value, callback) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      currentValue = value;
+      function fake() {
+        Http.fetchGet("book/search-isbn", { isbn: currentValue })
+          .then(resp => {
+            resp.data.push(currentValue);
+            callback(resp.data);
+          })
+          .catch(err => {
+            if (err && err.message) {
+              window.console.log(err.message);
+            } else {
+              window.console.log("查询图书库异常");
+            }
+          });
+      }
+      timeout = setTimeout(fake, 300);
+    },
     handleUpdateIcon(event) {
       this.imagePath = "";
       this.imgSrc = "";
