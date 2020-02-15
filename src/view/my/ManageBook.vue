@@ -321,7 +321,7 @@ export default {
           this.modifyBookVisible = false;
           this.bookIntroductionValue = null;
           this.modifyBookCode = null;
-          this.$message.error("设置成功！");
+          this.$message.success("设置成功！");
           this.loadBookList();
         })
         .catch(err => {
@@ -351,7 +351,7 @@ export default {
           this.selectBookTypeVisible = false;
           this.inputTreeValue = null;
           this.modifyBookCode = null;
-          this.$message.error("设置成功！");
+          this.$message.success("设置成功！");
           this.loadBookList();
         })
         .catch(err => {

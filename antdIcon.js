@@ -25,7 +25,14 @@ export {
     MinusSquareOutline,
     PlusSquareOutline,
     FileOutline,
-    QuestionCircleOutline
+    QuestionCircleOutline,
+    CheckCircleOutline,
+    CheckCircleFill,
+    CloseCircleFill,
+    CloseCircleOutline,
+    ExclamationCircleFill,
+    ExclamationCircleOutline
+
 
 }
 from '@ant-design/icons'

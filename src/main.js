@@ -46,6 +46,7 @@ import {
 Vue.config.productionTip = false;
 Vue.prototype.$message = message
 Vue.prototype.$confirm = Modal.confirm
+Vue.prototype.$success = Modal.success
 
 Vue.use(VueRouter)
 Vue.use(AMap);
@@ -96,7 +97,7 @@ function toEmotion(text, isNoGif) {
         return text;
     }
 
-    text = text.replace(/\[[\u4E00-\u9FA5]{1,3}\]/gi, function (word) {
+    text = text.replace(/\[[\u4E00-\u9FA5]{1,3}\]/gi, function(word) {
         var newWord = word.replace(/\[|\]/gi, '');
         var index = list.indexOf(newWord);
         var backgroundPositionX = -index * 24
@@ -121,7 +122,7 @@ function toEmotion(text, isNoGif) {
 
 
 Vue.directive('emotion', {
-    bind: function (el, binding) {
+    bind: function(el, binding) {
         el.innerHTML = toEmotion(binding.value)
     }
 });

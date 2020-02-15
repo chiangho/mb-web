@@ -1,16 +1,6 @@
 <template>
   <div>
     <a-form :form="form" @submit="handleSubmit">
-      <a-form-item v-bind="tailFormItemAlertLayout">
-        <a-alert
-          v-if="alertVisible"
-          :type="alertType"
-          :message="alertMessage"
-          closable
-          :afterClose="handleCloseAlert"
-        />
-      </a-form-item>
-
       <a-form-item v-bind="formItemLayout" label="邮箱">
         <a-input
           placeholder="邮箱"
@@ -126,7 +116,7 @@
       @cancel="handleCancel"
     >
       <p>
-        1、我们将保护你的注册隐私
+        1、我们将保护你的注册隐私。换读和借阅的地址信息将暴露出来，你是否接受？
         <br />2、换书过程请诚实守信
         <br />3、平台只提供换书信息发布和沟通的渠道。不负责线下的换书结果，但是如果发现用户有违诚实守信原则我们将封账号
         <br />4、你发布的图书必须符合中华人民共和国的相关法律法规。不得传播色情、暴力等内容
@@ -146,9 +136,6 @@ export default {
       confirmDirty: false,
       visible: false,
       confirmLoading: false,
-      alertVisible: false,
-      alertMessage: "",
-      alertType: "error",
       submitDisabled: false,
       formItemLayout: {
         labelCol: {
@@ -203,37 +190,33 @@ export default {
       this.form.setFieldsValue({ agreement: false });
     },
     handleSubmit(e) {
-      this.alertVisible = false;
-      this.alertMessage = "";
-      this.alertType = "error";
       let routerTemp = this.$router;
       e.preventDefault();
       this.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
           this.submitDisabled = true;
           Http.fetchPost("register", values)
-            .then(response => {
-              if (response.status === 200) {
-                this.$success({
-                  content: (
-                    <div>
-                      <p>您已经成功注册账号，请去登录吧</p>
-                    </div>
-                  ),
-                  onOk() {
-                    routerTemp.push("login");
-                  }
-                });
-              } else {
-                this.alertVisible = true;
-                this.alertMessage = response.error.message;
-              }
+            .then(() => {
+              this.$success({
+                content: (
+                  <div>
+                    <p>您已经成功注册账号，请去登录吧</p>
+                  </div>
+                ),
+                onOk() {
+                  routerTemp.push("login");
+                }
+              });
               this.submitDisabled = false;
             })
             .catch(err => {
-              this.alertVisible = true;
-              this.alertMessage = JSON.stringify(err);
               this.submitDisabled = false;
+              if (err && err.message) {
+                this.$message.error(err.message);
+              } else {
+                window.console.log(err);
+                this.$message.error("发生异常");
+              }
             });
         }
       });
@@ -258,38 +241,25 @@ export default {
       callback();
     },
     sentCaptchaToEmail() {
-      this.alertVisible = false;
-      this.alertMessage = "";
-      this.alertType = "error";
       let email = this.form.getFieldValue("email");
-      if (email) {
-        const params = {
-          email: email
-        };
-
-        Http.fetchPost("sent-register-code", params)
-          .then(response => {
-            if (response.status === 200) {
-              this.alertType = "success";
-              this.alertVisible = true;
-              this.alertMessage = "验证码已经发送到你的邮箱，请查收";
-            } else {
-              this.alertVisible = true;
-              this.alertMessage = response.error.message;
-            }
-          })
-          .catch(err => {
-            this.alertVisible = true;
-            this.alertMessage = JSON.stringify(err);
-          });
-      } else {
-        this.alertVisible = true;
-        this.alertMessage = "请填写注册邮箱";
+      if (!email) {
+        this.$message.success("请填写注册邮箱");
       }
-    },
-    handleCloseAlert() {
-      this.alertVisible = false;
-      this.alertMessage = "";
+      const params = {
+        email: email
+      };
+      Http.fetchPost("sent-register-code", params)
+        .then(() => {
+          this.$message.success("验证码已经发送到你的邮箱，请查收");
+        })
+        .catch(err => {
+          if (err && err.message) {
+            this.$message.error(err.message);
+          } else {
+            window.console.log(err);
+            this.$message.error("发生异常");
+          }
+        });
     }
   }
 };
