@@ -37,7 +37,7 @@
             placeholder="请上传图片"
             v-decorator="[
               'icon',
-              { rules: [{ required: true, message: '请上传图片!' }] },
+              { rules: [{ required: false, message: '请上传图片!' }] },
             ]"
           />
           <img v-if="isShowImage" :src="imagePath" />
@@ -53,7 +53,7 @@
           ></a-textarea>
         </a-form-item>
         <a-form-item :wrapper-col="tailFormItemLayout.wrapperCol">
-          <a-button block type="primary" >提交</a-button>
+          <a-button block type="primary" :disabled="submitDisabled" @click="save">提交</a-button>
         </a-form-item>
       </a-form>
     </a-spin>
@@ -93,7 +93,10 @@ export default {
 
       //select isbn
       isLoadBookList: false,
-      books: []
+      books: [],
+
+      // 提交按钮是否禁用
+      submitDisabled: false
     };
   },
   props: {
@@ -140,17 +143,51 @@ export default {
     }
   },
   methods: {
+    save() {
+      this.form.validateFieldsAndScroll((err, values) => {
+        let url = "";
+        if (this.code) {
+          url = "inventory/update";
+        } else {
+          url = "inventory/add";
+        }
+        if (!err) {
+          this.submitDisabled = true;
+          values.icon = this.imgSrc;
+          if (this.code) {
+            values.code = this.code;
+          }
+         
+          Http.ajax("post", url, null, values)
+            .then(() => {
+              this.submitDisabled = false;
+              this.$message.success("操作成功");
+              if (this.callback) {
+                this.callback();
+              }
+            })
+            .catch(err => {
+              this.submitDisabled = false;
+              if (err && err.message) {
+                this.$message.error(err.message);
+              } else {
+                this.$message.error("操作异常！");
+              }
+            });
+        }
+      });
+    },
     handleSearchBookSearch(value) {
-      if (value.length >4) {
+      if (value.length > 4) {
         this.fetchIsbn(value, this.handleSearchBookChangeCallBack);
       }
     },
     handleSearchBookChange(isbn) {
-      if(!isbn){
+      if (!isbn) {
         return;
       }
       //查询图书的信息
-      Http.fetchGet("book/detail", { isbn:isbn })
+      Http.fetchGet("book/detail", { isbn: isbn })
         .then(resp => {
           let data = resp.data;
           this.form.setFieldsValue({

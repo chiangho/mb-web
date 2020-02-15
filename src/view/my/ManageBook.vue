@@ -110,7 +110,13 @@
       <a-textarea placeholder="请填写图书简介" :rows="4" v-model="bookIntroductionValue" />
     </a-modal>
 
-    <a-modal @cancel="closeEditBookWindow" :title="editBookTitle" v-model="editBookVisible" :footer="null" :destroyOnClose="true">
+    <a-modal
+      @cancel="closeEditBookWindow"
+      :title="editBookTitle"
+      v-model="editBookVisible"
+      :footer="null"
+      :destroyOnClose="true"
+    >
       <EditInventory :callback="editBookCallBack" :code="modifyBookCode"></EditInventory>
     </a-modal>
   </div>
@@ -262,7 +268,7 @@ export default {
     }
   },
   methods: {
-    closeEditBookWindow(){
+    closeEditBookWindow() {
       this.editBookTitle = "";
       this.editBookVisible = false;
       this.modifyBookCode = null;
