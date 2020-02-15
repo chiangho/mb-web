@@ -14,6 +14,7 @@
             showSearch
             notFoundContent="没有找到相应的图书"
             placeholder="请选择条码"
+            :allowClear="true"
           >
             <a-select-option v-for="book in books" :key="book">{{book}}</a-select-option>
           </a-select>
@@ -143,6 +144,7 @@ export default {
     }
   },
   methods: {
+   
     save() {
       this.form.validateFieldsAndScroll((err, values) => {
         let url = "";
@@ -157,7 +159,7 @@ export default {
           if (this.code) {
             values.code = this.code;
           }
-         
+
           Http.ajax("post", url, null, values)
             .then(() => {
               this.submitDisabled = false;
@@ -182,6 +184,16 @@ export default {
         this.fetchIsbn(value, this.handleSearchBookChangeCallBack);
       }
     },
+    clearForm() {
+      this.form.setFieldsValue({
+        isbn: null,
+        name: null,
+        introduction: null
+      });
+      this.imgSrc = null;
+      this.isShowImage = false;
+      this.imagePath = "";
+    },
     handleSearchBookChange(isbn) {
       if (!isbn) {
         return;
@@ -189,18 +201,22 @@ export default {
       //查询图书的信息
       Http.fetchGet("book/detail", { isbn: isbn })
         .then(resp => {
-          let data = resp.data;
-          this.form.setFieldsValue({
-            isbn: data.isbn,
-            name: data.name,
-            introduction: data.introduction
-          });
-          this.imgSrc = data.icon;
-          //设置显示图片
-          if (data.icon) {
-            this.isShowImage = true;
-            this.imagePath =
-              Common.Config.host + "/common/down-image?path=" + data.icon;
+          if (resp.data) {
+            let data = resp.data;
+            this.form.setFieldsValue({
+              isbn: data.isbn,
+              name: data.name,
+              introduction: data.introduction
+            });
+            this.imgSrc = data.icon;
+            //设置显示图片
+            if (data.icon) {
+              this.isShowImage = true;
+              this.imagePath =
+                Common.Config.host + "/common/down-image?path=" + data.icon;
+            }
+          } else {
+            this.clearForm();
           }
         })
         .catch(err => {
